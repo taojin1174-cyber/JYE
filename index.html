@@ -14,6 +14,18 @@
   <div id="app"><p class="loading">正在打开行情跳动…</p></div>
   <div id="toast" role="status" aria-live="polite"></div>
   <dialog id="dialog" aria-labelledby="dialog-title"></dialog>
+  <script>
+    (() => {
+      function showRetry() {
+        if (!document.querySelector('#app .loading')) return;
+        document.getElementById('app').innerHTML = '<div class="error-panel"><h1>页面暂未加载完成</h1><p>请检查网络后重新打开。</p><button class="btn" id="retry-load">重新加载</button></div>';
+        document.getElementById('retry-load').addEventListener('click', () => location.reload());
+      }
+      window.addEventListener('error', showRetry, true);
+      window.addEventListener('unhandledrejection', showRetry);
+      setTimeout(showRetry, 20000);
+    })();
+  </script>
   <script type="module" src="./src/app.js"></script>
 </body>
 </html>

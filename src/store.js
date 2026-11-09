@@ -82,7 +82,7 @@ export const store = {
 async function mergeDiscovery() {
   data.leads=data.leads||[];
   try {
-    const response=await fetch(new URL('../data/discovery.json',import.meta.url),{cache:'no-store'});
+    const response=await fetch(new URL('../data/discovery.json',import.meta.url),{cache:'no-store',signal:AbortSignal.timeout(10000)});
     if(!response.ok)throw new Error('无法读取采集快照');
     const snapshot=await response.json();
     if(!Array.isArray(snapshot.items))throw new Error('采集快照格式错误');

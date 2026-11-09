@@ -18,5 +18,6 @@ async function bundle(path) {
 const entry=await bundle(resolve(root,'src/app.js'));
 let html=await readFile('index.html','utf8');
 html=html.replace('./favicon.svg',logo).replace('<link rel="stylesheet" href="./src/styles.css">',`<style>${await readFile('src/styles.css','utf8')}</style>`).replace('<script type="module" src="./src/app.js"></script>',`<script type="module">import '${entry}';</script>`);
+html=html.replace('<link rel="stylesheet" href="./src/settings.css">',`<style>${await readFile('src/settings.css','utf8')}</style>`);
 await mkdir('artifacts',{recursive:true});await writeFile('artifacts/行情跳动-离线体验.html',html);
 console.log('已生成 artifacts/行情跳动-离线体验.html，可直接用浏览器打开。');

@@ -1,0 +1,17 @@
+.settings-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.settings-unlock { max-width: 400px; margin: 42px auto 70px; padding: 28px; }
+.settings-unlock-icon { color: var(--green); margin-bottom: 15px; }
+.settings-unlock h2 { font-size: 18px; font-weight: 600; margin: 0 0 9px; }
+.settings-unlock > p { color: var(--muted); font-size: 12px; line-height: 1.8; margin: 0 0 20px; }
+.settings-unlock .btn { width: 100%; margin-top: 15px; min-height: 38px; }
+.settings-unlock > small { display: block; color: var(--muted); font-size: 10px; line-height: 1.7; margin-top: 17px; }
+@media (max-width: 760px) {
+  .settings-unlock { margin: 28px auto 50px; padding: 23px; }
+  .settings-tabs { margin-bottom: 16px; }
+}

@@ -1,0 +1,7 @@
+{
+  "sources": [
+    {"id":"roujiaosuo","name":"肉交所","url":"https://www.roujiaosuo.com/","adapter":"roujiaosuo","kind":"supply","enabled":true,"limit":48},
+    {"id":"cnfowl","name":"禽网 CNFOWL","url":"https://www.cnfowl.com/","adapter":"cnfowl","kind":"market","enabled":true,"limit":30},
+    {"id":"nahs","name":"全国畜牧总站","url":"https://www.nahs.org.cn/jcyj/","adapter":"nahs","kind":"macro","enabled":true,"limit":12}
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "sources": [
+    {
+      "id": "replace-with-real-source",
+      "name": "你的授权行情接口",
+      "enabled": false,
+      "url": "https://example.com/authorized-price-feed.json",
+      "format": "json",
+      "recordsPath": "data.quotes",
+      "headersEnv": "PRICE_FEED_HEADERS",
+      "mapping": {
+        "external_id": "id",
+        "supplier": "supplier_name",
+        "province": "province",
+        "city": "city",
+        "price": "price",
+        "unit": "unit",
+        "quoted_on": "date",
+        "valid_until": "valid_until",
+        "source_url": "url"
+      },
+      "defaults": {
+        "product_id": "chicken-fresh",
+        "basis": "factory",
+        "unit": "kg"
+      }
+    }
+  ]
+}

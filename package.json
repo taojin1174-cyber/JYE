@@ -1,0 +1,14 @@
+{
+  "name": "hangqing-tiaodong",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "collect": "node scripts/collect.mjs",
+    "discover": "node scripts/discovery.mjs"
+  },
+  "engines": { "node": ">=22" }
+}

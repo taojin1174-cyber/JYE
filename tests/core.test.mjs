@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import { normalizePrice,latestQuotes,summarize,trend,validateQuote,shiftDay,dayString,csvCell } from '../src/core.js';
 import { parseCSV,mapRecord } from '../scripts/collect.mjs';
 import { parseDiscovery } from '../scripts/discovery.mjs';
+import { matchesLeadCategory } from '../src/core.js';
+test('核价筛选跨来源包含多品类标题，未采集到的鹅信息不虚构',()=>{
+ assert.equal(matchesLeadCategory({category:'鸡',title:'鸡鸭鹅价格参考'},'鹅'),true);
+ assert.equal(matchesLeadCategory({category:'鹅',title:'今日供货'},'鹅'),true);
+ assert.equal(matchesLeadCategory({category:'鸡',title:'鸡腿报价'},'鹅'),false);
+});
 const products=[{id:'a',category:'鸡'},{id:'b',category:'鸡'}];
 const quote=(extra={})=>({id:'q',product_id:'a',supplier:'供应商甲',province:'山东',price:10,basis:'factory',source:'manual',status:'approved',quoted_on:'2026-11-09',valid_until:'2026-11-11',created_at:'2026-11-09T08:00:00Z',...extra});
 const opts={productId:'a',day:'2026-11-09',days:7,basis:'factory'};

@@ -13,6 +13,9 @@ export function normalizePrice(price, unit) {
   return Math.round(n * ({ kg:1, jin:2, ton:0.001 }[unit]) * 10000) / 10000;
 }
 export const money = value => value == null ? '—' : Number(value).toFixed(2);
+export function matchesLeadCategory(lead,category) {
+  return !category || lead.category===category || String(lead.title||'').includes(category);
+}
 export function isValidQuote(q, day = dayString()) {
   return !q.deleted_at && q.status === 'approved' && q.quoted_on <= day && q.valid_until >= day && Number.isFinite(Number(q.price)) && Number(q.price) > 0;
 }

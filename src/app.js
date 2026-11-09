@@ -1,4 +1,5 @@
 import { dayString, shiftDay, provinces, bases, statuses, money, normalizePrice, latestQuotes, summarize, trend, validateQuote, csvCell, isValidQuote, matchesLeadCategory } from './core.js';
+import { filterExport } from './export-filter.js';
 import { store } from './store.js';
 import { sourceCatalog,sourceKinds } from './sources.js';
 import { createSettingsAccess } from './settings-access.js';
@@ -161,6 +162,44 @@ function productForm() {
 function download(text,name,type='text/csv;charset=utf-8') {
  const url=URL.createObjectURL(new Blob([text],{type})); const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+function exportForm() {
+ if(!settingsAccess.isUnlocked())return;
+ const initialType=state.settingsView==='sources'?'leads':'quotes';
+ showDialog(dialogHead('筛选导出','按所选条件导出 CSV，可用 Excel 打开。日期按报价日或原文发布日期筛选。')+`<form id="export-form"><div class="form-body"><p class="form-error" role="alert"></p><div class="form-grid">${field('数据类型',`<select name="type" aria-label="导出数据类型">${options([['quotes','供货报价'],['leads','自动采集线索']],initialType)}</select>`)}${field('品类',`<select name="category" aria-label="导出品类">${options([...new Set([...categories(),'牛',...(data.leads||[]).map(l=>l.category).filter(Boolean)])],state.leadCategory,'全部品类')}</select>`)}<div class="full" id="export-quote-filters"><div class="form-grid">${field('产品 / 规格','<select name="product" aria-label="导出产品规格"></select>')}${field('省份',`<select name="province" aria-label="导出省份">${options(provinces,'','全部省份')}</select>`)}${field('审核状态',`<select name="status" aria-label="导出审核状态">${options(Object.entries(statuses),'','全部状态')}</select>`)}${field('报价来源',`<select name="source" aria-label="导出报价来源">${options([['manual','人工询价'],['engine','引擎采集']],'','全部来源')}</select>`)}</div></div>${field('开始日期','<input name="from" aria-label="导出开始日期" type="date">')}${field('结束日期','<input name="to" aria-label="导出结束日期" type="date">')}<p class="subtle full" id="export-count" role="status"></p></div></div><div class="dialog-foot"><button class="btn" type="button" data-action="close">取消</button><button class="btn primary" type="submit">导出 CSV</button></div></form>`);
+ const form=dialog.querySelector('#export-form');
+ const update=(resetProduct=false)=>{
+  const fields=Object.fromEntries(new FormData(form));
+  const quoteFields=form.querySelector('#export-quote-filters');
+  quoteFields.hidden=fields.type==='leads';
+  for(const input of quoteFields.querySelectorAll('select'))input.disabled=fields.type==='leads';
+  const select=form.elements.product;
+  const previous=resetProduct?'':select.value;
+  select.innerHTML=options(data.products.filter(p=>!fields.category||p.category===fields.category).map(p=>[p.id,productLabel(p)]),previous,'全部产品规格');
+  const current=Object.fromEntries(new FormData(form));
+  const count=form.querySelector('#export-count');
+  try{const n=filterExport(data,current).length;count.textContent=`符合条件：${n} 条${current.type==='leads'?'；设置日期时不含日期待核实的线索':'；包含所选状态的历史报价，不做均价去重'}`;
+   form.querySelector('[type=submit]').disabled=!n;form.querySelector('.form-error').textContent='';
+  }catch(error){count.textContent='';form.querySelector('.form-error').textContent=error.message;form.querySelector('[type=submit]').disabled=true;}
+ };
+ form.addEventListener('change',event=>update(event.target.name==='category'));
+ update();
+}
+function exportSelected(fields) {
+ if(!settingsAccess.isUnlocked())throw new Error('请先解锁数据设置');
+ const records=filterExport(data,fields);
+ if(!records.length)throw new Error('当前筛选没有可导出的记录');
+ let header,rows;
+ if(fields.type==='leads'){
+  header=['品类','来源','类型','标题','原始标价','地区','原文日期','链接','处理状态'];
+  const labels={new:'待核对',converted:'已转为报价',dismissed:'已忽略'};
+  rows=records.map(l=>[l.category,l.source_name,sourceKinds[l.kind],l.title,l.price_text,l.region_text,l.published_on,l.url,labels[l.status]||l.status]);
+ }else{
+  header=['品类','产品','状态','规格','供应商','省份','城市','供货价（元/kg）','报价口径','运费（元/kg）','起订量','报价日期','有效至','来源方式','来源名称','原始链接','审核状态','备注'];
+  rows=records.map(q=>{const p=product(q.product_id);return [p?.category,p?.name,p?.state,p?.spec,q.supplier,q.province,q.city,q.price,bases[q.basis],q.freight,q.min_order,q.quoted_on,q.valid_until,q.source==='engine'?'引擎采集':'人工询价',q.source_name,q.source_url,statuses[q.status],q.notes];});
+ }
+ download('\uFEFF'+[header,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n'),`行情跳动-${fields.type==='leads'?'采集线索':'供货报价'}-${fields.category||'全部品类'}-${dayString()}.csv`);
+ dialog.close();toast(`已导出 ${records.length} 条记录`);
+}
 function exportData() {
  let rows,header;
  if(state.page==='settings' && state.settingsView==='sources') {
@@ -203,7 +242,7 @@ document.addEventListener('click',event=>{
  if(action==='lock-settings'){settingsAccess.lock();render();toast('数据设置已锁定');}
  if(action==='add')quoteForm();
  if(action==='add-product')productForm();
- if(action==='export')exportData();
+ if(action==='export'){if(state.page==='settings')exportForm();else exportData();}
  if(action==='backup')download(store.backup(),`行情跳动-完整备份-${dayString()}.json`,'application/json');
  if(action==='account')toast(`${store.cloud?(store.user?.email||'团队账号'):'本机记录模式'} · ${({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role]}`);
  if(action==='reset-filters')changeValue({category:'',product:'',province:'',source:'',search:'',basis:'factory',days:7,sort:'price'});
@@ -228,6 +267,7 @@ document.addEventListener('submit',event=>{
    if(!await settingsAccess.unlock(password)) {form.querySelector('input').focus();throw new Error('密码不正确，请重新输入');}
    render();
   }
+  if(form.id==='export-form')exportSelected(fields);
   if(form.id==='quote-form') {
    const old=data.quotes.find(q=>q.id===form.dataset.id);
    let customProduct;

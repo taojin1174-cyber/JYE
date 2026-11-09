@@ -1,0 +1,3 @@
+[functions.account-admin]
+# 函数内通过 Auth /user 验证真实访问令牌，并查询有效成员与管理员权限。
+verify_jwt = false

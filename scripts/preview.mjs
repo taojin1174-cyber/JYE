@@ -8,7 +8,7 @@ const cache=new Map();
 async function bundle(path) {
  if(cache.has(path))return cache.get(path);
  let code=await readFile(path,'utf8');
- if(path===resolve(root,'config.js'))code="export const config={supabaseUrl:'',supabaseKey:''};";
+ if(path===resolve(root,'config.js'))code="export const config={supabaseUrl:'',supabaseKey:'',allowDemo:true};";
  if(path===resolve(root,'src/store.js'))code=code.replace("await fetch(new URL('../data/discovery.json',import.meta.url),{cache:'no-store',signal:AbortSignal.timeout(10000)})",`({ok:true,json:async()=>(${JSON.stringify(snapshot)})})`);
  code=code.replaceAll('./favicon.svg',logo);
  const deps=[...code.matchAll(/from\s+(['"])(\.[^'"]+)\1/g)];

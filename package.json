@@ -11,5 +11,10 @@
     "discover": "node scripts/discovery.mjs",
     "preview:offline": "node scripts/preview.mjs"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15"
+  }
 }

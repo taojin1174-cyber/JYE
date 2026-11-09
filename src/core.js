@@ -14,7 +14,7 @@ export function normalizePrice(price, unit) {
 }
 export const money = value => value == null ? '—' : Number(value).toFixed(2);
 export function isValidQuote(q, day = dayString()) {
-  return q.status === 'approved' && q.quoted_on <= day && q.valid_until >= day && Number.isFinite(Number(q.price)) && Number(q.price) > 0;
+  return !q.deleted_at && q.status === 'approved' && q.quoted_on <= day && q.valid_until >= day && Number.isFinite(Number(q.price)) && Number(q.price) > 0;
 }
 export function latestQuotes(quotes, {day = dayString(), days = 7, productId = '', category = '', products = [], province = '', basis = 'factory', source = ''} = {}) {
   const start = shiftDay(day, -(days - 1));

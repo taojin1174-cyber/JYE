@@ -33,6 +33,7 @@ jobs:
             fi
           fi
       # GITHUB_TOKEN 推送不会触发另一个 push 工作流，因此在此明确构建与发布。
+      - run: npm ci
       - run: npm test
       - run: npm run build
       - uses: actions/upload-artifact@v4

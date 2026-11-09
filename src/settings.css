@@ -5,6 +5,8 @@
   gap: 12px;
   margin-bottom: 20px;
 }
+.lead-actions { flex-wrap: wrap; align-items: center; }
+.lead-origin { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 25px; background: #f1f7f3; font-size: 11px; color: #627b69; }
 .settings-unlock { max-width: 400px; margin: 42px auto 70px; padding: 28px; }
 .settings-unlock-icon { color: var(--green); margin-bottom: 15px; }
 .settings-unlock h2 { font-size: 18px; font-weight: 600; margin: 0 0 9px; }

@@ -8,7 +8,8 @@
     "test": "node --test tests/*.test.mjs",
     "build": "node scripts/build.mjs",
     "collect": "node scripts/collect.mjs",
-    "discover": "node scripts/discovery.mjs"
+    "discover": "node scripts/discovery.mjs",
+    "preview:offline": "node scripts/preview.mjs"
   },
   "engines": { "node": ">=22" }
 }

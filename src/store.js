@@ -3,7 +3,14 @@ import { createDemo,defaultProducts } from './demo.js';
 import { can,canEditQuote,canReviewQuote,canRequestDeletion,defaultPermissions } from './permissions.js';
 
 // v2：上线前清空旧的本机录入数据（含混入的苗价报价）。旧键 v1 仍留在浏览器里，需要时可用控制台恢复。
-const DATA_KEY=config.localTrial?'hqt-trial-data-v2':'hqt-data-v2', SESSION_KEY='hqt-session-v1';
+const DATA_KEY=config.localTrial?'hqt-trial-data-v2':'hqt-data-v2', SESSION_KEY='hqt-session-v1', PREFS_KEY='hqt-prefs-v1';
+// 品类停用 / 删除属于本机显示偏好，随完整备份一起导出，换设备导入后保持一致。
+function readPrefs(){
+ let raw={};try{raw=JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');}catch{}
+ const names=value=>Array.isArray(value)?[...new Set(value.filter(x=>typeof x==='string'&&x.trim()))]:[];
+ return {disabledCategories:names(raw.disabledCategories),deletedCategories:names(raw.deletedCategories)};
+}
+function writePrefs(prefs){try{localStorage.setItem(PREFS_KEY,JSON.stringify(prefs));}catch{throw new Error('本机偏好保存失败，请检查浏览器存储');}}
 const cloud=Boolean(config.supabaseUrl&&config.supabaseKey);
 const mutableFields=['product_id','supplier','province','city','price','basis','source','source_name','source_url','quoted_on','valid_until','min_order','freight','notes','status'];
 // 发布快照把出处编码进 ref，运行时还原；静态文件本身不含明文网址 / 渠道名。
@@ -85,9 +92,85 @@ export const store={
   },
   async addProduct(product){requireAdmin();if(cloud){await request('/rest/v1/products',{method:'POST',body:product});return this.reload();}const next=structuredClone(data);next.products.push(product);persist(next);return viewData();},
   async dismissLead(id){requireAdmin();if(cloud){await request(`/rest/v1/collection_items?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',body:{status:'dismissed'}});return this.reload();}const next=structuredClone(data);const lead=next.leads.find(l=>l.id===id);if(!lead)throw new Error('线索不存在');lead.status='dismissed';persist(next);return viewData();},
+  // 已处理线索：恢复待审 / 删除 / 撤销入库。云端状态受 check 约束，删除退化为 dismissed。
+  async setLeadStatus(id,status){
+   requireAdmin();
+   const allowed=['pending','converted','dismissed',...(cloud?[]:['deleted'])];
+   if(!allowed.includes(status))throw new Error('线索状态无效');
+   if(cloud){await request(`/rest/v1/collection_items?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',body:{status}});return this.reload();}
+   const next=structuredClone(data);const lead=next.leads.find(l=>l.id===id);
+   if(!lead)throw new Error('线索不存在');
+   lead.status=status;persist(next);return viewData();
+  },
+  async deleteLead(id){return this.setLeadStatus(id,cloud?'dismissed':'deleted');},
+  async undoLeadQuote(leadId){
+   requireAdmin();
+   const quote=data.quotes.find(q=>q.collection_item_id===leadId);
+   if(!quote)throw new Error('没有找到该线索生成的报价');
+   if(cloud){
+    await request(`/rest/v1/quotes?id=eq.${encodeURIComponent(quote.id)}`,{method:'DELETE'});
+    await request(`/rest/v1/collection_items?id=eq.${encodeURIComponent(leadId)}`,{method:'PATCH',body:{status:'pending'}});
+    return this.reload();
+   }
+   const next=structuredClone(data);
+   next.quotes=next.quotes.filter(q=>q.id!==quote.id);
+   const lead=next.leads.find(l=>l.id===leadId);if(lead)lead.status='pending';
+   localAudit(next,'quote_undone',quote.id,{lead_id:leadId});persist(next);return viewData();
+  },
+  async toggleCategory(category,disabled){
+   requireAdmin();const name=String(category||'').trim();if(!name)throw new Error('品类名称无效');
+   const prefs=readPrefs();const set=new Set(prefs.disabledCategories);
+   if(disabled)set.add(name);else set.delete(name);
+   prefs.disabledCategories=[...set];writePrefs(prefs);return viewData();
+  },
+  async renameCategory(from,to){
+   requireAdmin();const name=String(to||'').trim();
+   if(!name||name.length>20)throw new Error('品类名称需为 1–20 个字');
+   if(name===from)return viewData();
+   if(data.products.some(p=>p.category===name))throw new Error('该品类名称已存在，避免把两个品类合并');
+   if(cloud){await request(`/rest/v1/products?category=eq.${encodeURIComponent(from)}`,{method:'PATCH',body:{category:name}});return this.reload();}
+   const next=structuredClone(data);for(const p of next.products)if(p.category===from)p.category=name;
+   const prefs=readPrefs();
+   prefs.disabledCategories=prefs.disabledCategories.map(c=>c===from?name:c);
+   prefs.deletedCategories=prefs.deletedCategories.map(c=>c===from?name:c);
+   writePrefs(prefs);persist(next);return viewData();
+  },
+  async deleteCategory(category){
+   requireAdmin();const name=String(category||'').trim();if(!name)throw new Error('品类名称无效');
+   const ids=new Set(data.products.filter(p=>p.category===name).map(p=>p.id));
+   if(data.quotes.some(q=>ids.has(q.product_id)))throw new Error('该品类已有报价，请先在报价审核处理，或改用「停用」');
+   if(cloud)await request(`/rest/v1/products?category=eq.${encodeURIComponent(name)}`,{method:'DELETE'});
+   else{const next=structuredClone(data);next.products=next.products.filter(p=>p.category!==name);persist(next);}
+   const prefs=readPrefs();
+   prefs.disabledCategories=prefs.disabledCategories.filter(c=>c!==name);
+   if(!prefs.deletedCategories.includes(name))prefs.deletedCategories.push(name);
+   writePrefs(prefs);
+   return cloud?this.reload():viewData();
+  },
+  async restoreCategory(category){
+   requireAdmin();const name=String(category||'').trim();if(!name)throw new Error('品类名称无效');
+   const prefs=readPrefs();
+   prefs.disabledCategories=prefs.disabledCategories.filter(c=>c!==name);
+   prefs.deletedCategories=prefs.deletedCategories.filter(c=>c!==name);
+   writePrefs(prefs);return viewData();
+  },
+  // 本机数据跨设备搬运：导出完整备份 → 在另一台设备导入（覆盖该设备数据）。
+  async importBackup(text){
+   requireAdmin();
+   if(cloud)throw new Error('共享数据库模式请在服务端导入，不要用本机备份覆盖');
+   let raw;try{raw=JSON.parse(String(text));}catch{throw new Error('备份文件不是有效的 JSON');}
+   if(!raw||!Array.isArray(raw.products)||!Array.isArray(raw.quotes))throw new Error('备份内容缺少产品库或报价数据');
+   const clean={products:raw.products,quotes:raw.quotes,leads:Array.isArray(raw.leads)?raw.leads:[],deletionRequests:Array.isArray(raw.deletionRequests)?raw.deletionRequests:[],audit:Array.isArray(raw.audit)?raw.audit:[]};
+   if(raw.prefs){const prefs=readPrefs();const names=v=>Array.isArray(v)?[...new Set(v.filter(x=>typeof x==='string'))]:null;
+    prefs.disabledCategories=names(raw.prefs.disabledCategories)??prefs.disabledCategories;
+    prefs.deletedCategories=names(raw.prefs.deletedCategories)??prefs.deletedCategories;
+    writePrefs(prefs);}
+   localStorage.setItem(DATA_KEY,JSON.stringify(clean));
+   return this.init();
+  },
   async members(){requireAdmin();return cloud?request('/rest/v1/members?select=*&order=created_at.asc'):structuredClone(demoMembers);},
   async accountAction(action,fields){if(!cloud)throw new Error('当前为本机演示，请先连接团队数据库后管理员工账号');if(action!=='change_password')requireAdmin();return request('/functions/v1/account-admin',{method:'POST',body:{...fields,action}});},
-  backup(){return JSON.stringify({version:2,exported_at:new Date().toISOString(),...data},null,2);},
+  backup(){return JSON.stringify({version:3,exported_at:new Date().toISOString(),...data,prefs:readPrefs()},null,2);},
 };
 function requireAdmin(){if(store.role!=='admin'||store.member?.active===false||store.requiresPasswordChange)throw new Error('需要有效管理员权限');}
 function checkReason(reason){if(typeof reason!=='string'||reason.trim().length<4||reason.length>500)throw new Error('请填写 4–500 字原因');}
@@ -105,6 +188,6 @@ async function request(path,{method='GET',body,headers={},anonymous=false}={}){
 }
 
 function viewData(){
- if(cloud||store.role==='admin')return data;
- return {...data,quotes:data.quotes.filter(q=>!q.deleted_at&&(q.status==='approved'||q.created_by===store.member.id||can(store.member,'can_review_quotes'))),deletionRequests:data.deletionRequests.filter(r=>r.requested_by===store.member.id),audit:[],members:[store.member]};
+ const base=cloud||store.role==='admin'?data:{...data,quotes:data.quotes.filter(q=>!q.deleted_at&&(q.status==='approved'||q.created_by===store.member.id||can(store.member,'can_review_quotes'))),deletionRequests:data.deletionRequests.filter(r=>r.requested_by===store.member.id),audit:[],members:[store.member]};
+ return {...base,prefs:readPrefs()};
 }

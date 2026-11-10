@@ -2,7 +2,11 @@
 export const sourceKinds={supply:'供货线索',market:'市场行情',macro:'宏观参考'};
 export const sourceCatalog=[
  {id:'roujiaosuo',name:'肉交所',url:'https://www.roujiaosuo.com/',kind:'supply',scope:'猪 / 鸡 / 鸭 / 羊 / 牛冻品',status:'公开列表已适配',note:'提取产品、标价、仓库地区及更新日；规格、供应商和税运条件必须人工核实。'},
- {id:'cnfowl',name:'禽网 CNFOWL',url:'https://www.cnfowl.com/',kind:'market',scope:'鸡 / 鸭 / 鹅 / 猪 / 禽蛋',status:'公开目录已适配',note:'保留行情标题、日期和原文链接；毛禽、白条、冻品口径分开。'},
+ {id:'cnfowl_rouji',name:'禽网 · 肉鸡行情',url:'https://www.cnfowl.com/quote/list-22.html',kind:'market',scope:'鸡苗 / 毛鸡（817、白羽、麻鸡、黄花公）',status:'价格表已适配',note:'每日《全国肉鸡（鸡苗、毛鸡）参考价格》，按省区取价；苗价元/羽不折算，毛鸡元/斤折算元/公斤。'},
+ {id:'cnfowl_rouya',name:'禽网 · 肉鸭行情',url:'https://www.cnfowl.com/quote/list-22.html',kind:'market',scope:'鸭苗 / 毛鸭（樱桃谷、麻鸭、骡鸭、白番）',status:'价格表已适配',note:'每日《全国肉鸭（鸭苗、毛鸭）参考价格》，分北方冻品区、中部半活禽区、南部活禽区。'},
+ {id:'cnfowl_baotiao',name:'禽网 · 白条鸡批发',url:'https://www.cnfowl.com/quote/list-24.html',kind:'market',scope:'全国主要批发市场白条鸡',status:'价格表已适配',note:'逐市场当日价与前一日价，单位元/公斤，可对照本地批发市场。'},
+ {id:'cnfowl_shixing',name:'禽网 · 石兴鹅价',url:'https://www.cnfowl.com/offer/',kind:'market',scope:'鹅 / 鸡 / 鸽（广东主产区）',status:'日报已适配',note:'每日石兴鹅苗价与毛鹅价（清远、江门、高要、阳江、白沙、惠州）；鹅苗元/只不折算。'},
+ {id:'cnfowl',name:'禽网 CNFOWL',url:'https://www.cnfowl.com/',kind:'market',scope:'鸡 / 鸭 / 鹅 / 猪 / 禽蛋',status:'公开目录已适配',note:'仅保留行情标题、日期和原文链接，作为价格表未覆盖栏目（蛋禽、淘汰禽）的线索。'},
  {id:'nahs',name:'全国畜牧总站',url:'https://www.nahs.org.cn/jcyj/',kind:'macro',scope:'畜产品 / 鸡肉 / 牛羊肉',status:'公开目录已适配',note:'集贸市场监测与周度参考，独立查看，不作为供应商供货价。'},
  {id:'cnhnb',name:'惠农网',url:'https://www.cnhnb.com/',kind:'supply',scope:'禽畜 / 肉蛋 / 活禽',status:'已核验首页 · 待适配',note:'有供应大厅和行情大厅；需区分商家报价与平台行情。'},
  {id:'ckexc',name:'鸡网 CKEXC',url:'https://www.ckexc.com/',kind:'market',scope:'鸡苗 / 毛鸡 / 白条鸡 / 鸡蛋',status:'已核验首页 · 待适配',note:'可见白条鸡发价、鸡苗毛鸡等分类，具体页面另行核验。'},

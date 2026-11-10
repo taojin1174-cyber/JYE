@@ -8,3 +8,21 @@
 .lead-tabs{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)}.lead-title{max-width:380px;white-space:normal;line-height:1.7}.lead-note{max-width:360px;line-height:1.7}.source-notes{white-space:normal;max-width:410px;font-size:11px;color:#7b887f;line-height:1.8}.nav{gap:23px}.chart-wrap{min-width:0}.panel-head select{max-width:65%}
 @media(max-width:1000px){.nav{gap:15px}.topbar{gap:25px}.top-actions .mode{display:none}}
 @media(max-width:760px){.nav{gap:0}.nav button{font-size:11px}.brand strong{font-size:17px}.lead-tabs{padding:12px;flex-wrap:wrap}.lead-title{min-width:220px}.source-notes{min-width:230px}.panel-head{flex-wrap:wrap}.panel-head select{max-width:100%}.panel-head .segmented{flex-wrap:wrap}.panel-head .segmented button{padding:6px 9px}.summary-strip{min-width:0}.summary-item{min-width:0}}
+/* 外部行情参考：只读展示公开行情价，紧凑三列，不参与均价 */
+.market-panel .panel-head{align-items:center}
+.market-meta{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);white-space:nowrap}
+.market-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.market-col{background:#fff;padding:13px 15px 14px}
+.market-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.market-head strong{font-size:19px;letter-spacing:.2px;color:#1c2b24}
+.market-head small{font-size:10px;color:var(--muted)}
+.market-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.market-col li{display:flex;gap:10px;align-items:baseline;justify-content:space-between;font-size:12px;border-bottom:1px dashed #eef1ef;padding-bottom:5px}
+.market-col li:last-child{border-bottom:0;padding-bottom:0}
+.market-col li span{color:#4c5a53;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.market-col li em{font-style:normal;color:var(--green);font-weight:600;flex-shrink:0}
+.market-foot{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:9px}
+.market-stages{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#4c5a53;margin:-2px 0 8px}
+.market-stages span{background:#f4f7f5;border-radius:3px;padding:2px 7px}
+.market-stages i{font-style:normal;color:var(--muted);margin-left:4px}
+@media(max-width:760px){.market-grid{grid-template-columns:1fr 1fr}.market-head strong{font-size:17px}.market-meta{width:100%;margin-left:0}}

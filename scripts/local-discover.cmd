@@ -30,7 +30,7 @@ if errorlevel 1 (
 git push origin main
 if errorlevel 1 (
   echo     Push failed, retrying in 5s...
-  timeout /t 5 /nobreak >nul
+  ping -n 6 127.0.0.1 >nul
   git push origin main
 )
 if errorlevel 1 echo     Push still failed. Check network or credentials.

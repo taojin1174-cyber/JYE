@@ -1,0 +1,6 @@
+# 采集快照是程序生成的数据文件，禁止做 CRLF 转换，
+# 否则每次 checkout 后工作区与索引不一致，日常脚本会在 pull 时报 "unstaged changes"。
+data/discovery.json -text
+
+# Windows 批处理必须保持 CRLF 原样，不做任何换行转换。
+*.cmd -text

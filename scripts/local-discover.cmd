@@ -1,24 +1,42 @@
 @echo off
-chcp 65001 >nul
 setlocal
+rem Clear proxy vars: a proxy makes GitHub return "CONNECT tunnel failed: 502".
+set "HTTP_PROXY="
+set "HTTPS_PROXY="
+set "http_proxy="
+set "https_proxy="
 cd /d "%~dp0.."
 
-echo [1/3] 采集公开行情（禽网 / 肉交所 / 畜牧总站）...
+echo [1/4] Collect public price leads...
 node scripts/discovery.mjs
-if errorlevel 1 echo     有来源本次未取到数据，可继续提交可用部分。
+if errorlevel 1 echo     Some sources failed, continuing with available data.
 
-echo [2/3] 检查快照是否有变化...
-git add data/discovery.json
+echo [2/4] Check snapshot changes...
+git add -A
 git diff --cached --quiet
 if not errorlevel 1 goto nochange
 
-echo [3/3] 提交并推送，GitHub Actions 会自动构建发布...
-git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Update public price leads (local run)"
+echo [3/4] Commit local snapshot...
+git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Update public price leads (local run)"
+
+echo [4/4] Sync with remote then push...
+git pull --rebase origin main
+if errorlevel 1 (
+  echo     Rebase conflict: keep the freshly collected snapshot...
+  git checkout --theirs data/discovery.json
+  git add data/discovery.json
+  git -c core.editor=true rebase --continue
+)
 git push origin main
-if errorlevel 1 echo     推送失败，检查网络或凭据后重试。
-echo 完成。
+if errorlevel 1 (
+  echo     Push failed, retrying in 5s...
+  timeout /t 5 /nobreak >nul
+  git push origin main
+)
+if errorlevel 1 echo     Push still failed. Check network or credentials.
+echo Done.
 goto :eof
 
 :nochange
-echo     快照无变化，无需提交。
-echo 完成。
+echo     Snapshot unchanged, nothing to commit.
+echo Done.

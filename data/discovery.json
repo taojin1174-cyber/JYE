@@ -1,627 +1,462 @@
 {
-  "fetched_at": "2026-11-10T07:09:22.379Z",
+  "fetched_at": "2026-11-10T11:01:06.421Z",
   "runs": [
     {
       "source_id": "roujiaosuo",
       "ok": true,
-      "count": 39
+      "count": 28
     },
     {
       "source_id": "cnfowl_rouji",
-      "ok": false,
-      "error": "fetch failed"
+      "ok": true,
+      "count": 35
     },
     {
       "source_id": "cnfowl_rouya",
-      "ok": false,
-      "error": "fetch failed"
+      "ok": true,
+      "count": 58
     },
     {
       "source_id": "cnfowl_baotiao",
-      "ok": false,
-      "error": "fetch failed"
+      "ok": true,
+      "count": 49
     },
     {
       "source_id": "cnfowl_shixing",
-      "ok": false,
-      "error": "fetch failed"
+      "ok": true,
+      "count": 22
     },
     {
       "source_id": "cnfowl",
-      "ok": false,
-      "error": "fetch failed"
+      "ok": true,
+      "count": 10
     },
     {
       "source_id": "nahs",
-      "ok": false,
-      "error": "fetch failed"
+      "ok": true,
+      "count": 12
     }
   ],
   "items": [
     {
-      "title": "猪扇子骨",
-      "url": "https://www.roujiaosuo.com/sell/show/1932676/",
+      "title": "金佰丰猪头肉",
+      "url": "https://www.roujiaosuo.com/sell/show/1925389/",
       "published_on": "2026-11-10",
-      "price_text": "6 元/公斤",
-      "region_text": "福建厦门市",
+      "price_text": "16 元/公斤",
+      "region_text": "河南新乡市",
       "category": "猪",
-      "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "0e2b0a54105360fdecaaae77277deadc15cbd6377dfb2c34f3316cef95e06fb7",
+      "details": "原文产地：中国；原文货量：25 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "d1eb6663805d591d574af0ef1a0f5704367859ac69651ffb25c36e947dd3ca4f",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.964Z"
     },
     {
-      "title": "熟牛肉",
-      "url": "https://www.roujiaosuo.com/sell/show/1932677/",
+      "title": "肥猪精碎肉",
+      "url": "https://www.roujiaosuo.com/sell/show/1921682/",
       "published_on": "2026-11-10",
-      "price_text": "24 元/公斤",
-      "region_text": "福建厦门市",
+      "price_text": "8.50 元/公斤",
+      "region_text": "广西南宁市",
+      "category": "猪",
+      "details": "原文产地：中国；原文货量：20 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "79f4acf5b583c4acc06d5fe783adb96345e591768202728beefe1e4d8cd84eb8",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "谷饲牛肋条",
+      "url": "https://www.roujiaosuo.com/sell/show/1924769/",
+      "published_on": "2026-11-10",
+      "price_text": "73 元/公斤",
+      "region_text": "山东德州市",
+      "category": "牛",
+      "details": "原文产地：中国；原文货量：1000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "caffd7ec9c97e9d76e4990f14241efe8e9f781cecc351724f25c41b5aa0f2122",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "牛肋条",
+      "url": "https://www.roujiaosuo.com/sell/show/1930879/",
+      "published_on": "2026-11-10",
+      "price_text": "121 元/公斤",
+      "region_text": "山东德州市",
       "category": "牛",
       "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "c7211c302c1f92718214bff12d2f7fbd8fc2ae1f6f11f71a52a4240e6ae45cc0",
+      "id": "65e9a4d9354f84fb06f5248a4f3437ceeeb862934fcfa18a286d9f759133d370",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "1898脖肉小公牛",
-      "url": "https://www.roujiaosuo.com/sell/show/1932990/",
+      "title": "牛肋条",
+      "url": "https://www.roujiaosuo.com/sell/show/1916800/",
       "published_on": "2026-11-10",
-      "price_text": "48 元/公斤",
-      "region_text": "广东深圳市",
+      "price_text": "75 元/公斤",
+      "region_text": "山东德州市",
       "category": "牛",
-      "details": "原文产地：阿根廷；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "b7db6adb7478edee610647fc159a7b9e6378de740b0cfa2a9ddf6158859ef98d",
+      "details": "原文产地：中国；原文货量：1000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "0e2e5f0a32c50e1229c479b7f72218eed0dece49350e46245908ac838ae7714c",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "黄标牛胸骨",
-      "url": "https://www.roujiaosuo.com/sell/show/272424/",
+      "title": "牛碎肉",
+      "url": "https://www.roujiaosuo.com/sell/show/1754713/",
       "published_on": "2026-11-10",
-      "price_text": "18.50 元/公斤",
-      "region_text": "河北沧州市",
+      "price_text": "29 元/公斤",
+      "region_text": "山东德州市",
       "category": "牛",
-      "details": "原文产地：新西兰；原文货量：50000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "7b17a3f6427969b2769652af0b05f90b6ea67b475be66e3147a7af3358476820",
+      "details": "原文产地：中国；原文货量：1000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "aabe5875a9883e5b6a0dd2edb74d5c5bd43f45e6f95d110416f140cfeee6bb5f",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "谷饲牛胸骨",
-      "url": "https://www.roujiaosuo.com/sell/show/275125/",
+      "title": "蒙得羊蹄",
+      "url": "https://www.roujiaosuo.com/sell/show/1932816/",
       "published_on": "2026-11-10",
-      "price_text": "25.01 元/公斤",
-      "region_text": "上海宝山区",
-      "category": "牛",
-      "details": "原文产地：阿根廷；原文货量：15000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "f212e9f64cb2a1413a5150557052a35c777fec8bbfc3a2b8fd18d3633ff4a879",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "肚包羊肉",
-      "url": "https://www.roujiaosuo.com/sell/show/248804/",
-      "published_on": "2026-11-10",
-      "price_text": "40.50 元/公斤",
-      "region_text": "河北沧州市",
+      "price_text": "14.50 元/公斤",
+      "region_text": "河南郑州市",
       "category": "羊",
-      "details": "原文产地：中国；原文货量：20000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "c2e1d0bab0437b478b84216cc84c88f30e096a126dbed4dc3ae591c12f94fe3f",
+      "details": "原文产地：巴西；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "2efc648bb4f4e2766a38f3539d6a66eb275ea48f3903fb636f6bdb15791cb3e3",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "羔羊长脖骨",
-      "url": "https://www.roujiaosuo.com/sell/show/260861/",
+      "title": "87厂 羔羊肚",
+      "url": "https://www.roujiaosuo.com/sell/show/1931833/",
       "published_on": "2026-11-10",
-      "price_text": "28.01 元/公斤",
-      "region_text": "河北沧州市",
+      "price_text": "37 元/公斤",
+      "region_text": "河南郑州市",
       "category": "羊",
-      "details": "原文产地：澳大利亚；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "8b85ab2a96e3389fb0e8979af6b934c1c68fd907656631759e44bdc92ff81b43",
+      "details": "原文产地：新西兰；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "dc29f06da621580e501c186f67857f7a7d63e9fa12eaf2daa72087b0785d03f1",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "羔羊蝴蝶排",
-      "url": "https://www.roujiaosuo.com/sell/show/304170/",
+      "title": "86厂绵羊肚",
+      "url": "https://www.roujiaosuo.com/sell/show/1931826/",
       "published_on": "2026-11-10",
-      "price_text": "17 元/公斤",
-      "region_text": "河北沧州市",
+      "price_text": "37.50 元/公斤",
+      "region_text": "河南郑州市",
       "category": "羊",
-      "details": "原文产地：澳大利亚；原文货量：18000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "6295ba5d748c2e15576a0e0852f194e58a8612ce2ca0cad0681a8ba6d9c6c2e6",
+      "details": "原文产地：新西兰；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "c1136dd7c8a772f6e1040d6a16e3102702fb41eb22148dc86a318921f9ce89e2",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "食品猪宝 20 公斤",
-      "url": "https://www.roujiaosuo.com/sell/show/1929736/",
+      "title": "78羔羊肚",
+      "url": "https://www.roujiaosuo.com/sell/show/1931830/",
       "published_on": "2026-11-10",
-      "price_text": "4.50 元/公斤",
-      "region_text": "山东临沂市",
-      "category": "猪",
-      "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "50c455387ea93cf834cd6633a0a6b8faa5e79298c2521df35280a6043f921750",
+      "price_text": "38 元/公斤",
+      "region_text": "河南郑州市",
+      "category": "羊",
+      "details": "原文产地：新西兰；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "4529285412654568a4428396d911126eef67ad2032915a9b7333bcadaf7d934f",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "肥猪银钱",
-      "url": "https://www.roujiaosuo.com/sell/show/1928822/",
+      "title": "50羔羊肚",
+      "url": "https://www.roujiaosuo.com/sell/show/1931827/",
       "published_on": "2026-11-10",
-      "price_text": "6.90 元/公斤",
-      "region_text": "山东临沂市",
-      "category": "猪",
-      "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "aac61cc1d358afccb4520c61c0fb6fcca246707adfd8380afda5770d739f23f5",
+      "price_text": "42 元/公斤",
+      "region_text": "河南郑州市",
+      "category": "羊",
+      "details": "原文产地：新西兰；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "c500bfb45c0bd59c8624cdaf3794d73f6e1a5085398e06288deaa9da205d4b38",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "肥猪碎月牙骨",
-      "url": "https://www.roujiaosuo.com/sell/show/1927531/",
+      "title": "42羔羊肚",
+      "url": "https://www.roujiaosuo.com/sell/show/1932395/",
       "published_on": "2026-11-10",
-      "price_text": "4.90 元/公斤",
-      "region_text": "山东临沂市",
-      "category": "猪",
-      "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "3d86f41fa4a16fd09a92f367052d13375e6a52ab62f5a05c719c9dac698b9c77",
+      "price_text": "36.50 元/公斤",
+      "region_text": "天津市辖区",
+      "category": "羊",
+      "details": "原文产地：新西兰；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "6ade8ede470c49d177032993c8f6b638ef5fa99139dc619be3ae0beb9101e63f",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "肥猪关节骨一",
-      "url": "https://www.roujiaosuo.com/sell/show/1927533/",
+      "title": "42绵羊肚",
+      "url": "https://www.roujiaosuo.com/sell/show/1932396/",
       "published_on": "2026-11-10",
-      "price_text": "3.60 元/公斤",
-      "region_text": "山东临沂市",
-      "category": "猪",
-      "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "b63b1fa06cef635ed4b69853febfbe4313eebefa442e96ec5416ce04ce7b660e",
+      "price_text": "36.50 元/公斤",
+      "region_text": "河南郑州市",
+      "category": "羊",
+      "details": "原文产地：新西兰；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "a75ed5fa90998e0ac2e171428b8040efc2c6374dadfd56e18f546a97f1925bf1",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "肥猪二号",
-      "url": "https://www.roujiaosuo.com/sell/show/1930202/",
+      "title": "40羔羊肚",
+      "url": "https://www.roujiaosuo.com/sell/show/1931828/",
+      "published_on": "2026-11-10",
+      "price_text": "41 元/公斤",
+      "region_text": "河南郑州市",
+      "category": "羊",
+      "details": "原文产地：新西兰；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "495a2f04498fd99397286525816b1bec961636a586a17d718f22255450e08758",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "鸡胗花",
+      "url": "https://www.roujiaosuo.com/sell/show/1747998/",
+      "published_on": "2026-11-10",
+      "price_text": "16.80 元/公斤",
+      "region_text": "江苏徐州市",
+      "category": "鸡",
+      "details": "原文产地：中国；原文货量：5000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "66c60125602832135af65dfea3e3f7dc7b17ba73ce339b2eb7632832fba39895",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "风味麻椒鸡块",
+      "url": "https://www.roujiaosuo.com/sell/show/1353070/",
+      "published_on": "2026-11-10",
+      "price_text": "8.80 元/公斤",
+      "region_text": "江苏徐州市",
+      "category": "鸡",
+      "details": "原文产地：中国；原文货量：7000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "52ce8e7b70a2ca99c8f9782f6b63efdc4559f2d2e7ae7e1809c01dcad731e6e7",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "鸡胗",
+      "url": "https://www.roujiaosuo.com/sell/show/1933005/",
       "published_on": "2026-11-10",
       "price_text": "7.50 元/公斤",
-      "region_text": "山东临沂市",
-      "category": "猪",
+      "region_text": "山东潍坊市",
+      "category": "鸡",
       "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "7a817456636e791d593d580ea8e978716e75b48b571e6072b333c0813899e78d",
+      "id": "2f54ca53e49a941e573ddb38367899fe3e07b029193c0a054efdeb9ae2960937",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "纯干牛肉筋",
-      "url": "https://www.roujiaosuo.com/sell/show/227557/",
-      "published_on": "2026-11-10",
-      "price_text": "38.01 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "牛",
-      "details": "原文产地：中国；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "d0b3af095b38bc02be5f7720b3aaf068b1f8ff806027565b7b727d4f33825483",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "白油牛胸骨",
-      "url": "https://www.roujiaosuo.com/sell/show/274040/",
-      "published_on": "2026-11-10",
-      "price_text": "20.60 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "牛",
-      "details": "原文产地：新西兰；原文货量：24000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "fed718e5af80bf968eda0ffcb2df5097ce6f9856cd3980355ea873e3966f3741",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "牛腱子",
-      "url": "https://www.roujiaosuo.com/sell/show/300223/",
-      "published_on": "2026-11-10",
-      "price_text": "67 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "牛",
-      "details": "原文产地：新西兰；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "07efb06b97dee49c783b282458c270044b00724d5ce80e32e7a715497d722e0f",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "牛腩排",
-      "url": "https://www.roujiaosuo.com/sell/show/306942/",
-      "published_on": "2026-11-10",
-      "price_text": "29.01 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "牛",
-      "details": "原文产地：阿根廷；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "e2868cf735cfe27ec4bc6928d7dfbeb5e15dbb80432d308d3ad1aca7c671a079",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "牛脊骨带排",
-      "url": "https://www.roujiaosuo.com/sell/show/258161/",
-      "published_on": "2026-11-10",
-      "price_text": "14.20 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "牛",
-      "details": "原文产地：新西兰；原文货量：15000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "c1b86bb7ff95570b5e76cf16f0b08bcc78359a4fb27109f48313a7cdb736aaec",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "羔羊肋排",
-      "url": "https://www.roujiaosuo.com/sell/show/306940/",
-      "published_on": "2026-11-10",
-      "price_text": "34 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "羊",
-      "details": "原文产地：新西兰；原文货量：15000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "dd0da642f67d1da03c20f1bc5ec088f495cc90a9f032f2db97b55c39b96c507f",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "羔羊肋排",
-      "url": "https://www.roujiaosuo.com/sell/show/227479/",
-      "published_on": "2026-11-10",
-      "price_text": "28.50 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "羊",
-      "details": "原文产地：澳大利亚；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "55d33149dc321205e97f8259da6e31580cef6cc758e026a056fd92aa9ca2909d",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "羔羊双节后腿骨",
-      "url": "https://www.roujiaosuo.com/sell/show/241918/",
-      "published_on": "2026-11-10",
-      "price_text": "24.04 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "羊",
-      "details": "原文产地：澳大利亚；原文货量：15000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "cce3c8cfc452a16efc628bc6af6eff709f029b02dab16bee58ecad68f6f450cb",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "羊肚包肉",
-      "url": "https://www.roujiaosuo.com/sell/show/295729/",
-      "published_on": "2026-11-10",
-      "price_text": "42.50 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "羊",
-      "details": "原文产地：中国；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "958ba61164fc1a2ecfc86dc8cf4c4ea98af3a48c66ac638b0f6641fcdaa67a70",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "大羊大角排",
-      "url": "https://www.roujiaosuo.com/sell/show/263208/",
-      "published_on": "2026-11-10",
-      "price_text": "18.50 元/公斤",
-      "region_text": "河北沧州市",
-      "category": "羊",
-      "details": "原文产地：中国；原文货量：15000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "05545aa967e16c104222188b0c59720586eafd142bdcf17fc213881d24fddbae",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "鸡杂小炒",
-      "url": "https://www.roujiaosuo.com/sell/show/1752536/",
-      "published_on": "2026-11-10",
-      "price_text": "8.60 元/公斤",
-      "region_text": "山东聊城市",
-      "category": "鸡",
-      "details": "原文产地：中国；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "bbabc6e0f88c2d08e256d5b15daaee7ffd109b101a1d3bcd73cb3cb825e27da3",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "老母鸡鸡爪",
-      "url": "https://www.roujiaosuo.com/sell/show/1024967/",
-      "published_on": "2026-11-10",
-      "price_text": "44 元/公斤",
-      "region_text": "山东聊城市",
-      "category": "鸡",
-      "details": "原文产地：中国；原文货量：30000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "08bb5de6e8343cc7f2f85f15dcabba0ff12e173f91aa572c4302676c64b85133",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "清真麻公鸡",
-      "url": "https://www.roujiaosuo.com/sell/show/879122/",
-      "published_on": "2026-11-10",
-      "price_text": "12.50 元/公斤",
-      "region_text": "山东聊城市",
-      "category": "鸡",
-      "details": "原文产地：中国；原文货量：66000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "7ae4672af89cbca366b2e987078e14ae743b89b3fa480ffb9c3360fc2aecf7c0",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "清真麻公鸡",
-      "url": "https://www.roujiaosuo.com/sell/show/878056/",
+      "title": "黄油鸡（清远鸡）",
+      "url": "https://www.roujiaosuo.com/sell/show/1923843/",
       "published_on": "2026-11-10",
       "price_text": "12.90 元/公斤",
+      "region_text": "河南濮阳市",
+      "category": "鸡",
+      "details": "原文产地：中国；原文货量：1000000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "8238c84936b9e85be374d5f8eac345225c5b6cb51d41ff872b84c236117c2557",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "黄油鸡产品",
+      "url": "https://www.roujiaosuo.com/sell/show/1932141/",
+      "published_on": "2026-11-10",
+      "price_text": "6.66 元/公斤",
+      "region_text": "河南濮阳市",
+      "category": "鸡",
+      "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "442ad813438469b18a6926f265e9199dc530b1634a268926132c857cb383f26e",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "鸡胗",
+      "url": "https://www.roujiaosuo.com/sell/show/1879011/",
+      "published_on": "2026-11-10",
+      "price_text": "11 元/公斤",
       "region_text": "山东聊城市",
       "category": "鸡",
-      "details": "原文产地：中国；原文货量：88000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "8ce396243210b52714eef3d127b4099d021c093779c5c2bfb96f8d3316ba8bd7",
+      "details": "原文产地：中国；原文货量：8000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "e7d7d0aa128e7ad1e980c60f58102a7192a9865bbd229a802ffc770bf8c0c9e6",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "清真鸡胗",
-      "url": "https://www.roujiaosuo.com/sell/show/829562/",
+      "title": "鸡胗",
+      "url": "https://www.roujiaosuo.com/sell/show/1879010/",
       "published_on": "2026-11-10",
-      "price_text": "8 元/公斤",
+      "price_text": "7.50 元/公斤",
       "region_text": "山东聊城市",
       "category": "鸡",
-      "details": "原文产地：中国；原文货量：15000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "b296b238160cd11cded58efb98e646dd514515a8b3d1ff704607a15aeef41483",
+      "details": "原文产地：中国；原文货量：12000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "13926dd22d652929176d5cfdc358b374bc1fd124a60a786f1ef4bfe9e25f9260",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "清真鸡片",
-      "url": "https://www.roujiaosuo.com/sell/show/918636/",
+      "title": "鸡爪",
+      "url": "https://www.roujiaosuo.com/sell/show/1879009/",
       "published_on": "2026-11-10",
-      "price_text": "8.40 元/公斤",
+      "price_text": "15 元/公斤",
       "region_text": "山东聊城市",
       "category": "鸡",
-      "details": "原文产地：中国；原文货量：80000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "cdb35b30f534af8156284d8ab1bbea0f4c3a8e98cbf1f8ec8719c68c5011cbc9",
+      "details": "原文产地：中国；原文货量：18000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "070b789c8b984cf147986adbc53a5dd6a1ea47a806c76bbceda5ca76ee0b6848",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "清真鸡片",
-      "url": "https://www.roujiaosuo.com/sell/show/918612/",
-      "published_on": "2026-11-10",
-      "price_text": "8.40 元/公斤",
-      "region_text": "山东聊城市",
-      "category": "鸡",
-      "details": "原文产地：中国；原文货量：80000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "9ee7833ca7033966b8713942fcab8fa8369d09aea68d96cb41647bc046cfae6e",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "清真鸡块",
-      "url": "https://www.roujiaosuo.com/sell/show/918595/",
-      "published_on": "2026-11-10",
-      "price_text": "7.90 元/公斤",
-      "region_text": "山东聊城市",
-      "category": "鸡",
-      "details": "原文产地：中国；原文货量：80000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "7035c33a9fa4385373d84d37f116645b25436414e495d3670e82dd4b1a6fe1ed",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "鸭肉砖",
-      "url": "https://www.roujiaosuo.com/sell/show/1344493/",
-      "published_on": "2026-11-10",
-      "price_text": "9 元/公斤",
-      "region_text": "山东滨州市",
-      "category": "鸭",
-      "details": "原文产地：中国；原文货量：4000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "ac8acee696d07a772fa5bf48d2ccd8071f7bd240bccd5a6b4fe3220931995cf7",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "小鸭翅",
-      "url": "https://www.roujiaosuo.com/sell/show/1911481/",
-      "published_on": "2026-11-10",
-      "price_text": "2500 元/公斤",
-      "region_text": "山东青岛市",
-      "category": "鸭",
-      "details": "原文产地：中国；原文货量：50000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "03711dfd85cb58d6c067896bc1ad0ef6d54a63b047f27c5841e8c84fcc12ae14",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "一级白条鸭",
-      "url": "https://www.roujiaosuo.com/sell/show/1831747/",
-      "published_on": "2026-11-10",
-      "price_text": "4.20 元/公斤",
-      "region_text": "山东聊城市",
-      "category": "鸭",
-      "details": "原文产地：中国；原文货量：30000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "6c35d2bc1d6c15dc3bef8910e9c468bf9bae92478acd3c68a351ecb38aaa9aea",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "熟鸭肠",
-      "url": "https://www.roujiaosuo.com/sell/show/1157786/",
-      "published_on": "2026-11-10",
-      "price_text": "7.70 元/公斤",
-      "region_text": "河南郑州市",
-      "category": "鸭",
-      "details": "原文产地：中国；原文货量：16000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "8f2540a0944014349db354f0c66f23eda88511a55f3a9f3701ae15e0ab7cf7b3",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "雪花鸭肉转",
-      "url": "https://www.roujiaosuo.com/sell/show/1770077/",
-      "published_on": "2026-11-10",
-      "price_text": "9 元/公斤",
-      "region_text": "山东济南市",
-      "category": "鸭",
-      "details": "原文产地：中国；原文货量：5000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "6771052a4a81504a8fdcf2045ba7a89858c57435e56161bcc81dc35147357560",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
-    },
-    {
-      "title": "熟鸭肠",
-      "url": "https://www.roujiaosuo.com/sell/show/1328026/",
-      "published_on": "2026-11-10",
-      "price_text": "7.20 元/公斤",
-      "region_text": "河南郑州市",
-      "category": "鸭",
-      "details": "原文产地：中国；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "4a6dc20de82003b5f61d41c2fc413807645bfd1a32d1e923f4cbe4a88408a5a2",
-      "source_id": "roujiaosuo",
-      "source_name": "肉交所",
-      "kind": "supply",
-      "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
       "title": "鸭边腿",
-      "url": "https://www.roujiaosuo.com/sell/show/1911537/",
+      "url": "https://www.roujiaosuo.com/sell/show/1933004/",
       "published_on": "2026-11-10",
-      "price_text": "6.20 元/公斤",
-      "region_text": "河南郑州市",
+      "price_text": "4.90 元/公斤",
+      "region_text": "山东烟台市",
       "category": "鸭",
-      "details": "原文产地：中国；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "1127e108097899ac014692ffb14e3d5aaa48001161eb4275b3db74b1cdb7661a",
+      "details": "原文产地：中国；原文货量：0 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "e49c568cfd8b8d5fd996bab581bc932ca3563bba6711161f532a4eb89aa84336",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
-      "title": "水发鸭肠",
-      "url": "https://www.roujiaosuo.com/sell/show/1909172/",
+      "title": "鸭食带",
+      "url": "https://www.roujiaosuo.com/sell/show/91421/",
       "published_on": "2026-11-10",
-      "price_text": "12 元/公斤",
-      "region_text": "山东临沂市",
+      "price_text": "11.50 元/公斤",
+      "region_text": "山东菏泽市",
       "category": "鸭",
       "details": "原文产地：中国；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
-      "id": "5b0c7e15fc4355b2f13243c9c664af85a0afd6493ae67bfd6b3dff168951333e",
+      "id": "5f25e8eea7536b1368c12b81540f3a56e86fb524819263ff24ccc2cb8976c6e5",
       "source_id": "roujiaosuo",
       "source_name": "肉交所",
       "kind": "supply",
       "status": "pending",
-      "fetched_at": "2026-11-10T07:09:19.651Z"
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "鸭软骨",
+      "url": "https://www.roujiaosuo.com/sell/show/526803/",
+      "published_on": "2026-11-10",
+      "price_text": "8.90 元/公斤",
+      "region_text": "山东菏泽市",
+      "category": "鸭",
+      "details": "原文产地：中国；原文货量：8000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "833efb75563c0d8602cbabfe801b1ec6605894e0d49ee87371aec7ea700ced8a",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "鸭胸软骨",
+      "url": "https://www.roujiaosuo.com/sell/show/530042/",
+      "published_on": "2026-11-10",
+      "price_text": "8 元/公斤",
+      "region_text": "山东菏泽市",
+      "category": "鸭",
+      "details": "原文产地：中国；原文货量：10000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "40686dcd2b1afa535937160867d2f1d57ecad13038691eeccd2863beb28df8db",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "鸭胸皮",
+      "url": "https://www.roujiaosuo.com/sell/show/530100/",
+      "published_on": "2026-11-10",
+      "price_text": "5.10 元/公斤",
+      "region_text": "山东菏泽市",
+      "category": "鸭",
+      "details": "原文产地：中国；原文货量：28000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "9683bec9736d275f8a42cf932e571d16bd0b94ad9944712f29f6d57d824ade8b",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
+    },
+    {
+      "title": "鸭胸",
+      "url": "https://www.roujiaosuo.com/sell/show/523010/",
+      "published_on": "2026-11-10",
+      "price_text": "7.50 元/公斤",
+      "region_text": "山东菏泽市",
+      "category": "鸭",
+      "details": "原文产地：中国；原文货量：30000 公斤（不是起订量）；税费、运费、规格及供应商待核实。",
+      "id": "a0c8392c2f4a666b13ec1dac92ed4005fe3f6aedcdd54a8d71e2da3113e52aa0",
+      "source_id": "roujiaosuo",
+      "source_name": "肉交所",
+      "kind": "supply",
+      "status": "pending",
+      "fetched_at": "2026-11-10T11:01:03.965Z"
     },
     {
       "title": "817鸡 安徽",
@@ -650,7 +485,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡 山东",
@@ -679,7 +514,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡 河南",
@@ -708,7 +543,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "白羽鸡 内蒙古黑吉辽",
@@ -737,7 +572,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "白羽鸡 河南/河北/山西江苏/山东/安徽",
@@ -766,7 +601,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "青脚麻鸡(公) 川渝",
@@ -795,7 +630,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "青脚麻鸡(公) 安徽",
@@ -824,7 +659,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "青脚麻鸡(公) 山东",
@@ -853,7 +688,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "青脚麻鸡(公) 江苏",
@@ -882,7 +717,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "青脚麻鸡(公) 山西",
@@ -911,7 +746,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "青脚麻鸡(公) 陕甘宁到户",
@@ -940,7 +775,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡(公) 川渝",
@@ -969,7 +804,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡(公) 江苏",
@@ -998,7 +833,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡(公) 江苏 广州",
@@ -1027,7 +862,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡(公) 河南",
@@ -1056,7 +891,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡(公) 吉林",
@@ -1085,7 +920,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 天津 3.0-3.3",
@@ -1114,7 +949,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 河北 3.0-3.3",
@@ -1143,7 +978,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 江苏 3.6≥",
@@ -1172,7 +1007,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 浙江 3.6≥",
@@ -1201,7 +1036,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 湖北 3.6≥",
@@ -1230,7 +1065,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 安徽 3.6≥",
@@ -1259,7 +1094,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 山东 3.5≥",
@@ -1288,7 +1123,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "817鸡（X-斤） 河南 3.2-3.5",
@@ -1317,7 +1152,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 川渝 ≥2kg",
@@ -1346,7 +1181,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 安徽 通货",
@@ -1375,7 +1210,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 山东 通货",
@@ -1404,7 +1239,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 江苏 公（2.50kg）",
@@ -1433,7 +1268,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 江苏 母（1.25kg）",
@@ -1462,7 +1297,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 山西 公（≥3.0kg）",
@@ -1491,7 +1326,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 山西 母（≥3.0kg）",
@@ -1520,7 +1355,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "麻鸡（X-kg） 陕甘宁 公（≥3.5kg）",
@@ -1549,7 +1384,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡（X-kg） 川渝小规格",
@@ -1578,7 +1413,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡（X-kg） 江苏大规格",
@@ -1607,7 +1442,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "黄花公鸡（X-kg） 吉林（≥3kg）",
@@ -1636,7 +1471,7 @@
       "source_name": "禽网·肉鸡行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.557Z"
+      "fetched_at": "2026-11-10T11:01:04.473Z"
     },
     {
       "title": "鸭苗报价·樱桃谷（白鸭） 鲁苏豫冀蒙晥鄂",
@@ -1665,7 +1500,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·樱桃谷（白鸭） 江西",
@@ -1694,7 +1529,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·樱桃谷（白鸭） 川渝",
@@ -1723,7 +1558,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·樱桃谷（白鸭） 湖南",
@@ -1752,7 +1587,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·樱桃谷（白鸭） 广东",
@@ -1781,7 +1616,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·樱桃谷（白鸭） 广西",
@@ -1810,7 +1645,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（四点麻） 安徽",
@@ -1839,7 +1674,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（四点麻） 江西",
@@ -1868,7 +1703,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（四点麻） 川渝",
@@ -1897,7 +1732,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（四点麻） 广东",
@@ -1926,7 +1761,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（四点麻） 广西",
@@ -1955,7 +1790,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（大种麻） 广东",
@@ -1984,7 +1819,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（大种麻） 广西",
@@ -2013,7 +1848,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·麻鸭（大种麻） 四川",
@@ -2042,7 +1877,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·骡鸭（M18） 安徽",
@@ -2071,7 +1906,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·骡鸭（M18） 福建",
@@ -2100,7 +1935,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·骡鸭（M18） 江西",
@@ -2129,7 +1964,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·骡鸭（M18） 广东",
@@ -2158,7 +1993,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·骡鸭（M18） 广西",
@@ -2187,7 +2022,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·白番 广东（公）",
@@ -2216,7 +2051,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "鸭苗报价·白番 广东（母）",
@@ -2245,7 +2080,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·北部冻品区（棚前） 江苏 活禽",
@@ -2274,7 +2109,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·北部冻品区（棚前） 山东 活禽",
@@ -2303,7 +2138,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·北部冻品区（棚前） 山东 胴体",
@@ -2332,7 +2167,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·北部冻品区（棚前） 河南 活禽",
@@ -2361,7 +2196,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·北部冻品区（棚前） 河北 活禽",
@@ -2390,7 +2225,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·北部冻品区（棚前） 安徽 活禽",
@@ -2419,7 +2254,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·北部冻品区（棚前） 湖北 活禽",
@@ -2448,7 +2283,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·中部半活禽区 江西 活禽",
@@ -2477,7 +2312,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·中部半活禽区 四川 活禽",
@@ -2506,7 +2341,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·中部半活禽区 重庆 活禽",
@@ -2535,7 +2370,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·中部半活禽区 湖南 活禽",
@@ -2564,7 +2399,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·中部半活禽区 浙江 活禽",
@@ -2593,7 +2428,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 广东 粤中水鸭",
@@ -2622,7 +2457,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 粤中旱鸭",
@@ -2651,7 +2486,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 粤东水鸭",
@@ -2680,7 +2515,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 粤东旱鸭",
@@ -2709,7 +2544,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 粤西水鸭",
@@ -2738,7 +2573,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.814Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 粤西旱鸭",
@@ -2767,7 +2602,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 广西 水鸭",
@@ -2796,7 +2631,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 广西 旱鸭",
@@ -2825,7 +2660,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 贵州 活禽",
@@ -2854,7 +2689,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白鸭大鸭·南部活禽区（塘口） 海南 活禽",
@@ -2883,7 +2718,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·中部半活禽区 安徽",
@@ -2912,7 +2747,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·中部半活禽区 江西",
@@ -2941,7 +2776,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·中部半活禽区 浙江",
@@ -2970,7 +2805,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·中部半活禽区 福建",
@@ -2999,7 +2834,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·南部活禽区 粤东",
@@ -3028,7 +2863,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·南部活禽区 粤中",
@@ -3057,7 +2892,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·南部活禽区 粤西",
@@ -3086,7 +2921,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "半番大鸭·南部活禽区 广西",
@@ -3115,7 +2950,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "麻鸭·半活禽区 江西",
@@ -3144,7 +2979,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "麻鸭·半活禽区 湖南",
@@ -3173,7 +3008,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "麻鸭·半活禽区 河南",
@@ -3202,7 +3037,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "麻鸭·半活禽区 福建",
@@ -3231,7 +3066,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "麻鸭·半活禽区 川渝",
@@ -3260,7 +3095,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "麻鸭·活禽区 广东",
@@ -3289,7 +3124,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "麻鸭·活禽区 广西",
@@ -3318,7 +3153,7 @@
       "source_name": "禽网·肉鸭行情",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:18.815Z"
+      "fetched_at": "2026-11-10T11:01:04.816Z"
     },
     {
       "title": "白条鸡 北京 北京大洋路农副产品市场有限公司",
@@ -3347,7 +3182,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 北京 北京市新发地农产品股份有限公司",
@@ -3376,7 +3211,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 天津 天津市金钟河蔬菜贸易中心",
@@ -3405,7 +3240,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 天津 天津市红旗农贸批发市场",
@@ -3434,7 +3269,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 天津 天津韩家墅海吉星农产品物流有限公司",
@@ -3463,7 +3298,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 天津 天津金元宝滨海农产品交易市场",
@@ -3492,7 +3327,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 河北 石家庄市交投大河集配物流有限公司",
@@ -3521,7 +3356,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 山西 长治市紫坊农产品综合交易市场有限公司",
@@ -3550,7 +3385,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 内蒙古 呼和浩特市美通商贸有限责任公司",
@@ -3579,7 +3414,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 内蒙古 内蒙古东瓦窑农副产品批发市场有限责任公司",
@@ -3608,7 +3443,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 内蒙古 包头市友谊蔬菜批发市场有限责任公司",
@@ -3637,7 +3472,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 辽宁 大连双兴商品城有限公司",
@@ -3666,7 +3501,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 黑龙江 哈尔滨哈达农副产品股份有限公司",
@@ -3695,7 +3530,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 黑龙江 齐齐哈尔站前农副产品综合市场有限公司",
@@ -3724,7 +3559,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 上海 上海江杨农产品市场经营管理有限公司",
@@ -3753,7 +3588,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 江苏 苏州市南环桥市场发展股份有限公司",
@@ -3782,7 +3617,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 江苏 连云港农副产品批发市场有限公司",
@@ -3811,7 +3646,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 浙江 余姚海吉新城农产品批发市场有限公司",
@@ -3840,7 +3675,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 浙江 浙江长兴新农都实业有限公司",
@@ -3869,7 +3704,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 安徽 合肥周谷堆农产品批发市场股份有限公司",
@@ -3898,7 +3733,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 安徽 阜阳瑶海农产品市场开发有限公司",
@@ -3927,7 +3762,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 江西 九江市琵琶湖农产品物流有限公司",
@@ -3956,7 +3791,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 江西 新余市同盛实业集团有限责任公司",
@@ -3985,7 +3820,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 山东 济南维尔康实业集团有限公司",
@@ -4014,7 +3849,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 山东 青岛重振华中蔬菜批发市场有限公司",
@@ -4043,7 +3878,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 山东 淄博鲁中蔬菜批发市场",
@@ -4072,7 +3907,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 山东 淄博市临淄群兴源贸易有限公司",
@@ -4101,7 +3936,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 河南 河南万邦国际农产品物流股份有限公司",
@@ -4130,7 +3965,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 河南 黄淮农产品股份有限公司",
@@ -4159,7 +3994,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 河南 驻马店市众信农副产品综合批发市场有限公司",
@@ -4188,7 +4023,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 湖北 襄阳竹叶山洪沟投资有限公司",
@@ -4217,7 +4052,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 湖南 长沙马王堆农产品股份有限公司",
@@ -4246,7 +4081,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 广东 深圳市福田农产品批发市场",
@@ -4275,7 +4110,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 广东 佛山市中南农业科技有限公司",
@@ -4304,7 +4139,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 广西壮族 广西新柳邕农产品批发市场有限公司",
@@ -4333,7 +4168,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 重庆 重庆双福农产品批发市场有限公司",
@@ -4362,7 +4197,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 四川 四川聚和生态农业发展有限公司",
@@ -4391,7 +4226,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 四川 成都农产品中心批发市场有限责任公司",
@@ -4420,7 +4255,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 贵州 贵阳地利农产品物流园有限公司",
@@ -4449,7 +4284,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 西藏 拉萨叁康渡口商贸有限公司",
@@ -4478,7 +4313,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 陕西 陕西欣桥实业发展有限公司",
@@ -4507,7 +4342,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 陕西 西安摩尔农产品有限责任公司",
@@ -4536,7 +4371,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 陕西 西安新北城农副产品交易市场管理有限公司",
@@ -4565,7 +4400,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 陕西 咸阳新阳光农副产品有限公司",
@@ -4594,7 +4429,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 宁夏回族 吴忠市鑫鲜农副产品市场有限公司",
@@ -4623,7 +4458,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 新疆维吾尔 乌鲁木齐北园春果业经营管理有限责任公司",
@@ -4652,7 +4487,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 新疆维吾尔 新疆九鼎农产品经营管理有限公司",
@@ -4681,7 +4516,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 新疆维吾尔 昌吉市园丰农副产品交易市场有限责任公司",
@@ -4710,7 +4545,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "白条鸡 新疆生产建设兵团 新疆九鼎农产品经营管理有限公司",
@@ -4739,7 +4574,7 @@
       "source_name": "禽网·白条鸡批发",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.058Z"
+      "fetched_at": "2026-11-10T11:01:05.109Z"
     },
     {
       "title": "鹅·清远鹅苗",
@@ -4768,7 +4603,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·高要鹅苗",
@@ -4797,7 +4632,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·江门鹅苗",
@@ -4826,7 +4661,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·阳江杂鹅苗",
@@ -4855,7 +4690,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·白沙杂鹅苗",
@@ -4884,7 +4719,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·清远地销鹅",
@@ -4913,7 +4748,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·清远地通鹅",
@@ -4942,7 +4777,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·江门地销鹅",
@@ -4971,7 +4806,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·阳江杂地销",
@@ -5000,7 +4835,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·白沙杂地销",
@@ -5029,7 +4864,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·白沙杂地通",
@@ -5058,7 +4893,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·惠州老地销",
@@ -5087,7 +4922,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·清远棚仔",
@@ -5116,7 +4951,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·高要棚鹅仔",
@@ -5145,7 +4980,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·江门棚仔",
@@ -5174,7 +5009,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·普通棚通鹅",
@@ -5203,7 +5038,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鹅·出口棚通鹅",
@@ -5232,7 +5067,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鸡·清远麻项苗",
@@ -5261,7 +5096,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鸡·清远麻鸡项",
@@ -5290,7 +5125,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鸡·清远麻阉鸡",
@@ -5319,7 +5154,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鸽·乳鸽",
@@ -5348,7 +5183,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "鸽·中鸽",
@@ -5377,7 +5212,7 @@
       "source_name": "禽网·石兴鹅价",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.496Z"
+      "fetched_at": "2026-11-10T11:01:05.922Z"
     },
     {
       "title": "2026-11-10 外三元生猪价格涨跌表",
@@ -5392,7 +5227,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 内三元生猪价格涨跌表",
@@ -5407,7 +5242,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 全国各主要批发市场白条鸡批发价格",
@@ -5422,7 +5257,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 全国淘汰蛋鸡参考价格",
@@ -5437,7 +5272,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 全国鸭蛋参考价格（省级均价）",
@@ -5452,7 +5287,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 全国鸡蛋参考价格（省级均价）",
@@ -5467,7 +5302,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 全国鸡鸭（白羽）、禽蛋综合行情概况",
@@ -5482,7 +5317,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 全国肉鸡（鸡苗、毛鸡）参考价格",
@@ -5497,7 +5332,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-10 全国肉鸭（鸭苗、毛鸭）参考价格",
@@ -5512,7 +5347,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "2026-11-09 外三元生猪价格涨跌表",
@@ -5527,7 +5362,7 @@
       "source_name": "禽网 CNFOWL",
       "kind": "market",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.699Z"
+      "fetched_at": "2026-11-10T11:01:06.171Z"
     },
     {
       "title": "10月第4周畜产品和饲料集贸市场价格情况",
@@ -5542,7 +5377,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "10月第3周畜产品和饲料集贸市场价格情况",
@@ -5557,7 +5392,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "10月第2周畜产品和饲料集贸市场价格情况",
@@ -5572,7 +5407,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "10月第1周畜产品和饲料集贸市场价格情况",
@@ -5587,7 +5422,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "9月第5周畜产品和饲料集贸市场价格情况",
@@ -5602,7 +5437,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "9月第4周畜产品和饲料集贸市场价格情况",
@@ -5617,7 +5452,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "9月第3周畜产品和饲料集贸市场价格情况",
@@ -5632,7 +5467,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "9月第1周畜产品和饲料集贸市场价格情况",
@@ -5647,7 +5482,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "9月第2周畜产品和饲料集贸市场价格情况",
@@ -5662,7 +5497,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "8月第4周畜产品和饲料集贸市场价格情况",
@@ -5677,7 +5512,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "8月第3周畜产品和饲料集贸市场价格情况",
@@ -5692,7 +5527,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     },
     {
       "title": "8月第2周畜产品和饲料集贸市场价格情况",
@@ -5707,7 +5542,7 @@
       "source_name": "全国畜牧总站",
       "kind": "macro",
       "status": "pending",
-      "fetched_at": "2026-11-10T05:54:19.899Z"
+      "fetched_at": "2026-11-10T11:01:06.415Z"
     }
   ]
 }

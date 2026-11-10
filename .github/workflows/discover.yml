@@ -40,9 +40,19 @@ jobs:
         with:
           name: discovered-site
           path: dist
+      # 单个来源失败属于常态（站点改版、地区网络限制、限流），不应把整次运行标红。
+      # 失败源保留上一版线索，页面照常发布；失败明细写入运行摘要，便于事后核对。
       - name: Report partial source failure
         if: steps.fetch.outcome == 'failure'
-        run: exit 1
+        run: |
+          echo "::warning::部分公开来源本次未取到数据，已沿用上一版线索，页面照常发布。"
+          {
+            echo "### 部分来源抓取失败"
+            echo ""
+            echo "以下来源本次未取到数据，页面继续使用上一次成功快照里的对应线索："
+            echo ""
+            node -e "const d=require('./data/discovery.json');const bad=(d.runs||[]).filter(r=>!r.ok);if(bad.length){for(const r of bad)console.log('- \`'+r.source_id+'\`：'+r.error)}else{console.log('（快照内未记录失败源）')}"
+          } >> "$GITHUB_STEP_SUMMARY"
   publish:
     needs: discover
     if: always() && needs.discover.result != 'cancelled'

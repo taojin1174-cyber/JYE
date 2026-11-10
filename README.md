@@ -142,6 +142,15 @@ GitHub 工作流 `Discover public price leads` 会定时生成快照、提交到
 - 行情价只进入总览的“外部行情参考”，不参与供货均价；`market` 类型线索不提供“核实入库”。
 - 页面改版时该来源标记失败并保留旧线索，其余来源照常更新；解析逻辑有 `tests/cnfowl-price.test.mjs` 覆盖，改结构前先跑 `npm test`。
 
+#### 网络前提：禽网只能在境内抓（2026-11-10 实测）
+
+GitHub Actions 运行在境外机房，实测抓 `cnfowl.com` 与 `nahs.org.cn` 一律 `fetch failed`，肉交所正常。因此**云端定时采集只能拿到肉交所的线索，禽网鸡鸭鹅行情必须从境内网络发起**。
+
+- 云端定时（`.github/workflows/discover.yml`，北京时间 08:10 / 14:10 / 20:10）继续跑，能拿到的源照常更新；失败源沿用上次快照，页面不会空白。
+- 单个源失败只写运行摘要与 `::warning::`，不再把整次运行标红，也不阻断发布。
+- 需要禽网当日报价时，在本机（境内网络）双击 `scripts/local-discover.cmd`：采完自动提交并推送 `data/discovery.json`，云端随即重新构建发布。可自行加 Windows 计划任务定时执行。
+- 抓取失败会带上 Node 的 cause 码（如 `ENOTFOUND`、`ECONNRESET`、`HTTP 403`），便于判断是 DNS、连接被拦还是站点改版；网络类失败自动重试两次。
+
 ### JSON / CSV 授权接口
 
 `collector/sources.example.json` 只演示映射格式，地址不可作为行情来源使用。把真实授权接口配置写入 `collector/sources.json`，确认 `enabled: true`。

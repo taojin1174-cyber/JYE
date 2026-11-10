@@ -165,10 +165,22 @@ export function parseDiscovery(html,source) {
  return unique.slice(0,source.limit||30).map(r=>({...r,id:createHash('sha256').update(r.market?`${source.id}|${r.url}|${r.title}|${r.price_text}`:`${source.id}|${r.url}|${r.published_on}|${r.price_text}`).digest('hex'),source_id:source.id,source_name:source.name,kind:source.kind,status:'pending',fetched_at:new Date().toISOString()}));
 }
 
-async function getHTML(url) {
- const response=await fetch(url,{headers:{'User-Agent':'HangqingTiaodong/0.1 (+public-market-reference)',Accept:'text/html,application/xhtml+xml'},signal:AbortSignal.timeout(20000)});
- if(!response.ok)throw new Error(`HTTP ${response.status}`);
- const html=await response.text();if(html.length>3_000_000)throw new Error('页面过大');return html;
+const BROWSER_HEADERS={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',Accept:'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8','Accept-Language':'zh-CN,zh;q=0.9'};
+// 网络类失败重试两次；HTTP 4xx 不重试。错误信息带上 cause 码（ENOTFOUND / ECONNRESET / 证书等），
+// 否则 Node 只报 "fetch failed"，无法判断是 DNS、连接还是站点拦截。
+async function getHTML(url,attempt=0) {
+ try{
+  const response=await fetch(url,{headers:BROWSER_HEADERS,signal:AbortSignal.timeout(20000)});
+  if(!response.ok)throw Object.assign(new Error(`HTTP ${response.status}`),{noRetry:true});
+  const html=await response.text();if(html.length>3_000_000)throw new Error('页面过大');return html;
+ }catch(e){
+  if(!e.noRetry&&attempt<2){
+   await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
+   return getHTML(url,attempt+1);
+  }
+  const code=e?.cause?.code||e?.cause?.errno||'';
+  throw new Error(code?`${e.message}（${code}）`:e.message);
+ }
 }
 // 日报类来源每天生成新文章，因此先读栏目列表，按标题匹配取当天最新一篇，再抓正文。
 function findArticleLink(listHtml,source){

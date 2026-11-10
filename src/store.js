@@ -6,6 +6,11 @@ import { can,canEditQuote,canReviewQuote,canRequestDeletion,defaultPermissions }
 const DATA_KEY=config.localTrial?'hqt-trial-data-v2':'hqt-data-v2', SESSION_KEY='hqt-session-v1';
 const cloud=Boolean(config.supabaseUrl&&config.supabaseKey);
 const mutableFields=['product_id','supplier','province','city','price','basis','source','source_name','source_url','quoted_on','valid_until','min_order','freight','notes','status'];
+// 发布快照把出处编码进 ref，运行时还原；静态文件本身不含明文网址 / 渠道名。
+const decodeRef=ref=>{
+ if(!ref)return{};
+ try{const bytes=Uint8Array.from(atob(ref),c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes));}catch{return{};}
+};
 let session;
 try{session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');}catch{session=null;}
 let data,refreshTask;
@@ -90,7 +95,7 @@ function localAudit(next,action,target_id,details={}){next.audit.push({id:crypto
 function persist(next){try{localStorage.setItem(DATA_KEY,JSON.stringify(next));}catch{throw new Error('保存失败：浏览器空间不足，请导出备份');}data=next;}
 async function mergeDiscovery(){
   data.leads||=[];
-  try{const response=await fetch(new URL('../data/discovery.json',import.meta.url),{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!response.ok)throw new Error('无法读取采集快照');const snapshot=await response.json();if(!Array.isArray(snapshot.items))throw new Error('采集快照格式错误');const states=new Map(data.leads.map(l=>[l.id,l.status]));const incoming=snapshot.items.map(l=>({...l,status:states.get(l.id)||'pending'}));const ids=new Set(incoming.map(l=>l.id));data.leads=[...incoming,...data.leads.filter(l=>!ids.has(l.id)&&l.status!=='pending')];store.discovery={fetched_at:snapshot.fetched_at,runs:snapshot.runs};}catch(error){store.discovery={error:error.message};}
+  try{const response=await fetch(new URL('../data/discovery.json',import.meta.url),{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!response.ok)throw new Error('无法读取采集快照');const snapshot=await response.json();if(!Array.isArray(snapshot.items))throw new Error('采集快照格式错误');const states=new Map(data.leads.map(l=>[l.id,l.status]));const incoming=snapshot.items.map(l=>({...l,...decodeRef(l.ref),status:states.get(l.id)||'pending'}));const ids=new Set(incoming.map(l=>l.id));data.leads=[...incoming,...data.leads.filter(l=>!ids.has(l.id)&&l.status!=='pending')];store.discovery={fetched_at:snapshot.fetched_at,runs:snapshot.runs};}catch(error){store.discovery={error:error.message};}
 }
 async function readAll(table,order){const all=[];for(let offset=0;;offset+=1000){const batch=await request(`/rest/v1/${table}?select=*&order=${order}.asc,id.asc&limit=1000&offset=${offset}`);all.push(...batch);if(batch.length<1000)return all;}}
 async function request(path,{method='GET',body,headers={},anonymous=false}={}){

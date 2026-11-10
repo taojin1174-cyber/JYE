@@ -34,20 +34,20 @@ export function buildQuickQuote(lead, products, today = dayString()) {
   const phone = pick(details, '电话').replace(/（.*$/, '');
   const specClue = pick(details, '规格/单个重量');
   const volume = pick(details, '原文货量');
-  const supplierRegion = pick(details, '供应商地区');
   const originalDate = String(lead.published_on || '');
   const staleDays = /^\d{4}-\d{2}-\d{2}$/.test(originalDate)
     ? Math.round((Date.parse(`${today}T12:00:00+08:00`) - Date.parse(`${originalDate}T12:00:00+08:00`)) / 86400000)
     : null;
   const quoted_on = today;
   const valid_until = shiftDay(today, 7);
-  const supplier = contact ? `${contact}（${lead.source_name || '肉交所'}）` : String(lead.title || '未注明供应商');
+  // 供应商只记联系人，不写入任何平台 / 渠道名称，避免报价列表泄露出处。
+  const supplier = contact ? `${contact}（供货方）` : String(lead.title || '未注明供应商');
 
+  // 备注只保留核价事实与系统补全说明；出处信息统一由「原始来源」字段在解锁后查看。
   const notes = [
-    `原文产品：${lead.title || ''}；标价：${lead.price_text || '见原文'}；原文发布日期：${originalDate || '未注明'}（价格需向供货商复核）`,
-    `仓库地区：${region || '未注明'}；供应商地区：${supplierRegion || '未注明'}；联系人：${contact || '未公开'}；电话：${phone || '未公开'}（平台脱敏）`,
-    `规格/单个重量：${specClue || '待核实'}；原文货量：${volume || '未注明'}（发布量，不是起订量）`,
-    `★ 系统补全（可修改）：产品规格按「${preset.category} / ${preset.name} / ${state} / 规格待核实」归类；计价口径暂按「${bases.factory}」记录，原文未注明税运条件；报价日按核实当天 ${quoted_on}，有效期默认 +7 天；起订量与运费待询。`,
+    `产品：${lead.title || ''}；标价：${lead.price_text || '待核实'}；信息日期：${originalDate || '未注明'}（价格需向供货商复核）`,
+    `地区：${region || '未注明'}；规格 / 单个重量：${specClue || '待核实'}；货量：${volume || '未注明'}（发布量，不是起订量）`,
+    `★ 系统补全（可修改）：产品规格按「${preset.category} / ${preset.name} / ${state} / 规格待核实」归类；计价口径暂按「${bases.factory}」记录，税运条件未注明；报价日按核实当天 ${quoted_on}，有效期默认 +7 天；起订量与运费待询。`,
   ].join('\n');
 
   const quote = {
@@ -77,11 +77,11 @@ export function buildQuickQuote(lead, products, today = dayString()) {
 
   const rows = [
     { label: '产品 / 规格', value: `${preset.category} · ${preset.name} · ${state} · 规格待核实`, note: '按品类自动归类' },
-    { label: '供货价', value: price ? `¥ ${price} / kg` : '待填写', note: `原文 ${lead.price_text || '见原文'}` },
-    { label: '供应商', value: supplier, note: contact ? '原文联系人' : '按原文标题暂记' },
-    { label: '地区', value: `${province}${city ? ' · ' + city : ''}`, note: '原文仓库地址' },
+    { label: '供货价', value: price ? `¥ ${price} / kg` : '待填写', note: `标价 ${lead.price_text || '待核实'}` },
+    { label: '供应商', value: supplier, note: contact ? '供货方联系人' : '按产品名暂记' },
+    { label: '地区', value: `${province}${city ? ' · ' + city : ''}`, note: '仓库所在地' },
     { label: '报价日 / 有效期', value: `${quoted_on} → ${valid_until}`, note: '今天 + 默认 7 天' },
-    { label: '计价口径', value: bases.factory, note: '默认值，原文未注明' },
+    { label: '计价口径', value: bases.factory, note: '默认值，税运条件待核实' },
   ];
 
   return { ok: reasons.length === 0, reasons, quote, product, rows, contact, phone, specClue, originalDate, staleDays };

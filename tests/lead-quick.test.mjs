@@ -37,7 +37,7 @@ test('元/斤按 ×2 折算，系统补全项明确写进备注', () => {
   const q = buildQuickQuote(lead({ price_text: '8 元/斤' }), [], TODAY);
   assert.equal(q.quote.price, 16);
   assert.match(q.quote.notes, /系统补全（可修改）/);
-  assert.match(q.quote.notes, /原文未注明税运条件/);
+  assert.match(q.quote.notes, /税运条件未注明/);
   assert.match(q.quote.notes, /不是起订量/);
 });
 

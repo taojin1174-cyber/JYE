@@ -24,6 +24,7 @@
 2. **清空旧数据**：鹅苗等禽网苗价行情已清（快照 214→183），本机录入数据键升到 `hqt-trial-data-v2`，表格「已核」键 `rjs-checked-v2`。清空方式与备份见 `B:\W工作区\_JYE备份\20261110_2330\`。
 3. **正式版 / 简洁版**：删掉 `MARKET OVERVIEW` 等全部英文小标、副标题、试运行横幅、「如何接入共享库」；顶栏显示「正式版」。**后续所有新页面按简洁标准做，不加 eyebrow / 副标题 / 长说明**。
 4. **一键确认入库**：点「核实入库」弹 6 行确认卡 →「确认入库」直接写库并标记线索 converted；「修改后再录」才开长表单；重复入库被拦。逻辑在 `src/lead-quick.js`。
+5. **出处保密（2026-11-11）**：前台所有页面、报价详情、导出 CSV 都不显示来源 / 网址 / 渠道名；只有「数据设置」输入密码解锁后才可见。发布产物全部脱敏，见下方「出处保密」小节。**不要再把这些字段加回前台**。
 
 ## 3. 文件地图
 
@@ -40,7 +41,8 @@
 | `scripts/roujiaosuo-build.mjs` | 生成 `leads.html` + CSV |
 | `scripts/import-roujiaosuo-leads.mjs` | 转标准线索并合并进快照；`--only-frozen` 保证苗价不被带回来；`--cloud` 单独 POST 写库 |
 | `scripts/discovery.mjs` | 原有 7 个网页适配器（禽网 / 畜牧总站等），**目前不参与冻品数据** |
-| `scripts/build.mjs` | 发布时复制 `index.html` / `config.js` / `leads.html` / `src/` / `data/` |
+| `scripts/build.mjs` | 发布时复制前端文件；把 `dist/data/discovery.json` 的出处编码进 `ref`（`src/store.js` 运行时还原）；排除 `roujiaosuo-leads.{json,csv}`；**发布前自检** dist 不得含明文渠道名 / 网址，命中就构建失败 |
+| `tests/privacy.test.mjs` | 9 个用例守住「前台零出处 / 解锁才可见 / 编码可还原」，改前台前先看它 |
 | `.github/workflows/discover.yml` | 定时采集 → 带 `--cloud --only-frozen` 合并 |
 | `tests/` | `node --test tests/*.test.mjs`，新增逻辑必须补测试 |
 
@@ -54,6 +56,22 @@
 | 审核纪律 | 线索必须人工核实后才进报价库；行情价/官方监测不参与供货均价 |
 | 系统补全项 | 产品归类、计价口径（出厂·含税·不含运）、报价日（核实当天）、有效期（+7 天）、供应商（原文联系人）——**必须写进 `notes` 并在确认卡标注**，不能偷偷编造 |
 | 一句话 | 采集只抓公开字段，遵守站点条款与频率限制 |
+
+### 出处保密（必须守住，2026-11-11 定）
+
+**规则**：同事打开网站时，不能看出报价来自哪里；来源名称、原文网址、采集痕迹只在「数据设置」输入密码解锁后出现。
+
+| 层 | 做法 |
+|---|---|
+| 前台渲染 | `src/app.js` 的 `unlocked()` 门控：顶栏线索表入口、报价详情「来源 / 原始来源」、录入表单三个来源字段、前台导出 CSV 的来源 / 链接列、备注 `safeNotes()` 脱敏。总览的「外部行情参考」板块已删除 |
+| 报价数据 | `src/lead-quick.js` 供应商只写联系人（不写渠道名），备注只保留核价事实与系统补全说明；`src/lead-prefill.js` 同步中性化 |
+| 独立线索表 | `leads.html` 加 PBKDF2 密码门（与设置页同一密码 / verifier），payload 与详情链接双重编码，页面文案中性化 |
+| 发布快照 | `scripts/build.mjs` 把 `url / source_name / details / source_id` 编码进 `ref`；`src/store.js` 加载时还原，来源中心（解锁后）功能不变 |
+| 静态 JS | `src/sources.js` 的来源目录整体编码，运行时解码；`src/app.js` 里不出现明文渠道名 |
+| 原始数据 | `data/roujiaosuo-leads.{json,csv}` **不发布**（只在仓库 / 本地），`dist/data/` 只剩脱敏后的 `discovery.json` |
+| 防回归 | `npm run build` 结尾 `scanLeak()` 自检，dist 里若出现明文渠道名 / 网址直接构建失败 |
+
+**边界（别误以为绝对保密）**：静态站的密码门是界面级，懂技术的人若刻意查看源码或解码 `ref` 仍能追溯；**GitHub 仓库本身是 public**，仓库里的 `data/discovery.json`、采集脚本、HANDOFF.md 仍含完整出处。要真正隔离：① 把仓库设为 private；② 按待办 #1 接 Supabase，线索与报价按 RLS 权限下发。
 
 ## 5. 两台电脑协作纪律（重要）
 
@@ -97,7 +115,8 @@ WorkBuddy 账号级会自动同步长期画像与偏好（登同一账号即可�
 | 4 | 建库顺序 | README 只写了 `schema.sql`，必须再跑 `supabase/migrations/20261109_team_permissions.sql` 再建 admin，否则登录后 404、管理员 `active` 判定失败 |
 | 5 | 仓库体积 | 约 860KB 静态数据每次抓取都提交，长期要瘦身（只留必要字段） |
 | 6 | 冗余 | `src/team-ui.js` 无引用可清；`supabase/functions/account-admin/` 的 `index.ts` 是入口、`handler.js` 是实现，**不是重复代码** |
+| 7 | **仓库是 public** | `git clone` 无需认证即可拉到完整源码、明文采集快照与脚本。网站发布产物已脱敏，但仓库本身仍可看到出处；建议设为 private |
 
 ---
 
-*最后更新：2026-11-10 23:58（HEAD `7a9e3f6`，线上已验证）*
+*最后更新：2026-11-11（出处保密改造；当前 HEAD 以 `git log -1` 为准）*

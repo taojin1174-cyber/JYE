@@ -15,7 +15,7 @@ export const store={
   async init(){
     if(Boolean(config.supabaseUrl)!==Boolean(config.supabaseKey))throw new Error('共享数据库配置不完整，请同时填写 URL 和公钥');
     if(!cloud){
-      if(config.allowDemo!==true&&!config.localTrial)throw new Error('团队数据库尚未连接，正式试运行暂未开放。请先连接 Supabase 并完成员工账号配置。');
+      if(config.allowDemo!==true&&!config.localTrial)throw new Error('团队数据库尚未连接，请先在配置中填写 Supabase 地址与公钥。');
       const saved=localStorage.getItem(DATA_KEY);
       try{data=saved?JSON.parse(saved):config.localTrial?{products:structuredClone(defaultProducts),quotes:[],leads:[]}:createDemo();}catch{throw new Error('本机数据无法读取，请先备份浏览器存储，避免覆盖');}
       if(!Array.isArray(data?.quotes)||!Array.isArray(data?.products))throw new Error('本机数据格式不正确');

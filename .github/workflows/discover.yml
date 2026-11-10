@@ -23,6 +23,13 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      # 肉交所四品类线索由本机抓取后提交 data/roujiaosuo-leads.json，
+      # 这里只做离线转换与合并，不联网；避免每次定时采集把待审线索冲掉。
+      - name: Merge frozen-poultry leads
+        run: node scripts/import-roujiaosuo-leads.mjs --cloud --only-frozen
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - name: Save public snapshot
         run: |
           if [ -f data/discovery.json ]; then

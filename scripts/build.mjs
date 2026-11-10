@@ -7,7 +7,7 @@ if(config.supabaseKey.startsWith('eyJ')) {
   if(payload.role==='service_role')throw new Error('service_role 不能发布到前端，请使用 anon 公钥');
 }
 await mkdir('dist',{recursive:true});
-for(const file of ['index.html','config.js','favicon.svg'])await copyFile(file,`dist/${file}`);
+for(const file of ['index.html','leads.html','config.js','favicon.svg'])await copyFile(file,`dist/${file}`);
 await cp('src','dist/src',{recursive:true});
 await cp('data','dist/data',{recursive:true});
 // HTML 与模块使用同一内容版本，避免发布后旧缓存与新模块交叉加载。

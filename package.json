@@ -9,6 +9,9 @@
     "build": "node scripts/build.mjs",
     "collect": "node scripts/collect.mjs",
     "discover": "node scripts/discovery.mjs",
+    "leads": "node scripts/roujiaosuo-scrape.mjs && node scripts/roujiaosuo-build.mjs && node scripts/import-roujiaosuo-leads.mjs --only-frozen",
+    "leads:build": "node scripts/roujiaosuo-build.mjs",
+    "leads:import": "node scripts/import-roujiaosuo-leads.mjs",
     "preview:offline": "node scripts/preview.mjs"
   },
   "engines": {

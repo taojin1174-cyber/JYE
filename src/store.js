@@ -2,7 +2,8 @@ import { config } from '../config.js';
 import { createDemo,defaultProducts } from './demo.js';
 import { can,canEditQuote,canReviewQuote,canRequestDeletion,defaultPermissions } from './permissions.js';
 
-const DATA_KEY=config.localTrial?'hqt-trial-data-v1':'hqt-data-v1', SESSION_KEY='hqt-session-v1';
+// v2：上线前清空旧的本机录入数据（含混入的苗价报价）。旧键 v1 仍留在浏览器里，需要时可用控制台恢复。
+const DATA_KEY=config.localTrial?'hqt-trial-data-v2':'hqt-data-v2', SESSION_KEY='hqt-session-v1';
 const cloud=Boolean(config.supabaseUrl&&config.supabaseKey);
 const mutableFields=['product_id','supplier','province','city','price','basis','source','source_name','source_url','quoted_on','valid_until','min_order','freight','notes','status'];
 let session;

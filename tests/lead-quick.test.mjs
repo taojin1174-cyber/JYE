@@ -5,7 +5,7 @@ import { buildQuickQuote } from '../src/lead-quick.js';
 import { validateQuote, dayString } from '../src/core.js';
 
 const TODAY = '2026-11-10';
-const snapshot = JSON.parse(readFileSync(new URL('../data/discovery.json', import.meta.url), 'utf8'));
+const snapshot = JSON.parse(readFileSync(new URL('./fixtures/leads.json', import.meta.url), 'utf8'));
 const sample = cat => snapshot.items.find(i => String(i.details || '').includes(`品类：${cat}（冻品）`));
 const lead = overrides => ({ ...sample('清远鸡'), ...overrides });
 

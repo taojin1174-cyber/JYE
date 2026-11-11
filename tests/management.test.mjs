@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildQuickQuote } from '../src/lead-quick.js';
 
-const snapshot = JSON.parse(readFileSync(new URL('../data/discovery.json', import.meta.url), 'utf8'));
+const snapshot = JSON.parse(readFileSync(new URL('./fixtures/leads.json', import.meta.url), 'utf8'));
 const HANDLED = new Set(['converted', 'dismissed', 'deleted']);
 
 function setup() {

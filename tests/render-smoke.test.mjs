@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { settingsLock } from '../src/settings-lock.js';
 import { accessLock } from '../src/access-lock.js';
 
-const snapshot = JSON.parse(readFileSync(new URL('../data/discovery.json', import.meta.url), 'utf8'));
+const snapshot = JSON.parse(readFileSync(new URL('./fixtures/leads.json', import.meta.url), 'utf8'));
 
 // 最小 DOM 桩：只验证模块能完整启动、4 个 hash 页面都能渲染出正确结构。
 function stubDom(hash, { unlocked = true } = {}) {

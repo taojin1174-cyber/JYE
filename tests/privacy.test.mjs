@@ -42,7 +42,7 @@ test('前台导出去掉来源与链接列，筛选导出仍需解锁', () => {
 });
 
 test('一键入库写入的供应商与备注不含渠道名，且报价仍合法', () => {
-  const snapshot = JSON.parse(read('../data/discovery.json'));
+  const snapshot = JSON.parse(read('./fixtures/leads.json'));
   const lead = snapshot.items.find(i => String(i.details || '').includes('品类：清远鸡（冻品）'));
   const q = buildQuickQuote(lead, [], '2026-11-11');
   assert.equal(q.ok, true, q.reasons.join('；'));

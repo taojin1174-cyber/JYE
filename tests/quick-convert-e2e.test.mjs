@@ -5,7 +5,7 @@ import { buildQuickQuote } from '../src/lead-quick.js';
 import { validateQuote } from '../src/core.js';
 
 const TODAY = '2026-11-10';
-const snapshot = JSON.parse(readFileSync(new URL('../data/discovery.json', import.meta.url), 'utf8'));
+const snapshot = JSON.parse(readFileSync(new URL('./fixtures/leads.json', import.meta.url), 'utf8'));
 
 test('一键确认入库：写库、直接生效、线索标记已转报价、重复入库被拦截', async () => {
   const memory = new Map();

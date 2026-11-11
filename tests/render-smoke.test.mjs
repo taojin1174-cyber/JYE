@@ -18,16 +18,21 @@ function stubDom(hash, { unlocked = true, data = snapshot, storage = {} } = {}) 
   const unlockedKey = `hqt-settings:/:${settingsLock.verifier.slice(0, 16)}`;
   const session = new Map([[unlockedKey, 'unlocked']]);
   const el = () => ({ innerHTML: '', textContent: '', open: false, classList: { add() {}, remove() {} }, showModal() { this.open = true; }, close() { this.open = false; }, querySelector: () => null, addEventListener() {} });
+  const clicks = [];
   const app = el(), toast = el(), dialog = el();
   globalThis.document = {
     querySelector: sel => sel === '#app' ? app : sel === '#toast' ? toast : sel === '#dialog' ? dialog : null,
-    addEventListener() {},
+    addEventListener: (type, fn) => { if (type === 'click') clicks.push(fn); },
   };
   globalThis.window = { addEventListener() {} };
   globalThis.location = { hash, pathname: '/', reload() {} };
   globalThis.localStorage = { getItem: k => memory.get(k) ?? null, setItem: (k, v) => memory.set(k, v), removeItem: k => memory.delete(k) };
   globalThis.sessionStorage = { getItem: k => session.get(k) ?? null, setItem: (k, v) => session.set(k, v), removeItem: k => session.delete(k) };
   globalThis.fetch = async () => ({ ok: true, json: async () => data });
+  app.__click = dataset => {
+    const target = { dataset, closest: sel => (sel === 'button,a' ? target : null) };
+    for (const fn of clicks) fn({ target });
+  };
   return app;
 }
 
@@ -101,6 +106,26 @@ test('已入库的线索不消失，改为沉到列表末尾并标注', async ()
   assert.match(last, /已入库/, '已入库的行要标注状态，避免与待核实混淆');
   assert.doesNotMatch(last, /data-lead="/, '已入库的线索不应再出现核实入库按钮');
   assert.equal(rows.filter(r => !/lead-done/.test(r)).length, rows.length - 1, '只有已入库的那一行被淡化');
+});
+
+test('线索表可按发布日期升降序切换', async () => {
+  const app = stubDom('#settings');
+  await import('../src/app.js?route=lead-sort');
+  const rows = () => {
+    const start = app.innerHTML.indexOf('<tbody>') + 7;
+    return app.innerHTML.slice(start, app.innerHTML.indexOf('</tbody>')).split('<tr').filter(Boolean);
+  };
+  // 默认从新到旧：表头可点，且首行是样本里最新的 2026-11-10。
+  assert.match(app.innerHTML, /<th aria-sort="descending"><button class="th-sort"[^>]*data-lead-sort/, '发布日期列头应可点击排序');
+  assert.match(rows()[0], /2026-11-10/, '默认应按发布日期从新到旧');
+  // 点一次改为从早到晚：首行变成最早的 2026-11-07，表头状态跟着翻转。
+  app.__click({ leadSort: '' });
+  assert.match(app.innerHTML, /<th aria-sort="ascending">/, '点击后应切换为升序');
+  assert.match(rows()[0], /2026-11-07/, '升序时最早的线索应排在第一行');
+  // 再点一次回到从新到旧。
+  app.__click({ leadSort: '' });
+  assert.match(app.innerHTML, /<th aria-sort="descending">/, '再次点击应切回降序');
+  assert.match(rows()[0], /2026-11-10/, '降序时最新的线索应排在第一行');
 });
 
 test('访问密码配置只含盐与派生值，且迭代次数达标', () => {

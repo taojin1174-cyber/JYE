@@ -53,3 +53,11 @@ tbody tr.lead-done .lead-title a{color:#7d8d84}
 /* 页面工具栏：左侧筛选与右侧操作按钮同排，右端对齐（行情总览 / 采购比价 / 报价审核） */
 .page-bar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
 @media(max-width:760px){.page-bar-actions{width:100%;justify-content:flex-end}.page-bar-actions .export-label{display:none}}
+
+/* 可排序表头：整格可点，点击切换升 / 降序 */
+th[aria-sort] .th-sort{color:#6d7f74;font-weight:500}
+.th-sort{display:inline-flex;align-items:center;gap:4px;height:42px;padding:0;font-size:11px;font-weight:400;color:inherit;white-space:nowrap}
+.th-sort:hover{color:var(--green)}
+.th-sort svg{opacity:.5;transition:opacity .15s}
+.th-sort:hover svg,.th-sort:focus-visible svg{opacity:1}
+@media(max-width:760px){.th-sort{height:38px}}

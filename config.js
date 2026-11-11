@@ -7,4 +7,9 @@ export const config = {
   localTrial: true,
   supabaseUrl: 'https://gquwwbdvljelvlaovyih.supabase.co', // ← 粘贴 Project URL，例如 https://xxxxxxxx.supabase.co
   supabaseKey: 'sb_publishable_efk9tPn2jOBaLv3YAuYtyg_7O3JukZq', // ← 粘贴 publishable key(sb_publishable_...) 或旧版 anon(eyJ...)
+  // 登录邮箱不再由使用者填写，登录页只保留密码框。
+  loginEmail: 'taojin1174@163.com',
+  // 登录口令：页面只输 loginPin，实际提交给账号系统的是 loginPassword（Supabase 要求至少 6 位）。
+  loginPin: 'A1234',
+  loginPassword: 'A123456',
 };

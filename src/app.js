@@ -420,7 +420,7 @@ document.addEventListener('submit',event=>{
    if(data.products.some(x=>['category','name','state','spec'].every(k=>x[k]===p[k])))throw new Error('相同规格已存在');
    data=await store.addProduct(p);dialog.close();render();toast('产品规格已添加');
   }
-  if(form.id==='login-form') {const result=await store.login(fields.email,fields.password);if(result){data=result;render();}}
+  if(form.id==='login-form') {const result=await store.login(fields.password);if(result){data=result;render();}}
   if(form.id==='members-form') {
    for(const [id,role]of Object.entries(fields))if(form.querySelector(`[name="${CSS.escape(id)}"]`).dataset.original!==role)await store.changeRole(id,role);
    dialog.close();toast('成员角色已保存');
@@ -431,7 +431,7 @@ async function showMembers() {
  const members=await store.members();
  showDialog(dialogHead('团队成员','新增成员请先在 Supabase Authentication 中邀请，再加入 members 表授权。')+`<form id="members-form"><div class="form-body"><p class="form-error" role="alert"></p>${members.map(m=>`<div class="settings-row"><span>${esc(m.display_name||m.email||m.id)}${m.id===store.user?.id?'（你）':''}</span>${m.id===store.user?.id?'<span class="muted">管理员</span>':`<select name="${esc(m.id)}" aria-label="${esc(m.display_name||m.email)}的角色" data-original="${esc(m.role)}">${options([['viewer','只读成员'],['editor','编辑人员'],['admin','管理员']],m.role)}</select>`}</div>`).join('')}</div><div class="dialog-foot"><button class="btn" type="button" data-action="close">取消</button><button class="btn primary" type="submit">保存权限</button></div></form>`);
 }
-function loginPage(error='') {app.innerHTML=`<main class="login"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>登录行情跳动</h1><p>使用管理员授权的账号访问团队采购工作台。</p><form id="login-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="email">邮箱</label><input id="email" name="email" type="email" autocomplete="username" required></div><div class="field" style="margin-top:16px"><label for="password">密码</label><input id="password" name="password" type="password" autocomplete="current-password" required></div><button class="btn primary" type="submit">登录</button></form></main>`;}
+function loginPage(error='') {app.innerHTML=`<main class="login"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>登录行情跳动</h1><p>请输入访问密码进入采购工作台。</p><form id="login-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="password">密码</label><input id="password" name="password" type="password" autocomplete="current-password" required autofocus></div><button class="btn primary" type="submit">登录</button></form></main>`;}
 function accountDialog() {
  const who = store.cloud ? (store.user?.email || '团队账号') : '正式版';
  const roleName = ({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role] || '';

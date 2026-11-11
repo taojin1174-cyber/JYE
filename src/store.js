@@ -50,6 +50,11 @@ export const store={
     data={products,quotes,leads,deletionRequests,audit,members};return viewData();
   },
   async login(email,password){
+    // 登录页只保留密码框：只传一个参数时，按配置中的登录邮箱提交。
+    if(password===undefined||password===null){password=email;email=config.loginEmail||'';}
+    if(!email)throw new Error('尚未配置登录账号，请联系管理员');
+    // 页面口令与账号系统密码可能不同（账号系统要求至少 6 位）。
+    if(config.loginPin&&config.loginPassword&&password===config.loginPin)password=config.loginPassword;
     try{session=await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email,password},anonymous:true});session.expires_at=Math.floor(Date.now()/1000)+session.expires_in;localStorage.setItem(SESSION_KEY,JSON.stringify(session));return await this.init();}
     catch(error){this.clearSession();throw error;}
   },

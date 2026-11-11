@@ -32,7 +32,7 @@ try {
  await writeFile('dist/CNAME',domain+'\n');
 }catch(e){if(e.code!=='ENOENT')throw e;}
 // 发布前自检：静态产物里不得出现明文渠道名 / 采集网址，防止以后某次改动把出处带回来。
-const LEAK=/roujiaosuo\.com|cnfowl\.com|chinabreed\.com|nahs\.org\.cn|肉交所|禽网|畜牧总站/i;
+const LEAK=/roujiaosuo\.com|cnfowl\.com|soozhu\.com|chinabreed\.com|nahs\.org\.cn|肉交所|禽网|畜牧总站|搜猪网/i;
 async function scanLeak(dir){
  for(const entry of await readdir(dir,{withFileTypes:true})){
   const target=`${dir}/${entry.name}`;

@@ -1,7 +1,7 @@
 import { readFile,mkdir,writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
-import { dayString } from '../src/core.js';
+import { dayString, provinces } from '../src/core.js';
 
 const ENTITIES={'&nbsp;':' ','&#160;':' ','&amp;':'&','&quot;':'"','&#39;':"'",'&lt;':'<','&gt;':'>','&ge;':'≥','&le;':'≤','&plusmn;':'±','&mdash;':'—','&hellip;':'…','&ldquo;':'“','&rdquo;':'”','&middot;':'·'};
 const clean=value=>String(value).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]*>/g,' ').replace(/&(?:#160|nbsp|amp|quot|#39|lt|gt|ge|le|plusmn|mdash|hellip|ldquo|rdquo|middot);/gi,m=>ENTITIES[m.toLowerCase()]??' ').replace(/\s+/g,' ').trim();
@@ -131,6 +131,44 @@ function parseDailyOffer(html){
  return out;
 }
 
+// 搜猪网按省每日一篇：《2026.11.11河北省瘦肉型肉猪(110kg左右)价格》，
+// 正文首表为「日均价格 / 去年同期 / 环比 / 同比」，下面还有各市县明细表。
+function parseSoozhuProvince(html,source){
+ const heading=clean(source.articleTitle||html.match(/<h1[^>]*id=["']title["'][^>]*>([\s\S]*?)<\/h1>/i)?.[1]||html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]||'').split('|')[0];
+ if(!/瘦肉型肉猪/.test(heading))return [];
+ const day=heading.match(/(20\d{2})\.(\d{1,2})\.(\d{1,2})/);
+ const province=provinces.find(p=>heading.includes(p))||'';
+ if(!day||!province)return [];
+ const published_on=`${day[1]}-${day[2].padStart(2,'0')}-${day[3].padStart(2,'0')}`;
+ const num=value=>{const n=Number(String(value||'').replace(/[^\d.]/g,''));return Number.isFinite(n)&&n>0?n:null;};
+ let price=null,lastYear=null;
+ for(const table of html.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)){
+  const rows=[...table[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(tr=>[...tr[1].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(cell=>clean(cell[1])));
+  if(!rows.length||!rows[0].some(cell=>cell.includes('日均价格')))continue;
+  // 表头与数据行列数并不对齐（“环比”列只输出一个 %），只认第一格价格与第二格去年同期。
+  price=num((rows[1]||[])[0]); lastYear=num((rows[1]||[])[1]);
+  if(price)break;
+ }
+ if(!price)return [];
+ const breed='瘦肉型肉猪(110kg左右)';
+ const market={breed,region:province,spec:'出栏活猪 · 110 kg 左右',unit:'元/公斤',stage:'活畜',price_low:price,price_high:price,price_mid:price,unit_norm:'元/公斤',price_norm_mid:price,price_norm_low:price,price_norm_high:price,previous:lastYear};
+ return [{title:`猪·${province} 瘦肉型肉猪出栏价`,url:source.url,published_on,price_text:`${price} 元/公斤`,region_text:province,category:'猪',market,
+  details:`原文：${province}瘦肉型肉猪（110 kg 左右）出栏日均价 ${price} 元/公斤${lastYear?`，去年同期 ${lastYear} 元/公斤`:''}。生猪出栏价不等于白条肉或分割品价格，不与供货均价混算。`}];
+}
+// 搜猪网猪价频道列表页：当日每省一篇，按标题抓出可以逐篇取正文的文章地址。
+export function soozhuArticles(listHtml,base='https://www.soozhu.com/c/zhujiage/'){
+ const out=[],seen=new Set();
+ for(const m of listHtml.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)){
+  const href=attr(m[1],'href');if(!href)continue;
+  let url;try{url=new URL(href,base).href;}catch{continue;}
+  if(!/^https:\/\/www\.soozhu\.com\/article\/\d+\/$/.test(url))continue;
+  const title=clean(attr(m[1],'title')||m[2]);
+  if(!/瘦肉型肉猪/.test(title)||seen.has(url))continue;
+  seen.add(url);out.push({url,title});
+ }
+ return out;
+}
+
 export function parseDiscovery(html,source) {
  const records=[];
  const published_on=dateIn(html.match(/<h1[^>]*id=["']title["'][^>]*>([\s\S]*?)<\/h1>/i)?.[1])||dateIn(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1])||null;
@@ -147,6 +185,8 @@ export function parseDiscovery(html,source) {
    if(!/^\d+(?:\.\d+)?\s*元\s*\/\s*(?:公斤|千克|斤|吨)$/.test(price_text))continue;
    records.push({title,url,published_on:date,price_text,region_text:clean(fields.get(6)||''),category:inferCategory(title),details:`原文产地：${clean(fields.get(3)||'未注明')}；原文货量：${clean(fields.get(5)||'未注明')}（不是起订量）；税费、运费、规格及供应商待核实。`});
   }
+ } else if(source.adapter==='soozhu-province') {
+  records.push(...parseSoozhuProvince(html,source));
  } else if(['cnfowl','nahs'].includes(source.adapter)) {
   for(const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
    const href=attr(m[1],'href');if(!href)continue;
@@ -205,6 +245,20 @@ export async function discover({cacheDir='',persistCloud=false}={}) {
  const items=[],runs=[];let errors=0;
  for(const source of sources.filter(s=>s.enabled)) {
   try {
+   // 搜猪网每天每省一篇，先读频道列表，再逐篇取正文均价；单篇失败不影响其它省份。
+   if(source.adapter==='soozhu-province'&&!cacheDir) {
+    const articles=soozhuArticles(await getHTML(source.listUrl||source.url)).slice(0,source.limit||20);
+    if(!articles.length)throw new Error(`列表页未找到“${source.match||'瘦肉型肉猪'}”文章`);
+    const parsed=[];
+    for(const article of articles) {
+     try { parsed.push(...parseDiscovery(await getHTML(article.url),{...source,url:article.url,articleTitle:article.title})); }
+     catch(e) { console.error(`${source.id} ${article.url}: ${e.message}`); }
+    }
+    if(!parsed.length)throw new Error('各省文章均未解析到有效记录，页面结构可能变化');
+    items.push(...parsed);runs.push({source_id:source.id,ok:true,count:parsed.length});
+    console.log(`${source.id}: ${parsed.length} 条公开线索（未进入供货均价）`);
+    continue;
+   }
    const {html,url}=cacheDir?{html:await readFile(`${cacheDir}/${source.id}.html`,'utf8'),url:source.url}:await loadSourceHTML(source);
    const parsed=parseDiscovery(html,{...source,url});items.push(...parsed);runs.push({source_id:source.id,ok:true,count:parsed.length});
    console.log(`${source.id}: ${parsed.length} 条公开线索（未进入供货均价）`);

@@ -6,6 +6,7 @@
     {"id":"cnfowl_baotiao","name":"禽网·白条鸡批发","url":"https://www.cnfowl.com/quote/list-24.html","listUrl":"https://www.cnfowl.com/quote/list-24.html","match":"全国各主要批发市场白条鸡批发价格","adapter":"cnfowl-price","kind":"market","enabled":true,"limit":60},
     {"id":"cnfowl_shixing","name":"禽网·石兴鹅价","url":"https://www.cnfowl.com/offer/","listUrl":"https://www.cnfowl.com/offer/","match":"石兴鹅/鸡/鸽行情信息","adapter":"cnfowl-offer","kind":"market","enabled":true,"limit":40},
     {"id":"cnfowl","name":"禽网 CNFOWL","url":"https://www.cnfowl.com/","adapter":"cnfowl","kind":"market","enabled":true,"limit":10},
+    {"id":"soozhu_pig","name":"搜猪网·生猪出栏价","url":"https://www.soozhu.com/c/zhujiage/","listUrl":"https://www.soozhu.com/c/zhujiage/","adapter":"soozhu-province","kind":"market","enabled":true,"limit":20,"match":"瘦肉型肉猪"},
     {"id":"nahs","name":"全国畜牧总站","url":"https://www.nahs.org.cn/jcyj/","adapter":"nahs","kind":"macro","enabled":true,"limit":12}
   ]
 }

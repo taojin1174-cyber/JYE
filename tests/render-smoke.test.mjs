@@ -30,7 +30,7 @@ function stubDom(hash, { unlocked = true } = {}) {
 const cases = [
   ['overview', ['参考范围', '产品参考均价', '导出数据', '录入报价']],
   ['compare', ['供货报价', '全部产品规格']],
-  ['review', ['待确认报价', '刷新记录']],
+  ['review', ['待确认', '刷新记录']],
   ['settings', ['管理品类', '导入备份', '此设备（未上传）', '基础设置']],
   ['settings/sources', ['自动采集线索', '已处理', '核实入库']],
 ];

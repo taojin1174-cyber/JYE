@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizePrice,latestQuotes,summarize,trend,validateQuote,shiftDay,dayString,csvCell } from '../src/core.js';
+import { normalizePrice,normalizeFreight,latestQuotes,summarize,trend,validateQuote,shiftDay,dayString,csvCell } from '../src/core.js';
 import { parseCSV,mapRecord } from '../scripts/collect.mjs';
 import { parseDiscovery } from '../scripts/discovery.mjs';
 import { matchesLeadCategory } from '../src/core.js';
@@ -20,6 +20,16 @@ test('北京时间跨月、跨年及单位换算',()=>{
  assert.equal(normalizePrice(12000,'ton'),12);
  assert.throws(()=>normalizePrice(-1,'kg'));
  assert.throws(()=>normalizePrice('NaN','kg'));
+});
+test('运费可按吨录入，统一折算成元/kg',()=>{
+ assert.equal(normalizeFreight('0.6','kg'),0.6);
+ assert.equal(normalizeFreight(80,'ton'),0.08);
+ assert.equal(normalizeFreight('950','ton'),0.95);
+ assert.equal(normalizeFreight('','ton'),null);
+ assert.equal(normalizeFreight(null),null);
+ assert.throws(()=>normalizeFreight(-1,'kg'));
+ assert.throws(()=>normalizeFreight('abc','kg'));
+ assert.throws(()=>normalizeFreight(1,'jin'));
 });
 test('同规格同口径，只保留周期内最新有效供应商样本',()=>{
  const quotes=[quote(),quote({id:'old',price:50,quoted_on:'2026-11-08'}),quote({id:'pending',supplier:'待审',status:'pending'}),quote({id:'rejected',supplier:'拒绝',status:'rejected'}),quote({id:'expired',supplier:'过期',valid_until:'2026-11-08'}),quote({id:'future',supplier:'未来',quoted_on:'2026-11-10'}),quote({id:'different',supplier:'另一规格',product_id:'b'}),quote({id:'basis',supplier:'含运',basis:'delivered'}),quote({id:'old-period',supplier:'周期外',quoted_on:'2026-10-31',valid_until:'2026-11-15'})];

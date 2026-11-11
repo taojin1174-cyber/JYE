@@ -86,3 +86,9 @@ th[aria-sort] .th-sort{color:#6d7f74;font-weight:500}
   .lead-head .lead-filters{order:3;width:100%;margin-left:0}
 }
 @media(max-width:1100px){.lead-head h2 small{display:none}}
+
+/* 价格 / 运费：数值框 + 单位下拉。单位下拉按「元/吨」的实际宽度自适应，避免被原生箭头挤掉字 */
+.price-input{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start}
+.price-input input{min-width:0}
+.price-input select{width:auto;min-width:82px;padding:9px 26px 9px 9px}
+@media(max-width:520px){.price-input{grid-template-columns:1fr}}

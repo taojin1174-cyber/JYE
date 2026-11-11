@@ -12,6 +12,14 @@ export function normalizePrice(price, unit) {
   if (!['kg','jin','ton'].includes(unit)) throw new Error('不支持的计价单位');
   return Math.round(n * ({ kg:1, jin:2, ton:0.001 }[unit]) * 10000) / 10000;
 }
+// 运费可按吨报价，入库前统一折算成元/kg；留空表示未填。
+export function normalizeFreight(value, unit = 'kg') {
+  if (value === '' || value == null) return null;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) throw new Error('运费不能为负数');
+  if (!['kg','ton'].includes(unit)) throw new Error('不支持的运费计价单位');
+  return Math.round(n * (unit === 'ton' ? 0.001 : 1) * 10000) / 10000;
+}
 export const money = value => value == null ? '—' : Number(value).toFixed(2);
 export function matchesLeadCategory(lead,category) {
   return !category || lead.category===category || String(lead.title||'').includes(category);

@@ -61,3 +61,16 @@ th[aria-sort] .th-sort{color:#6d7f74;font-weight:500}
 .th-sort svg{opacity:.5;transition:opacity .15s}
 .th-sort:hover svg,.th-sort:focus-visible svg{opacity:1}
 @media(max-width:760px){.th-sort{height:38px}}
+
+/* 线索表工具行：来源类型标签靠左，品类与发布时间两个下拉靠右成组 */
+.lead-filters{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.lead-filters select{height:32px;min-height:32px;padding-top:0;padding-bottom:0}
+@media(max-width:760px){.lead-filters{width:100%;margin-left:0}.lead-filters select{flex:1;min-width:0}}
+
+/* 窄屏分页：脚注独占一行，翻页按钮换到下一行右对齐，避免「1 / 11」被压成竖排 */
+@media(max-width:760px){
+  .pagination{flex-wrap:wrap;gap:8px}
+  .pagination>span{flex:1 1 100%}
+  .pagination div{width:100%;justify-content:flex-end}
+  .pagination div span{white-space:nowrap}
+}

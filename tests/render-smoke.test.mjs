@@ -18,11 +18,11 @@ function stubDom(hash, { unlocked = true, data = snapshot, storage = {} } = {}) 
   const unlockedKey = `hqt-settings:/:${settingsLock.verifier.slice(0, 16)}`;
   const session = new Map([[unlockedKey, 'unlocked']]);
   const el = () => ({ innerHTML: '', textContent: '', open: false, classList: { add() {}, remove() {} }, showModal() { this.open = true; }, close() { this.open = false; }, querySelector: () => null, addEventListener() {} });
-  const clicks = [];
+  const clicks = [], changes = [];
   const app = el(), toast = el(), dialog = el();
   globalThis.document = {
     querySelector: sel => sel === '#app' ? app : sel === '#toast' ? toast : sel === '#dialog' ? dialog : null,
-    addEventListener: (type, fn) => { if (type === 'click') clicks.push(fn); },
+    addEventListener: (type, fn) => { if (type === 'click') clicks.push(fn); if (type === 'change') changes.push(fn); },
   };
   globalThis.window = { addEventListener() {} };
   globalThis.location = { hash, pathname: '/', reload() {} };
@@ -32,6 +32,10 @@ function stubDom(hash, { unlocked = true, data = snapshot, storage = {} } = {}) 
   app.__click = dataset => {
     const target = { dataset, closest: sel => (sel === 'button,a' ? target : null) };
     for (const fn of clicks) fn({ target });
+  };
+  app.__change = (dataset, value) => {
+    const target = { dataset, value, id: '', files: [] };
+    for (const fn of changes) fn({ target });
   };
   return app;
 }
@@ -126,6 +130,20 @@ test('线索表可按发布日期升降序切换', async () => {
   app.__click({ leadSort: '' });
   assert.match(app.innerHTML, /<th aria-sort="descending">/, '再次点击应切回降序');
   assert.match(rows()[0], /2026-11-10/, '降序时最新的线索应排在第一行');
+});
+
+test('线索默认只显示近 30 天，更早的折叠但可切到全部时间', async () => {
+  // 采集会抓到多年前的行情文章，这类老线索默认不该占据列表。
+  const old = { ...snapshot.items[0], id: 'fixture-old', published_on: '2016-10-20', title: '2016 年历史行情文章' };
+  const data = { ...snapshot, items: [...snapshot.items, old] };
+  const app = stubDom('#settings', { data });
+  await import('../src/app.js?route=lead-range');
+  assert.doesNotMatch(app.innerHTML, /2016 年历史行情文章/, '默认不该显示 2016 年的线索');
+  assert.match(app.innerHTML, /折叠 1 条旧线索/, '应提示被折叠的旧线索数量');
+  assert.match(app.innerHTML, /data-filter="leadRange"/, '应提供发布时间下拉');
+  app.__change({ filter: 'leadRange' }, '0');
+  assert.match(app.innerHTML, /2016 年历史行情文章/, '选「全部时间」后旧线索应重新出现');
+  assert.doesNotMatch(app.innerHTML, /折叠 1 条/, '不再显示折叠提示');
 });
 
 test('访问密码配置只含盐与派生值，且迭代次数达标', () => {

@@ -27,3 +27,35 @@
 }
 
 /* settings 栏目行压缩：tabs-actions 与分段标签同排 */
+
+/* 基础设置：方形折叠卡片，默认收起，点击展开占满整行 */
+.settings-grid { grid-template-columns: repeat(4, 1fr); align-items: start; gap: 14px; }
+.panel.fold { position: relative; }
+.panel.fold > summary { cursor: pointer; list-style: none; user-select: none; }
+.panel.fold > summary::-webkit-details-marker { display: none; }
+.panel.fold > summary::after { content: '+'; margin-left: auto; color: #7d9487; font-size: 17px; line-height: 1; }
+.panel.fold[open] > summary::after { content: '−'; }
+.panel.fold[open] { grid-column: 1 / -1; }
+.panel.fold[open] > summary { background: #fbfcfb; }
+.panel.fold:not([open]) { aspect-ratio: 1.15; }
+.panel.fold:not([open]) > summary { border-bottom: 0; height: 100%; flex-direction: column; align-items: flex-start; justify-content: center; gap: 5px; padding: 15px 16px; }
+.panel.fold:not([open]) > summary h2 { flex-direction: column; align-items: flex-start; gap: 4px; font-size: 13px; }
+.panel.fold:not([open]) > summary::after { position: absolute; top: 11px; right: 13px; margin: 0; }
+.fold-actions { display: flex; justify-content: flex-end; margin: -4px 0 8px; }
+.row-right { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.text-btn.danger { color: #b35a4d; }
+
+/* 线索详情：默认收起，点开看完整采集信息 */
+.lead-more { margin-top: 6px; }
+.lead-more > summary { cursor: pointer; list-style: none; display: inline-block; font-size: 10px; color: var(--green); }
+.lead-more > summary::-webkit-details-marker { display: none; }
+.lead-more > summary::before { content: '▸ '; }
+.lead-more[open] > summary::before { content: '▾ '; }
+.lead-more > .lead-note { margin-top: 6px; padding: 8px 10px; background: #f7faf8; border: 1px solid #eef2ef; border-radius: 4px; }
+
+@media (max-width: 760px) {
+  .settings-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .panel.fold:not([open]) { aspect-ratio: 1.3; }
+  .panel.fold:not([open]) > summary { padding: 12px 13px; }
+}
+

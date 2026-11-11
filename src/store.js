@@ -96,6 +96,25 @@ export const store={
     const next=structuredClone(data);const quote=next.quotes.find(q=>q.id===id);if(!quote?.deleted_at)throw new Error('报价不在回收站');Object.assign(quote,{deleted_at:null,deleted_by:null,deletion_request_id:null,restored_at:new Date().toISOString(),restored_by:this.member.id,restore_reason:reason.trim()});localAudit(next,'quote_restored',id,{reason:reason.trim()});persist(next);return viewData();
   },
   async addProduct(product){requireAdmin();if(cloud){await request('/rest/v1/products',{method:'POST',body:product});return this.reload();}const next=structuredClone(data);next.products.push(product);persist(next);return viewData();},
+  // 删除产品规格。已有报价引用的产品不允许直接删，避免报价变成无主记录。
+  async deleteProduct(id){
+   requireAdmin();
+   const product=(data.products||[]).find(p=>p.id===id);
+   if(!product)throw new Error('产品不存在');
+   const used=(data.quotes||[]).filter(q=>q.product_id===id&&!q.deleted_at).length;
+   if(used)throw new Error(`「${product.name} ${product.spec}」还有 ${used} 条报价，请先删除这些报价再删产品`);
+   if(cloud){
+    try{await request(`/rest/v1/products?id=eq.${encodeURIComponent(id)}`,{method:'DELETE'});}
+    catch(e){
+     const msg=String(e&&e.message||'');
+     if(/permission denied|42501|jwt/i.test(msg))throw new Error('云端尚未开通删除权限，请先在 Supabase 执行 supabase/migrations/20261111_product_delete.sql');
+     if(/foreign key|23503/i.test(msg))throw new Error('该规格仍被报价引用，请先删除对应报价');
+     throw e;
+    }
+    return this.reload();
+   }
+   const next=structuredClone(data);next.products=next.products.filter(p=>p.id!==id);persist(next);return viewData();
+  },
   async dismissLead(id){requireAdmin();if(cloud){await request(`/rest/v1/collection_items?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',body:{status:'dismissed'}});return this.reload();}const next=structuredClone(data);const lead=next.leads.find(l=>l.id===id);if(!lead)throw new Error('线索不存在');lead.status='dismissed';persist(next);return viewData();},
   // 已处理线索：恢复待审 / 删除 / 撤销入库。云端状态受 check 约束，删除退化为 dismissed。
   async setLeadStatus(id,status){

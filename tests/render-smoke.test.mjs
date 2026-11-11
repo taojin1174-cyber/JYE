@@ -31,8 +31,8 @@ const cases = [
   ['overview', ['参考范围', '产品参考均价', '导出数据', '录入报价']],
   ['compare', ['供货报价', '全部产品规格']],
   ['review', ['待确认', '刷新记录']],
-  ['settings', ['管理品类', '导入备份', '此设备（未上传）', '基础设置']],
-  ['settings/sources', ['自动采集线索', '已处理', '核实入库']],
+  ['settings', ['自动采集线索', '已处理', '数据中心', '基础设置']],
+  ['settings/general', ['管理品类', '导入备份', '此设备（未上传）', '产品库']],
 ];
 
 for (const [hash, markers] of cases) {
@@ -48,6 +48,17 @@ for (const [hash, markers] of cases) {
   });
 }
 
+test('基础设置页：四个面板是可折叠卡片，产品库带删除入口', async () => {
+  const app = stubDom('#settings/general');
+  await import('../src/app.js?route=settings-fold');
+  const html = app.innerHTML;
+  const folds = html.match(/<details class="panel fold"/g) || [];
+  assert.equal(folds.length, 4, '产品库/数据来源/统计口径/团队与访问都应是折叠卡片');
+  assert.ok(!/<section class="panel">/.test(html), '基础设置不应再有不可折叠的面板');
+  assert.match(html, /data-delete-product="/, '产品库应提供删除按钮');
+  assert.match(html, /data-action="add-product"/, '产品库应保留添加按钮');
+});
+
 test('数据设置页的导出与录入按钮并入栏目行，不再单独占一行', async () => {
   const app = stubDom('#settings');
   await import('../src/app.js?route=settings-tabs');
@@ -57,7 +68,7 @@ test('数据设置页的导出与录入按钮并入栏目行，不再单独占�
   assert.ok(start >= 0, '缺少栏目行');
   const bar = html.slice(start, start + 900);
   assert.match(bar, /data-settings-view="general"/, '栏目行应含基础设置');
-  assert.match(bar, /data-settings-view="sources"/, '栏目行应含来源中心');
+  assert.match(bar, /data-settings-view="sources"/, '栏目行应含数据中心');
   assert.match(bar, /data-action="export"/, '导出按钮应在栏目行内');
   assert.match(bar, /data-action="add"/, '录入按钮应在栏目行内');
   assert.match(bar, /data-action="lock-settings"/, '锁定按钮应在栏目行内');

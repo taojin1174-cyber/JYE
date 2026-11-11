@@ -63,7 +63,7 @@ function changeValue(values) { Object.assign(state,values,{pageNumber:1}); rende
 
 function header() {
  const pending=data.quotes.filter(q=>q.status==='pending').length;
- return `<header class="topbar"><a href="#overview" class="brand" aria-label="行情跳动首页"><img src="./favicon.svg" alt=""><div><strong>行情跳动</strong></div></a><nav class="nav" aria-label="主导航">${[['overview','行情总览'],['compare','采购比价'],['review','报价审核'],['settings','数据设置']].map(([id,label])=>`<button data-page="${id}" class="${state.page===id?'active':''}">${label}${id==='review'&&pending?`<span class="count">${pending}</span>`:''}</button>`).join('')}</nav><div class="top-actions">${unlocked()?'<a class="text-btn" href="./leads.html">线索表 ↗</a>':''}<span class="mode">${store.cloud?'团队工作台':'正式版'}</span><button class="avatar" data-action="account" aria-label="账户信息">${admin()?'管':store.role==='editor'?'编':'览'}</button></div></header>`;
+ return `<header class="topbar"><a href="#overview" class="brand" aria-label="行情跳动首页"><img src="./favicon.svg" alt=""><div><strong>行情跳动</strong></div></a><nav class="nav" aria-label="主导航">${[['overview','行情总览'],['compare','采购比价'],['review','报价审核'],['settings','数据设置']].map(([id,label])=>`<button data-page="${id}" class="${state.page===id?'active':''}">${label}${id==='review'&&pending?`<span class="count">${pending}</span>`:''}</button>`).join('')}</nav><div class="top-actions"><span class="mode">${store.cloud?'团队工作台':'正式版'}</span><button class="avatar" data-action="account" aria-label="账户信息">${admin()?'管':store.role==='editor'?'编':'览'}</button></div></header>`;
 }
 function render() {
  if(!['overview','compare','review','settings'].includes(state.page)) state.page='overview';

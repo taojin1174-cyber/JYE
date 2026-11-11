@@ -1,7 +1,7 @@
 @echo off
 setlocal
-rem One-click daily run: public market leads + roujiaosuo poultry leads,
-rem then commit and push. Run once per day after the machine is switched on.
+rem One-click daily run: collect leads, write them to the cloud, back up locally.
+rem Business data never enters this public repo -- only code does.
 rem Clear proxy vars: a stale proxy makes GitHub return "CONNECT tunnel failed: 502".
 set "HTTP_PROXY="
 set "HTTPS_PROXY="
@@ -21,39 +21,37 @@ set "PROXYARG=-c http.proxy=socks5h://127.0.0.1:10808"
 
 :netok
 
-echo [1/5] Collect public market leads...
+echo [1/6] Collect public market leads...
 node scripts/discovery.mjs
 if errorlevel 1 echo     Some sources failed, continuing with available data.
 
-echo [2/5] Scrape roujiaosuo poultry leads...
+echo [2/6] Push new market leads to cloud (insert only, never overwrite reviewed)...
+node scripts/import-leads-to-cloud.mjs
+if errorlevel 1 echo     Cloud import failed; local snapshot kept.
+
+echo [3/6] Scrape roujiaosuo poultry leads...
 node scripts/roujiaosuo-scrape.mjs
 if errorlevel 1 (
   echo     Scrape failed, keeping the previous lead file.
 ) else (
   node scripts/roujiaosuo-build.mjs
-  node scripts/import-roujiaosuo-leads.mjs --only-frozen
+  node scripts/import-roujiaosuo-leads.mjs --only-frozen --cloud
 )
 
-echo [3/5] Backup cloud data to local folder...
+echo [4/6] Backup cloud data to local folder...
 if exist .env node scripts\backup-cloud.mjs
 
-if not exist backups mkdir backups
-echo [4/5] Check changes...
+echo [5/6] Check code changes...
 git add -A
 git diff --cached --quiet
 if not errorlevel 1 goto nochange
 
-echo [5/5] Commit and push...
-git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Daily price collection (local run)"
+echo [6/6] Commit and push code only...
+git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Daily code update (local run)"
 git %PROXYARG% pull --rebase origin main
 if errorlevel 1 (
-  echo     Rebase conflict: keep the freshly collected snapshot...
-  git checkout --theirs data/discovery.json 2>nul
-  git checkout --theirs data/roujiaosuo-leads.json 2>nul
-  git checkout --theirs data/roujiaosuo-leads.csv 2>nul
-  node scripts/import-roujiaosuo-leads.mjs --only-frozen
-  git add -A
-  git -c core.editor=true rebase --continue
+  echo     Rebase failed, please resolve manually. Nothing was pushed.
+  goto done
 )
 git %PROXYARG% push origin main
 if errorlevel 1 (
@@ -62,6 +60,8 @@ if errorlevel 1 (
   git %PROXYARG% push origin main
 )
 if errorlevel 1 echo     Push still failed. Check network or open the proxy on port 10808.
+
+:done
 echo Done.
 goto :eof
 

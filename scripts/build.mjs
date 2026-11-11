@@ -6,26 +6,13 @@ if(config.supabaseKey.startsWith('eyJ')) {
   const payload=JSON.parse(Buffer.from(config.supabaseKey.split('.')[1],'base64url').toString());
   if(payload.role==='service_role')throw new Error('service_role 不能发布到前端，请使用 anon 公钥');
 }
+// 每次全量重建，避免上一次构建残留的页面或数据文件被一起发布。
+await rm('dist',{recursive:true,force:true});
 await mkdir('dist',{recursive:true});
-await rm('dist/data',{recursive:true,force:true});
-for(const file of ['index.html','leads.html','rescue.html','config.js','favicon.svg'])await copyFile(file,`dist/${file}`);
+// 只发布页面骨架与代码；任何业务数据（线索、报价、产品）一律不进静态产物。
+// 数据只能通过登录后的 Supabase 接口按行级权限获取，静态文件里不得内嵌或预渲染。
+for(const file of ['index.html','rescue.html','config.js','favicon.svg'])await copyFile(file,`dist/${file}`);
 await cp('src','dist/src',{recursive:true});
-// 原始抓取结果（含明文详情链接）不发布，只保留前端运行需要的采集快照。
-await mkdir('dist/data',{recursive:true});
-for(const file of await readdir('data')){
-  if(/^roujiaosuo-leads\.(json|csv)$/.test(file))continue;
-  await copyFile(`data/${file}`,`dist/data/${file}`);
-}
-// 发布快照脱敏：出处字段编码进 ref，由 src/store.js 运行时还原。
-// 直接打开 dist/data/discovery.json 看不到明文网址、渠道名或采集细节。
-const snapshot=JSON.parse(await readFile('data/discovery.json','utf8'));
-const enc=value=>Buffer.from(String(value??''),'utf8').toString('base64');
-snapshot.items=(snapshot.items||[]).map(item=>{
-  const {url,source_name,details,source_id,...rest}=item;
-  return {...rest,source_id:'supply',source_name:'供货线索',url:'',details:'',ref:enc(JSON.stringify({url,source_name,details,source_id}))};
-});
-snapshot.runs=(snapshot.runs||[]).map(run=>({...run,source_id:'supply'}));
-await writeFile('dist/data/discovery.json',JSON.stringify(snapshot,null,2)+'\n');
 // HTML 与模块使用同一内容版本，避免发布后旧缓存与新模块交叉加载。
 const sourceFiles=(await readdir('src')).filter(name=>/\.(js|css)$/.test(name)).sort();
 const hash=createHash('sha256');

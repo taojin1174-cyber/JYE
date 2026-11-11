@@ -315,7 +315,13 @@ render();
 </body>
 </html>`;
 
-await writeFile(new URL('../leads.html', import.meta.url), html, 'utf8');
+// 线索页默认不再生成：静态 HTML 会把完整线索数据下发给未登录访客，
+// 密码门只在浏览器里校验，挡不住直接下载。需要离线查看时显式加 --with-page，
+// 生成的 leads.html 已被 .gitignore 排除，不会进公开仓库、也不会被发布。
+if (process.argv.includes('--with-page')) {
+  await writeFile(new URL('../leads.html', import.meta.url), html, 'utf8');
+  console.log('已生成本地 leads.html（不发布、不进仓库）');
+}
 
 const csvCols = [
   ['品类', 'category'], ['序号', 'idx'], ['更新日期', 'updated_on'], ['更新时间文本', 'updated_text'],
@@ -334,5 +340,5 @@ const csvText = '\uFEFF' + [csvCols.map(c => '"' + c[0] + '"').join(',')]
   }).join(',')))
   .join('\r\n');
 await writeFile(new URL('../data/roujiaosuo-leads.csv', import.meta.url), csvText, 'utf8');
-console.log('已生成 leads.html 与 data/roujiaosuo-leads.csv；总条数', rows.length);
+console.log('已生成 data/roujiaosuo-leads.csv（本地数据，不进仓库）；总条数', rows.length);
 for (const c of CATS) console.log(' ', c, summary[c].count, '条，中位价', summary[c].median, '元/斤');

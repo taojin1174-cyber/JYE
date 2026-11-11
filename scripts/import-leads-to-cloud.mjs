@@ -2,6 +2,15 @@
 // 仅用于服务端/本机一次性搬运；密钥从环境变量读取，绝不写进仓库或前端。
 // 用法：SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/import-leads-to-cloud.mjs
 import { readFile } from 'node:fs/promises';
+import { readFileSync, existsSync } from 'node:fs';
+
+// 允许直接用仓库根目录的 .env（不进仓库），省去每次手工导出环境变量。
+if (existsSync('.env')) {
+  for (const line of readFileSync('.env', 'utf8').split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
+  }
+}
 
 const FIELDS = ['id', 'source_id', 'source_name', 'title', 'url', 'price_text', 'region_text', 'published_on', 'category', 'kind', 'details', 'status', 'fetched_at'];
 const KINDS = new Set(['supply', 'market', 'macro']);
@@ -36,7 +45,9 @@ async function main() {
     const batch = normalized.slice(i, i + 100);
     const response = await fetch(`${endpoint}/rest/v1/collection_items?on_conflict=id`, {
       method: 'POST',
-      headers: { ...headers, Prefer: 'resolution=merge-duplicates,return=minimal' },
+      // ignore-duplicates：只补云端没有的线索。绝不能覆盖已有记录，
+      // 否则每天采集都会把用户已经「入库 / 忽略」的线索状态冲回待审。
+      headers: { ...headers, Prefer: 'resolution=ignore-duplicates,return=minimal' },
       body: JSON.stringify(batch),
       signal: AbortSignal.timeout(30000),
     });

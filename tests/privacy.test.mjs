@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { buildQuickQuote } from '../src/lead-quick.js';
 import { validateQuote } from '../src/core.js';
 
@@ -58,20 +58,23 @@ test('静态模块与页面元数据不泄露明文出处', () => {
   assert.doesNotMatch(read('../scripts/roujiaosuo-build.mjs'), /肉交所|roujiaosuo\.com|登录肉交所/);
 });
 
-test('发布脚本必须脱敏快照、排除原始抓取数据并做发布前自检', () => {
+test('构建脚本不把任何业务数据写进静态产物，并保留发布前泄漏自检', () => {
   const b = read('../scripts/build.mjs');
-  assert.match(b, /rm\('dist\/data'/);
-  assert.match(b, /roujiaosuo-leads/);
-  assert.match(b, /ref:enc/);
-  assert.match(b, /scanLeak/);
-  assert.match(b, /store\.js 运行时还原/);
+  assert.doesNotMatch(b, /dist\/data/, '不得生成数据目录');
+  assert.doesNotMatch(b, /discovery\.json/, '不得读取采集快照并发布');
+  assert.doesNotMatch(b, /leads\.html/, '不得复制线索页');
+  assert.match(b, /rm\('dist'/, '每次构建应全量重建，避免旧数据残留');
+  assert.match(b, /scanLeak/, '仍需保留发布前的明文泄漏自检');
 });
 
-test('发布快照的 ref 编码可无损还原，还原后仍能一键入库', () => {
-  const snapshot = JSON.parse(read('../data/discovery.json'));
+test('线索数据的来源字段编码可无损还原', () => {
   const enc = v => Buffer.from(String(v ?? ''), 'utf8').toString('base64');
   const dec = v => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(v), c => c.charCodeAt(0))));
-  const item = snapshot.items[0];
+  const item = {
+    id: 'x1', title: '白条鹅 5斤装', price_text: '9.80元/斤', region_text: '广东清远',
+    published_on: '2026-11-10', category: '鹅', kind: 'supply', status: 'pending',
+    url: 'https://example.com/item/1', source_name: '某来源', source_id: 'src-1', details: '详情文本',
+  };
   const { url, source_name, details, source_id, ...rest } = item;
   const published = {
     ...rest, source_id: 'supply', source_name: '供货线索', url: '', details: '',
@@ -87,11 +90,18 @@ test('发布快照的 ref 编码可无损还原，还原后仍能一键入库', 
   assert.equal(q.ok, true, q.reasons.join('；'));
 });
 
-test('线索表页面必须有密码门且数据不以明文内嵌', () => {
-  const html = read('../leads.html');
-  assert.match(html, /id="gate-form"/);
-  assert.match(html, /id="app" hidden/);
-  assert.match(html, /type="text\/plain"/);
-  assert.match(html, /verifyGate/);
-  assert.doesNotMatch(html, /roujiaosuo\.com|肉交所/);
+test('公开产物不得包含任何业务数据（线索页密码门只是前端校验，挡不住直接下载）', () => {
+  // 静态页面的密码门在浏览器里校验，服务器仍会把整份数据发给未登录访客，
+  // 所以线索页不再生成、数据不再预渲染进任何静态文件。
+  for (const p of ['../leads.html', '../dist/leads.html', '../dist/data', '../dist/data/discovery.json']) {
+    assert.equal(existsSync(new URL(p, import.meta.url)), false, `${p} 不应存在：会被未登录访客直接下载`);
+  }
+});
+
+test('构建脚本不向静态产物写入业务数据', () => {
+  const build = read('../scripts/build.mjs');
+  assert.doesNotMatch(build, /leads\.html/, '构建不得复制线索页');
+  assert.doesNotMatch(build, /dist\/data/, '构建不得生成数据目录');
+  const gen = read('../scripts/roujiaosuo-build.mjs');
+  assert.match(gen, /--with-page/, '线索页只能在显式加参数时生成到本地');
 });

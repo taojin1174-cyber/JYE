@@ -23,22 +23,19 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      # 肉交所四品类线索由本机抓取后提交 data/roujiaosuo-leads.json，
-      # 这里只做离线转换与合并，不联网；避免每次定时采集把待审线索冲掉。
+      # 肉交所快照不再进仓库（含供应商联系方式），本机采集时直接入库；
+      # 有这个文件才合并，没有就跳过，避免工作流因为缺文件而失败。
       - name: Merge frozen-poultry leads
-        run: node scripts/import-roujiaosuo-leads.mjs --cloud --only-frozen
+        run: |
+          if [ -f data/roujiaosuo-leads.json ]; then
+            node scripts/import-roujiaosuo-leads.mjs --cloud --only-frozen
+          else
+            echo "无本地肉交所快照，跳过合并（该品类由本机采集后直接写库）"
+          fi
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      - name: Save public snapshot
-        run: |
-          if [ -f data/discovery.json ]; then
-            git add data/discovery.json
-            if ! git diff --cached --quiet; then
-              git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Update public price leads'
-              git push
-            fi
-          fi
+      # 采集结果只写数据库，不回写仓库：公开仓库不得留有任何业务数据快照。
       # GITHUB_TOKEN 推送不会触发另一个 push 工作流，因此在此明确构建与发布。
       - run: npm ci
       - run: npm test

@@ -3,6 +3,15 @@
 // 不绕过登录、不补全电话、不推算规格；标价为待核实线索，不进入供货均价。
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { readFileSync, existsSync } from 'node:fs';
+
+// 允许直接用仓库根目录的 .env（不进仓库），省去每次手工导出环境变量。
+if (existsSync('.env')) {
+  for (const line of readFileSync('.env', 'utf8').split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
+  }
+}
 
 const SOURCE_ID = 'roujiaosuo_cats';
 const SOURCE_NAME = '肉交所·四品类';

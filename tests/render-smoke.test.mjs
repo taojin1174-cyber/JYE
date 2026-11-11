@@ -3,13 +3,17 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { settingsLock } from '../src/settings-lock.js';
 import { accessLock } from '../src/access-lock.js';
+import { config } from '../config.js';
+
+// 本机模式的数据键名，由 config.localTrial 决定；用于预置「已入库」等历史状态。
+const DATA_KEY = config.localTrial ? 'hqt-trial-data-v2' : 'hqt-data-v2';
 
 const snapshot = JSON.parse(readFileSync(new URL('./fixtures/leads.json', import.meta.url), 'utf8'));
 
 // 最小 DOM 桩：只验证模块能完整启动、4 个 hash 页面都能渲染出正确结构。
-function stubDom(hash, { unlocked = true } = {}) {
+function stubDom(hash, { unlocked = true, data = snapshot, storage = {} } = {}) {
   // 全站访问门：默认按「已解锁」启动，另有一条用例验证未解锁时只显示密码页。
-  const memory = new Map([[`hqt-access:/:${accessLock.verifier.slice(0, 16)}`, 'unlocked']]);
+  const memory = new Map([[`hqt-access:/:${accessLock.verifier.slice(0, 16)}`, 'unlocked'], ...Object.entries(storage)]);
   if (!unlocked) memory.clear();
   const unlockedKey = `hqt-settings:/:${settingsLock.verifier.slice(0, 16)}`;
   const session = new Map([[unlockedKey, 'unlocked']]);
@@ -23,7 +27,7 @@ function stubDom(hash, { unlocked = true } = {}) {
   globalThis.location = { hash, pathname: '/', reload() {} };
   globalThis.localStorage = { getItem: k => memory.get(k) ?? null, setItem: (k, v) => memory.set(k, v), removeItem: k => memory.delete(k) };
   globalThis.sessionStorage = { getItem: k => session.get(k) ?? null, setItem: (k, v) => session.set(k, v), removeItem: k => session.delete(k) };
-  globalThis.fetch = async () => ({ ok: true, json: async () => snapshot });
+  globalThis.fetch = async () => ({ ok: true, json: async () => data });
   return app;
 }
 
@@ -80,6 +84,23 @@ test('未解锁时只显示访问密码页，页面不含任何报价或线索',
   assert.match(app.innerHTML, /请输入访问密码/);
   assert.match(app.innerHTML, /id="access-form"/);
   assert.doesNotMatch(app.innerHTML, /产品参考均价|供货报价|待确认报价|自动采集线索/);
+});
+
+test('已入库的线索不消失，改为沉到列表末尾并标注', async () => {
+  // 预置一条本机已入库记录：它在采集快照里仍然存在（发布日 2026-11-10，本应排在前面）。
+  const storage = { [DATA_KEY]: JSON.stringify({ products: [], quotes: [], leads: [{ id: 'fixture-0003', status: 'converted' }] }) };
+  const app = stubDom('#settings', { storage });
+  await import('../src/app.js?route=lead-done-last');
+  const html = app.innerHTML;
+  const body = html.slice(html.indexOf('<tbody>') + 7, html.indexOf('</tbody>'));
+  const rows = body.split('<tr').filter(Boolean);
+  const last = rows.at(-1);
+  assert.equal(rows.length, 10, '已入库的线索仍留在列表里，不应被隐藏');
+  assert.match(last, /lead-done/, '已入库的线索应排在本页最后一行');
+  assert.match(last, /白条鹅（净膛）/, '排到末尾的应是刚入库的那条线索');
+  assert.match(last, /已入库/, '已入库的行要标注状态，避免与待核实混淆');
+  assert.doesNotMatch(last, /data-lead="/, '已入库的线索不应再出现核实入库按钮');
+  assert.equal(rows.filter(r => !/lead-done/.test(r)).length, rows.length - 1, '只有已入库的那一行被淡化');
 });
 
 test('访问密码配置只含盐与派生值，且迭代次数达标', () => {

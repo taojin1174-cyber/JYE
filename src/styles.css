@@ -26,6 +26,12 @@
 .access-tip{display:block;margin-top:14px;font-size:10px;color:var(--muted);line-height:1.7;text-align:center}
 .login.access h1{margin-bottom:6px}
 
+/* 已入库的线索沉到列表末尾：整行淡化并带左侧标线，与待核实区分 */
+tbody tr.lead-done td{background:#fafbfa;color:#93a099}
+tbody tr.lead-done:hover td{background:#f6f9f7}
+tbody tr.lead-done td:first-child{box-shadow:inset 3px 0 #cbdfd3}
+tbody tr.lead-done .lead-title a{color:#7d8d84}
+
 /* 页面工具栏：左侧筛选与右侧操作按钮同排，右端对齐（行情总览 / 采购比价 / 报价审核） */
 .page-bar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
 @media(max-width:760px){.page-bar-actions{width:100%;justify-content:flex-end}.page-bar-actions .export-label{display:none}}

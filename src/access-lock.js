@@ -4,6 +4,6 @@ export const accessLock = Object.freeze({
   "algorithm": "PBKDF2",
   "hash": "SHA-256",
   "iterations": 600000,
-  "salt": "034e7cf7b86a494c90e206741e0d8870",
-  "verifier": "301fe6305600edde943ec008d163c265363f76a5ec8eff88df20f55235f37bb6"
+  "salt": "4916e08ee4e4d409615311eadf6387cf",
+  "verifier": "f468258de6388bde4db4c00f34109ee37f60bbffd9d1b4be4ca522f89bfa8676"
 });

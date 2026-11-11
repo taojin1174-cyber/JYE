@@ -48,6 +48,21 @@ for (const [hash, markers] of cases) {
   });
 }
 
+test('数据设置页的导出与录入按钮并入栏目行，不再单独占一行', async () => {
+  const app = stubDom('#settings');
+  await import('../src/app.js?route=settings-tabs');
+  const html = app.innerHTML;
+  assert.doesNotMatch(html, /class="page-actions/, '不应再输出独立的操作行');
+  const start = html.indexOf('<div class="settings-tabs">');
+  assert.ok(start >= 0, '缺少栏目行');
+  const bar = html.slice(start, start + 900);
+  assert.match(bar, /data-settings-view="general"/, '栏目行应含基础设置');
+  assert.match(bar, /data-settings-view="sources"/, '栏目行应含来源中心');
+  assert.match(bar, /data-action="export"/, '导出按钮应在栏目行内');
+  assert.match(bar, /data-action="add"/, '录入按钮应在栏目行内');
+  assert.match(bar, /data-action="lock-settings"/, '锁定按钮应在栏目行内');
+});
+
 test('未解锁时只显示访问密码页，页面不含任何报价或线索', async () => {
   const app = stubDom('#overview', { unlocked: false });
   await import('../src/app.js?route=locked');

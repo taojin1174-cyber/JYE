@@ -2,9 +2,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-bottom: 16px;
 }
+.tabs-actions { display: flex; align-items: center; gap: 6px; }
+.settings-tabs .btn { min-height: 27px; padding: 4px 9px; font-size: 11px; gap: 5px; }
+.settings-tabs .segmented button { padding: 5px 13px; }
 .lead-actions { flex-wrap: wrap; align-items: center; }
 .custom-product-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 15px; background: #f3f7f4; border: 1px solid #e2ebe5; border-radius: 5px; }
 .custom-product-fields[hidden] { display: none; }
@@ -17,5 +21,7 @@
 .settings-unlock > small { display: block; color: var(--muted); font-size: 10px; line-height: 1.7; margin-top: 17px; }
 @media (max-width: 760px) {
   .settings-unlock { margin: 28px auto 50px; padding: 23px; }
-  .settings-tabs { margin-bottom: 16px; }
+  .settings-tabs { margin-bottom: 14px; gap: 8px; }
+  .tabs-actions { flex: 1; justify-content: flex-end; }
+  .settings-tabs .export-label { display: none; }
 }

@@ -48,7 +48,8 @@ test('一键入库写入的供应商与备注不含渠道名，且报价仍合�
   assert.equal(q.ok, true, q.reasons.join('；'));
   assert.doesNotMatch(q.quote.supplier, FORBIDDEN);
   assert.doesNotMatch(q.quote.notes, FORBIDDEN);
-  assert.doesNotThrow(() => validateQuote(q.quote, [q.product], '2026-11-11'));
+  // 有效期由录入人填写，补齐后才应通过校验。
+  assert.doesNotThrow(() => validateQuote({ ...q.quote, valid_until: '2026-11-11' }, [q.product], '2026-11-11'));
 });
 
 test('静态模块与页面元数据不泄露明文出处', () => {

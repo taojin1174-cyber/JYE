@@ -192,12 +192,12 @@ function quickConvertDialog(lead) {
  const extra=[q.contact?`联系人 ${esc(q.contact)}`:'',q.phone?`电话 ${esc(q.phone)}（平台脱敏）`:'',q.specClue&&q.specClue!=='待核实'?`规格线索 ${esc(q.specClue.slice(0,42))}`:''].filter(Boolean).join(' · ');
  const stale=q.staleDays!=null&&q.staleDays>30?`<div class="review-intro" style="margin:0 0 14px">${icon('info',14)} 原文发布于 ${esc(q.originalDate)}（${q.staleDays} 天前），价格可能已失效，请重点复核。</div>`:'';
  const blocked=q.ok?'':`<div class="review-intro" style="margin:0 0 14px">${icon('info',14)} ${q.reasons.map(esc).join('；')}，请点「修改后再录」补齐。</div>`;
- showDialog(dialogHead('确认入库',esc(lead.title))+`<div class="form-body"><p class="form-error" role="alert"></p>${stale}${blocked}<div class="settings-body" style="padding:0;line-height:1.6">${q.rows.map(r=>`<div class="settings-row"><span>${esc(r.label)}<small class="product-spec" style="display:block">${esc(r.note)}</small></span><strong>${esc(r.value)}</strong></div>`).join('')}${extra?`<p class="subtle" style="margin:14px 0 0">${extra}</p>`:''}<p class="subtle" style="margin:14px 0 0">系统补全项已写入备注，入库后可在「报价审核 → 详情 → 编辑报价」修改。<a href="${esc(lead.url)}" target="_blank" rel="noopener noreferrer">查看采集原文 ↗</a></p></div></div><div class="dialog-foot"><button class="btn" data-action="close">取消</button><button class="btn" data-quick-edit="${esc(lead.id)}">修改后再录</button>${q.ok?`<button class="btn primary" data-quick-confirm="${esc(lead.id)}">确认入库</button>`:''}</div>`);
+ showDialog(dialogHead('确认入库',esc(lead.title))+`<div class="form-body"><p class="form-error" role="alert"></p>${stale}${blocked}<div class="settings-body" style="padding:0;line-height:1.6">${q.rows.map(r=>r.label==='报价日 / 有效期'?`<div class="settings-row"><span>${esc(r.label)}<small class="product-spec" style="display:block">${esc(r.note)}</small></span><span class="quick-until"><strong>${esc(q.quote.quoted_on)}</strong> → <input type="date" id="quick-valid-until" aria-label="报价有效期" min="${esc(q.quote.quoted_on)}" required></span></div>`:`<div class="settings-row"><span>${esc(r.label)}<small class="product-spec" style="display:block">${esc(r.note)}</small></span><strong>${esc(r.value)}</strong></div>`).join('')}${extra?`<p class="subtle" style="margin:14px 0 0">${extra}</p>`:''}<p class="subtle" style="margin:14px 0 0">系统补全项已写入备注，入库后可在「报价审核 → 详情 → 编辑报价」修改。<a href="${esc(lead.url)}" target="_blank" rel="noopener noreferrer">查看采集原文 ↗</a></p></div></div><div class="dialog-foot"><button class="btn" data-action="close">取消</button><button class="btn" data-quick-edit="${esc(lead.id)}">修改后再录</button>${q.ok?`<button class="btn primary" data-quick-confirm="${esc(lead.id)}">确认入库</button>`:''}</div>`);
 }
 function quoteForm(existing,lead) {
  if(!canWrite()) return;
  let collectedProduct;
- const q=existing||{product_id:state.product||data.products[0]?.id,price:'',province:'广东',city:'',supplier:'',basis:state.basis,source:'manual',source_name:'电话询价',source_url:'',quoted_on:dayString(),valid_until:shiftDay(dayString(),2),min_order:'',freight:'',notes:''};
+ const q=existing||{product_id:state.product||data.products[0]?.id,price:'',province:'广东',city:'',supplier:'',basis:state.basis,source:'manual',source_name:'电话询价',source_url:'',quoted_on:dayString(),valid_until:'',min_order:'',freight:'',notes:''};
  if(lead) {
   if(lead.kind!=='supply')return;
   const prefill=leadPrefill(lead);
@@ -331,7 +331,10 @@ document.addEventListener('click',event=>{
   if(!lead)throw new Error('线索不存在');
   const q=buildQuickQuote(lead,data.products);
   if(!q.ok)throw new Error(q.reasons.join('；'));
-  const quote={...q.quote,id:crypto.randomUUID()};
+  // 有效期必须由录入人当场填写，系统不再代填默认天数。
+  const until=document.querySelector('#quick-valid-until')?.value||'';
+  if(!until){document.querySelector('#quick-valid-until')?.focus();throw new Error('请先填写这条报价的有效期');}
+  const quote={...q.quote,valid_until:until,id:crypto.randomUUID()};
   validateQuote(quote,[...data.products,q.product]);
   if(!data.products.some(p=>p.id===q.product.id)){
    if(!admin())throw new Error('首次入库该品类需要管理员添加产品规格');
@@ -462,7 +465,7 @@ async function showMembers() {
  const members=await store.members();
  showDialog(dialogHead('团队成员','新增成员请先在 Supabase Authentication 中邀请，再加入 members 表授权。')+`<form id="members-form"><div class="form-body"><p class="form-error" role="alert"></p>${members.map(m=>`<div class="settings-row"><span>${esc(m.display_name||m.email||m.id)}${m.id===store.user?.id?'（你）':''}</span>${m.id===store.user?.id?'<span class="muted">管理员</span>':`<select name="${esc(m.id)}" aria-label="${esc(m.display_name||m.email)}的角色" data-original="${esc(m.role)}">${options([['viewer','只读成员'],['editor','编辑人员'],['admin','管理员']],m.role)}</select>`}</div>`).join('')}</div><div class="dialog-foot"><button class="btn" type="button" data-action="close">取消</button><button class="btn primary" type="submit">保存权限</button></div></form>`);
 }
-function loginPage(error='') {app.innerHTML=`<main class="login"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>登录行情跳动</h1><p>请输入访问密码进入采购工作台。</p><form id="login-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="password">密码</label><input id="password" name="password" type="password" autocomplete="current-password" required autofocus></div><button class="btn primary" type="submit">登录</button></form></main>`;}
+function loginPage(error='') {app.innerHTML=`<main class="login"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>验证数据库口令</h1><p>首次在这台设备打开，或登录状态已过期。<br>口令由你自己保管，网页不保存、不缓存。</p><form id="login-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="password">数据库口令</label><input id="password" name="password" type="password" autocomplete="current-password" required autofocus></div><button class="btn primary" type="submit">验证并进入</button></form><small class="access-tip">验证通过后本设备会记住登录状态，之后只输访问密码即可。</small></main>`;}
 function accountDialog() {
  const who = store.cloud ? (store.user?.email || '团队账号') : '正式版';
  const roleName = ({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role] || '';

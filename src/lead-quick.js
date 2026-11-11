@@ -1,7 +1,7 @@
 // 「核实入库」一键确认：把采集线索里已有的公开事实直接组装成一条完整报价。
 // 原则：只带入原文事实；系统补全的部分（规格归类、计价口径、有效期、报价日）
 // 一律写进备注并在确认卡上标出来，入库后仍可在报价详情里改，不静默编造。
-import { dayString, shiftDay, provinces, bases, normalizePrice } from './core.js';
+import { dayString, provinces, bases, normalizePrice } from './core.js';
 
 const FROZEN = {
   '清远鸡': { id: 'frozen-qingyuan-chicken', category: '鸡', name: '清远鸡' },
@@ -39,7 +39,8 @@ export function buildQuickQuote(lead, products, today = dayString()) {
     ? Math.round((Date.parse(`${today}T12:00:00+08:00`) - Date.parse(`${originalDate}T12:00:00+08:00`)) / 86400000)
     : null;
   const quoted_on = today;
-  const valid_until = shiftDay(today, 7);
+  // 有效期不预设：由录入人每次明确填写，避免系统替人决定这条报价"还能用多久"。
+  const valid_until = '';
   // 供应商只记联系人，不写入任何平台 / 渠道名称，避免报价列表泄露出处。
   const supplier = contact ? `${contact}（供货方）` : String(lead.title || '未注明供应商');
 
@@ -80,7 +81,7 @@ export function buildQuickQuote(lead, products, today = dayString()) {
     { label: '供货价', value: price ? `¥ ${price} / kg` : '待填写', note: `标价 ${lead.price_text || '待核实'}` },
     { label: '供应商', value: supplier, note: contact ? '供货方联系人' : '按产品名暂记' },
     { label: '地区', value: `${province}${city ? ' · ' + city : ''}`, note: '仓库所在地' },
-    { label: '报价日 / 有效期', value: `${quoted_on} → ${valid_until}`, note: '今天 + 默认 7 天' },
+    { label: '报价日 / 有效期', value: `${quoted_on} → 待填写`, note: '有效期由你填写，系统不预设' },
     { label: '计价口径', value: bases.factory, note: '默认值，税运条件待核实' },
   ];
 

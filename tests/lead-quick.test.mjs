@@ -12,12 +12,14 @@ const lead = overrides => ({ ...sample('清远鸡'), ...overrides });
 test('真实线索可一键组装成合法报价，且价格 / 地区 / 来源均来自原文', () => {
   const q = buildQuickQuote(lead(), [], TODAY);
   assert.equal(q.ok, true, q.reasons.join('；'));
-  assert.doesNotThrow(() => validateQuote(q.quote, [q.product], TODAY));
+  assert.equal(q.quote.quoted_on, TODAY);
+  // 有效期不再由系统预设，必须由录入人当场填写。
+  assert.equal(q.quote.valid_until, '');
+  assert.throws(() => validateQuote(q.quote, [q.product], TODAY), /有效期/);
+  assert.doesNotThrow(() => validateQuote({ ...q.quote, valid_until: TODAY }, [q.product], TODAY));
   assert.equal(q.quote.price, 12.9);
   assert.equal(q.quote.province, '河南');
   assert.equal(q.quote.city, '濮阳市');
-  assert.equal(q.quote.quoted_on, TODAY);
-  assert.equal(q.quote.valid_until, '2026-11-17');
   assert.equal(q.quote.status, 'approved');
   assert.equal(q.quote.source, 'engine');
   assert.equal(q.quote.collection_item_id, lead().id);
@@ -63,7 +65,9 @@ test('历史发布信息标出天数，报价日仍取核实当天', () => {
   assert.match(q.quote.notes, /2016-05-01/);
 });
 
-test('报价日不早于有效期，默认当天可用', () => {
+test('有效期不预设，缺了就不能入库', () => {
   const q = buildQuickQuote(lead(), [], dayString());
-  assert.doesNotThrow(() => validateQuote(q.quote, [q.product]));
+  assert.equal(q.quote.valid_until, '');
+  assert.throws(() => validateQuote(q.quote, [q.product]), /有效期/);
+  assert.doesNotThrow(() => validateQuote({ ...q.quote, valid_until: dayString() }, [q.product]));
 });

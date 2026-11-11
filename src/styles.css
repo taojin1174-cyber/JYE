@@ -92,3 +92,5 @@ th[aria-sort] .th-sort{color:#6d7f74;font-weight:500}
 .price-input input{min-width:0}
 .price-input select{width:auto;min-width:82px;padding:9px 26px 9px 9px}
 @media(max-width:520px){.price-input{grid-template-columns:1fr}}
+
+.quick-until{display:inline-flex;align-items:center;gap:7px}.quick-until input{width:152px;padding:6px 9px;font-size:12px;min-height:32px}

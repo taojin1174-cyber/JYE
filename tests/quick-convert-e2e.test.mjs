@@ -19,7 +19,8 @@ test('一键确认入库：写库、直接生效、线索标记已转报价、�
   const lead = data.leads.find(l => String(l.details || '').includes('品类：清远鸡（冻品）'));
   const q = buildQuickQuote(lead, data.products, TODAY);
   assert.equal(q.ok, true, q.reasons.join('；'));
-  const quote = { ...q.quote, id: 'quick-test-1' };
+  // 有效期改由录入人当场填写，这里模拟确认卡上填了当天。
+  const quote = { ...q.quote, valid_until: TODAY, id: 'quick-test-1' };
   validateQuote(quote, [...data.products, q.product], TODAY);
   if (!data.products.some(p => p.id === q.product.id)) data = await store.addProduct(q.product);
   await store.saveQuote(quote);

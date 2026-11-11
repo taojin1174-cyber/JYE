@@ -32,6 +32,24 @@ tbody tr.lead-done:hover td{background:#f6f9f7}
 tbody tr.lead-done td:first-child{box-shadow:inset 3px 0 #cbdfd3}
 tbody tr.lead-done .lead-title a{color:#7d8d84}
 
+/* 采购比价：品类下拉 + 产品 + 地区 + 周期 + 口径 + 搜索 + 操作压成一行 */
+.compare-filters .btn{height:35px;min-height:35px}
+.compare-filters .text-btn{height:35px}
+.compare-filters .search{height:35px}
+.compare-filters .search input{width:130px}
+@media(min-width:1240px){
+  .compare-filters{flex-wrap:nowrap}
+  .compare-filters .search,.compare-filters .text-btn,.compare-filters .page-bar-actions{flex-shrink:0}
+}
+@media(max-width:759px){
+  .compare-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
+  .compare-filters>select{width:100%;min-width:0}
+  .compare-filters .search{grid-column:1/-1}
+  .compare-filters .search input{width:100%}
+  .compare-filters .text-btn{justify-self:start}
+  .compare-filters .page-bar-actions{grid-column:1/-1;width:100%;justify-content:flex-end;margin-left:0}
+}
+
 /* 页面工具栏：左侧筛选与右侧操作按钮同排，右端对齐（行情总览 / 采购比价 / 报价审核） */
 .page-bar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
 @media(max-width:760px){.page-bar-actions{width:100%;justify-content:flex-end}.page-bar-actions .export-label{display:none}}

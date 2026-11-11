@@ -25,3 +25,5 @@
   .tabs-actions { flex: 1; justify-content: flex-end; }
   .settings-tabs .export-label { display: none; }
 }
+
+/* settings 栏目行压缩：tabs-actions 与分段标签同排 */

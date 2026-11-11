@@ -21,11 +21,11 @@ set "PROXYARG=-c http.proxy=socks5h://127.0.0.1:10808"
 
 :netok
 
-echo [1/4] Collect public market leads...
+echo [1/5] Collect public market leads...
 node scripts/discovery.mjs
 if errorlevel 1 echo     Some sources failed, continuing with available data.
 
-echo [2/4] Scrape roujiaosuo poultry leads...
+echo [2/5] Scrape roujiaosuo poultry leads...
 node scripts/roujiaosuo-scrape.mjs
 if errorlevel 1 (
   echo     Scrape failed, keeping the previous lead file.
@@ -34,12 +34,16 @@ if errorlevel 1 (
   node scripts/import-roujiaosuo-leads.mjs --only-frozen
 )
 
-echo [3/4] Check changes...
+echo [3/5] Backup cloud data to local folder...
+if exist .env node scripts\backup-cloud.mjs
+
+if not exist backups mkdir backups
+echo [4/5] Check changes...
 git add -A
 git diff --cached --quiet
 if not errorlevel 1 goto nochange
 
-echo [4/4] Commit and push...
+echo [5/5] Commit and push...
 git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Daily price collection (local run)"
 git %PROXYARG% pull --rebase origin main
 if errorlevel 1 (

@@ -9,3 +9,6 @@ artifacts/
 # 部署包产物
 deploy/*.tar.gz
 deploy/*.zip
+
+# 云端数据库本地备份（含成员邮箱等敏感信息，只留本机，绝不进仓库）
+backups/

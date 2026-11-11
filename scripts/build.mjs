@@ -8,7 +8,7 @@ if(config.supabaseKey.startsWith('eyJ')) {
 }
 await mkdir('dist',{recursive:true});
 await rm('dist/data',{recursive:true,force:true});
-for(const file of ['index.html','leads.html','config.js','favicon.svg'])await copyFile(file,`dist/${file}`);
+for(const file of ['index.html','leads.html','rescue.html','config.js','favicon.svg'])await copyFile(file,`dist/${file}`);
 await cp('src','dist/src',{recursive:true});
 // 原始抓取结果（含明文详情链接）不发布，只保留前端运行需要的采集快照。
 await mkdir('dist/data',{recursive:true});

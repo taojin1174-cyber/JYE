@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#177454">
+  <title>本机数据救援</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <style>
+    :root{--green:#177454;--ink:#1c2321;--muted:#67736f;--line:#e3e8e6;--bg:#f6f8f7}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+    main{max-width:640px;margin:0 auto;padding:40px 20px 60px}
+    h1{font-size:22px;margin:0 0 10px}
+    .lead{color:var(--muted);margin:0 0 22px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+    .card strong{color:var(--green)}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+    th{color:var(--muted);font-weight:500}
+    .btn{display:inline-block;border:0;border-radius:10px;padding:12px 22px;background:var(--green);color:#fff;font-size:15px;cursor:pointer}
+    .btn:disabled{background:#b9c6c1;cursor:not-allowed}
+    .tip{color:var(--muted);font-size:13px;margin-top:14px}
+    .warn{color:#a8452f}
+    ol{padding-left:20px;margin:10px 0 0}
+    code{background:#eef3f1;padding:1px 5px;border-radius:4px;font-size:13px}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>本机数据救援</h1>
+    <p class="lead">这个页面只读取<strong>当前这台电脑、这个浏览器</strong>里缓存的数据，不会上传到任何服务器。用于把切换云端之前录入的报价取出来，再导入共享数据库。</p>
+
+    <div class="card" id="status">正在检查本机数据…</div>
+    <div id="detail"></div>
+
+    <p><button class="btn" id="download" disabled>下载备份 JSON</button></p>
+    <p class="tip">下载后回到首页登录云端账号，进入「数据设置 → 导入备份」，选择这个文件即可合并进共享数据库。</p>
+
+    <div class="card" style="margin-top:26px">
+      <strong>如果这里显示没有数据</strong>
+      <ol>
+        <li>确认用的是<strong>当初录入报价的那台电脑、那个浏览器</strong>（无痕窗口读不到，换浏览器也读不到）。</li>
+        <li>确认没有清理过浏览器数据。</li>
+        <li>本机数据的存储键是 <code>hqt-trial-data-v2</code>，可在开发者工具 → Application → Local Storage 里核对。</li>
+      </ol>
+    </div>
+  </main>
+  <script>
+    const KEYS = [
+      ['hqt-trial-data-v2', '本机试运行 v2'],
+      ['hqt-data-v2', '正式版 v2'],
+      ['hqt-trial-data-v1', '本机试运行 v1'],
+      ['hqt-data-v1', '演示版 v1'],
+    ];
+    const statusEl = document.getElementById('status');
+    const detailEl = document.getElementById('detail');
+    const button = document.getElementById('download');
+    let best = null;
+
+    const rows = [];
+    for (const [key, label] of KEYS) {
+      let raw = null;
+      try { raw = localStorage.getItem(key); } catch { continue; }
+      if (!raw) continue;
+      try {
+        const parsed = JSON.parse(raw);
+        const quotes = Array.isArray(parsed.quotes) ? parsed.quotes : [];
+        const products = Array.isArray(parsed.products) ? parsed.products : [];
+        const leads = Array.isArray(parsed.leads) ? parsed.leads : [];
+        rows.push({ label, key, quotes: quotes.length, products: products.length, leads: leads.length });
+        if (!best || quotes.length > best.quotes.length) best = { ...parsed, quotes, products, leads };
+      } catch { rows.push({ label, key, broken: true }); }
+    }
+
+    if (!rows.length) {
+      statusEl.innerHTML = '<span class="warn">没有找到本机数据。</span>可能这台设备从未录入过，或已清理浏览器缓存。';
+    } else if (!best || !best.quotes.length) {
+      statusEl.innerHTML = '找到了本机数据，但其中<strong>没有报价记录</strong>，无需救援。';
+      renderTable();
+    } else {
+      statusEl.innerHTML = `找到 <strong>${best.quotes.length}</strong> 条报价、${best.products.length} 个产品规格，可以下载备份。`;
+      renderTable();
+      button.disabled = false;
+    }
+
+    function renderTable() {
+      detailEl.innerHTML = '<div class="card"><table><thead><tr><th>数据来源</th><th>产品</th><th>报价</th><th>线索</th></tr></thead><tbody>' +
+        rows.map(r => `<tr><td>${r.label}${r.broken ? '（无法解析）' : ''}</td><td>${r.products ?? '-'}</td><td>${r.quotes ?? '-'}</td><td>${r.leads ?? '-'}</td></tr>`).join('') +
+        '</tbody></table></div>';
+    }
+
+    button.addEventListener('click', () => {
+      if (!best) return;
+      const payload = {
+        version: 3,
+        exported_at: new Date().toISOString(),
+        products: best.products,
+        quotes: best.quotes,
+        leads: best.leads,
+        deletionRequests: Array.isArray(best.deletionRequests) ? best.deletionRequests : [],
+        audit: Array.isArray(best.audit) ? best.audit : [],
+      };
+      const stamp = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Shanghai' }).format(new Date());
+      const blob = new Blob(['\uFEFF' + JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `行情跳动-本机救援-${stamp}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+    });
+  </script>
+</body>
+</html>

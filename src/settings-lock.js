@@ -3,6 +3,6 @@ export const settingsLock = Object.freeze({
   "algorithm": "PBKDF2",
   "hash": "SHA-256",
   "iterations": 600000,
-  "salt": "0944ef057b0bcc9e71544bdab0bc422b",
-  "verifier": "4bf310d3d72b8d5bfd0e443cc6aadea7f355b0c97e9502e83e37cadec62a549a"
+  "salt": "cbf180748c8c640c22ae60cdb099cf78",
+  "verifier": "c45649d49f3696e4d5381f1fded5ba0a098b2e1a7aa064f16f12b947375d2899"
 });

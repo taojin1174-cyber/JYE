@@ -5,6 +5,7 @@ import { filterExport } from './export-filter.js';
 import { store } from './store.js';
 import { sourceCatalog,sourceKinds } from './sources.js';
 import { createSettingsAccess } from './settings-access.js';
+import { accessGate } from './access-gate.js';
 
 const icons = {
   plus:'<path d="M12 5v14M5 12h14"/>', down:'<path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/>',
@@ -296,7 +297,7 @@ let toastTimer;
 function toast(message) {const el=document.querySelector('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),4500);}
 async function execute(fn,button) {
  if(busy)return; busy=true;if(button)button.disabled=true;
- try{await fn();}catch(error){const err=dialog.open?dialog.querySelector('.form-error'):document.querySelector('#login-form .form-error, #settings-unlock-form .form-error');if(err)err.textContent=error.message;else toast(error.message);}finally{busy=false;if(button)button.disabled=false;}
+ try{await fn();}catch(error){const err=dialog.open?dialog.querySelector('.form-error'):document.querySelector('#access-form .form-error, #login-form .form-error, #settings-unlock-form .form-error');if(err)err.textContent=error.message;else toast(error.message);}finally{busy=false;if(button)button.disabled=false;}
 }
 document.addEventListener('click',event=>{
  const el=event.target.closest('button,a'); if(!el)return;
@@ -346,7 +347,8 @@ document.addEventListener('click',event=>{
  if(action==='import-backup')document.querySelector('#import-backup-file')?.click();
  if(action==='export'){if(state.page==='settings')exportForm();else exportData();}
  if(action==='backup')download(store.backup(),`行情跳动-完整备份-${dayString()}.json`,'application/json');
- if(action==='account')toast(`${store.cloud?(store.user?.email||'团队账号'):'正式版'} · ${({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role]}`);
+ if(action==='account')accountDialog();
+ if(action==='lock-access')execute(async()=>{settingsAccess.lock();accessGate.lock();if(store.cloud)await store.logout();dialog.close();accessPage();toast('已退出访问，需重新输入密码');},el);
  if(action==='reset-filters')changeValue({category:'',product:'',province:'',source:'',search:'',basis:'factory',days:7,sort:'price'});
  if(action==='refresh')execute(async()=>{data=await store.reload();render();toast('记录已刷新');},el);
  if(action==='logout')execute(async()=>{settingsAccess.lock();await store.logout();loginPage();},el);
@@ -371,6 +373,13 @@ document.addEventListener('input',event=>{if(event.target.id==='search'){const v
 document.addEventListener('submit',event=>{
  const form=event.target;event.preventDefault(); const fields=Object.fromEntries(new FormData(form));
  execute(async()=>{
+  if(form.id==='access-form') {
+   const password = fields.password;
+   fields.password = '';
+   form.reset();
+   if(!await accessGate.unlock(password)) {form.querySelector('input').focus();throw new Error('密码不正确，请重新输入');}
+   await boot();
+  }
   if(form.id==='settings-unlock-form') {
    const password = fields.password;
    fields.password = '';
@@ -422,9 +431,22 @@ async function showMembers() {
  showDialog(dialogHead('团队成员','新增成员请先在 Supabase Authentication 中邀请，再加入 members 表授权。')+`<form id="members-form"><div class="form-body"><p class="form-error" role="alert"></p>${members.map(m=>`<div class="settings-row"><span>${esc(m.display_name||m.email||m.id)}${m.id===store.user?.id?'（你）':''}</span>${m.id===store.user?.id?'<span class="muted">管理员</span>':`<select name="${esc(m.id)}" aria-label="${esc(m.display_name||m.email)}的角色" data-original="${esc(m.role)}">${options([['viewer','只读成员'],['editor','编辑人员'],['admin','管理员']],m.role)}</select>`}</div>`).join('')}</div><div class="dialog-foot"><button class="btn" type="button" data-action="close">取消</button><button class="btn primary" type="submit">保存权限</button></div></form>`);
 }
 function loginPage(error='') {app.innerHTML=`<main class="login"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>登录行情跳动</h1><p>使用管理员授权的账号访问团队采购工作台。</p><form id="login-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="email">邮箱</label><input id="email" name="email" type="email" autocomplete="username" required></div><div class="field" style="margin-top:16px"><label for="password">密码</label><input id="password" name="password" type="password" autocomplete="current-password" required></div><button class="btn primary" type="submit">登录</button></form></main>`;}
-window.addEventListener('hashchange',()=>{readRoute();if(store.role)render();});
-try {const result=await store.init();if(result){data=result;render();}else loginPage();}
-catch(error) {
- if(store.cloud)loginPage(error.message);
- else app.innerHTML=`<div class="error-panel"><h1>暂时无法读取数据</h1><p>${esc(error.message)}</p><button class="btn" onclick="location.reload()">重新打开</button></div>`;
+function accountDialog() {
+ const who = store.cloud ? (store.user?.email || '团队账号') : '正式版';
+ const roleName = ({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role] || '';
+ showDialog(dialogHead('账户',`${esc(who)}${roleName?` · ${roleName}`:''}`)+`<div class="form-body"><div class="settings-row"><span>数据保存位置</span><strong>${store.cloud?'共享数据库':'此浏览器（未上传）'}</strong></div><div class="settings-row"><span>访问保护</span><strong>已启用访问密码</strong></div><p class="subtle" style="margin:14px 0 0">退出访问后，本设备需重新输入密码才能看到内容；已录入的报价不受影响。</p></div><div class="dialog-foot"><button class="btn" data-action="close">关闭</button><button class="btn danger" data-action="lock-access">退出访问</button></div>`);
 }
+// 全站访问门：未解锁前不加载任何数据，报价与线索不进入内存和页面。
+function accessPage(error='') {
+ app.innerHTML=`<main class="login access"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>行情跳动</h1><p>内部采购参考站，请输入访问密码。</p><form id="access-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="access-password">访问密码</label><input id="access-password" name="password" type="password" autocomplete="current-password" required maxlength="256" placeholder="请输入访问密码" autofocus></div><button class="btn primary" type="submit">进入</button></form><small class="access-tip">仅在本设备记住访问状态，清除浏览器数据后需重新输入。</small></main>`;
+ document.querySelector('#access-password')?.focus();
+}
+async function boot() {
+ try {const result=await store.init();if(result){data=result;render();}else loginPage();}
+ catch(error) {
+  if(store.cloud)loginPage(error.message);
+  else app.innerHTML=`<div class="error-panel"><h1>暂时无法读取数据</h1><p>${esc(error.message)}</p><button class="btn" onclick="location.reload()">重新打开</button></div>`;
+ }
+}
+window.addEventListener('hashchange',()=>{readRoute();if(store.role)render();});
+if(accessGate.isUnlocked())await boot();else accessPage();

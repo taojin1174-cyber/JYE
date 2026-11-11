@@ -1,6 +1,6 @@
 {
-  "fetched_at": "2026-11-10T15:07:44.230Z",
-  "today": "2026-11-10",
+  "fetched_at": "2026-11-11T01:01:30.728Z",
+  "today": "2026-11-11",
   "stats": [
     {
       "keyword": "清远鸡",
@@ -34,8 +34,8 @@
       "price_text": "12.90 元/公斤",
       "volume_text": "1000000公斤",
       "warehouse": "河南濮阳市",
-      "updated_text": "5小时前",
-      "updated_on": "2026-11-11",
+      "updated_text": "15小时前",
+      "updated_on": "2026-11-10",
       "keywords": [
         "清远鸡"
       ],
@@ -64,7 +64,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.219Z"
+      "fetched_at": "2026-11-11T01:01:30.725Z"
     },
     {
       "id": "1920569",
@@ -106,7 +106,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.725Z"
     },
     {
       "id": "1897004",
@@ -148,7 +148,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1871870",
@@ -190,7 +190,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "546260",
@@ -232,7 +232,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1815234",
@@ -274,7 +274,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1461722",
@@ -316,7 +316,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1471075",
@@ -358,7 +358,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1514526",
@@ -400,7 +400,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1696288",
@@ -442,7 +442,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1634490",
@@ -484,7 +484,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.220Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1610413",
@@ -526,7 +526,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1451482",
@@ -568,7 +568,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1424365",
@@ -610,7 +610,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1411323",
@@ -652,7 +652,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "981486",
@@ -694,7 +694,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "615545",
@@ -736,7 +736,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "615426",
@@ -778,7 +778,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "940378",
@@ -820,7 +820,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "888595",
@@ -862,7 +862,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "611705",
@@ -904,7 +904,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "703211",
@@ -946,7 +946,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "221263",
@@ -988,7 +988,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "221262",
@@ -1030,7 +1030,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "546648",
@@ -1072,7 +1072,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "259444",
@@ -1114,7 +1114,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "318611",
@@ -1156,7 +1156,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "196784",
@@ -1198,7 +1198,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "289236",
@@ -1240,7 +1240,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "87263",
@@ -1282,7 +1282,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.221Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "86981",
@@ -1324,7 +1324,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "67991",
@@ -1366,7 +1366,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "49564",
@@ -1408,7 +1408,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "49266",
@@ -1450,7 +1450,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "32729",
@@ -1492,7 +1492,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1702351",
@@ -1534,7 +1534,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1932290",
@@ -1576,7 +1576,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1930834",
@@ -1618,7 +1618,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1873598",
@@ -1660,7 +1660,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1838556",
@@ -1702,7 +1702,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1760218",
@@ -1744,7 +1744,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "443932",
@@ -1786,7 +1786,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1729885",
@@ -1828,7 +1828,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1589273",
@@ -1870,7 +1870,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1456135",
@@ -1912,7 +1912,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1262633",
@@ -1954,7 +1954,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1205739",
@@ -1996,7 +1996,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "869927",
@@ -2038,7 +2038,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "911422",
@@ -2080,7 +2080,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.726Z"
     },
     {
       "id": "1379049",
@@ -2122,7 +2122,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1344164",
@@ -2164,7 +2164,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1343485",
@@ -2206,7 +2206,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1298513",
@@ -2248,7 +2248,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "291626",
@@ -2290,7 +2290,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.222Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1155282",
@@ -2332,7 +2332,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "890738",
@@ -2374,7 +2374,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "924202",
@@ -2416,7 +2416,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "447662",
@@ -2458,7 +2458,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "326142",
@@ -2500,7 +2500,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "913303",
@@ -2542,7 +2542,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "603108",
@@ -2584,7 +2584,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "613492",
@@ -2626,7 +2626,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "654931",
@@ -2668,7 +2668,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "709269",
@@ -2710,7 +2710,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "298226",
@@ -2752,7 +2752,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "602858",
@@ -2794,7 +2794,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "597105",
@@ -2836,7 +2836,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "456337",
@@ -2878,7 +2878,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "298220",
@@ -2920,7 +2920,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "264735",
@@ -2962,7 +2962,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "345073",
@@ -3004,7 +3004,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "326908",
@@ -3046,7 +3046,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.223Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "261695",
@@ -3088,7 +3088,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "106399",
@@ -3130,7 +3130,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "157029",
@@ -3172,7 +3172,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "149090",
@@ -3214,7 +3214,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "133051",
@@ -3256,7 +3256,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "130706",
@@ -3298,7 +3298,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "128801",
@@ -3340,7 +3340,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "98488",
@@ -3382,7 +3382,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "96516",
@@ -3424,7 +3424,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "90600",
@@ -3466,7 +3466,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "88816",
@@ -3508,7 +3508,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "88209",
@@ -3550,7 +3550,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "94551",
@@ -3592,7 +3592,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "93696",
@@ -3634,7 +3634,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "92776",
@@ -3676,7 +3676,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "92303",
@@ -3718,7 +3718,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "88250",
@@ -3760,7 +3760,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "84247",
@@ -3802,7 +3802,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "82947",
@@ -3844,7 +3844,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "81935",
@@ -3886,7 +3886,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "81166",
@@ -3928,7 +3928,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "79952",
@@ -3970,7 +3970,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "78062",
@@ -4012,7 +4012,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.224Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "61200",
@@ -4054,7 +4054,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "61454",
@@ -4096,7 +4096,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "59012",
@@ -4138,7 +4138,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "58824",
@@ -4180,7 +4180,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "58350",
@@ -4222,7 +4222,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "57952",
@@ -4264,7 +4264,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "57675",
@@ -4306,7 +4306,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "57328",
@@ -4348,7 +4348,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "56935",
@@ -4390,7 +4390,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "56832",
@@ -4432,7 +4432,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "56334",
@@ -4474,7 +4474,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "56059",
@@ -4516,7 +4516,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "55198",
@@ -4558,7 +4558,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "54790",
@@ -4600,7 +4600,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "53168",
@@ -4642,7 +4642,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "28418",
@@ -4684,7 +4684,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "15931",
@@ -4726,7 +4726,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "13815",
@@ -4768,7 +4768,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "13742",
@@ -4810,7 +4810,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "7451",
@@ -4852,7 +4852,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "2555",
@@ -4894,7 +4894,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.225Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "2248",
@@ -4936,7 +4936,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "2158",
@@ -4978,7 +4978,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "523",
@@ -5020,7 +5020,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "683",
@@ -5062,7 +5062,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "669",
@@ -5104,7 +5104,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1413273",
@@ -5146,7 +5146,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1524385",
@@ -5188,7 +5188,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1286839",
@@ -5230,7 +5230,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1126355",
@@ -5272,7 +5272,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "703159",
@@ -5314,7 +5314,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "246744",
@@ -5356,7 +5356,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "355615",
@@ -5398,7 +5398,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "74845",
@@ -5440,7 +5440,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1815637",
@@ -5482,7 +5482,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1841568",
@@ -5524,7 +5524,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1898485",
@@ -5566,7 +5566,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1852290",
@@ -5608,7 +5608,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1851429",
@@ -5650,7 +5650,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1841819",
@@ -5692,7 +5692,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1840079",
@@ -5734,7 +5734,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1796320",
@@ -5776,7 +5776,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1920228",
@@ -5818,7 +5818,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1917728",
@@ -5860,7 +5860,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1910067",
@@ -5902,7 +5902,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1907220",
@@ -5944,7 +5944,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.226Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1907077",
@@ -5986,7 +5986,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1240514",
@@ -6028,7 +6028,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1923154",
@@ -6070,7 +6070,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1836171",
@@ -6112,7 +6112,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1887428",
@@ -6154,7 +6154,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1842277",
@@ -6196,7 +6196,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1835786",
@@ -6238,7 +6238,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1718016",
@@ -6280,7 +6280,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1806126",
@@ -6322,7 +6322,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1799552",
@@ -6364,7 +6364,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1796173",
@@ -6406,7 +6406,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1793711",
@@ -6448,7 +6448,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1791768",
@@ -6490,7 +6490,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1481639",
@@ -6532,7 +6532,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1708286",
@@ -6574,7 +6574,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1687686",
@@ -6616,7 +6616,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1538160",
@@ -6658,7 +6658,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1507956",
@@ -6700,7 +6700,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1319918",
@@ -6742,7 +6742,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1288739",
@@ -6784,7 +6784,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1216656",
@@ -6826,7 +6826,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1209493",
@@ -6868,7 +6868,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1162300",
@@ -6910,7 +6910,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.727Z"
     },
     {
       "id": "1155806",
@@ -6952,7 +6952,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.227Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "1139739",
@@ -6994,7 +6994,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "1133190",
@@ -7036,7 +7036,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "1131656",
@@ -7078,7 +7078,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "1046339",
@@ -7120,7 +7120,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "1001424",
@@ -7162,7 +7162,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "982120",
@@ -7204,7 +7204,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "948977",
@@ -7246,7 +7246,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "913109",
@@ -7288,7 +7288,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "878862",
@@ -7330,7 +7330,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "798154",
@@ -7372,7 +7372,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "480068",
@@ -7414,7 +7414,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "622961",
@@ -7456,7 +7456,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "619237",
@@ -7498,7 +7498,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "325246",
@@ -7540,7 +7540,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "205962",
@@ -7582,7 +7582,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "114777",
@@ -7624,7 +7624,7 @@
       "price_unit_final": "吨",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "19689",
@@ -7666,7 +7666,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     },
     {
       "id": "11189",
@@ -7708,7 +7708,7 @@
       "price_unit_final": "公斤",
       "price_low": null,
       "price_high": null,
-      "fetched_at": "2026-11-10T15:07:44.228Z"
+      "fetched_at": "2026-11-11T01:01:30.728Z"
     }
   ]
 }

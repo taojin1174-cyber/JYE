@@ -22,3 +22,6 @@
 .pill.off{background:#f1f2f1;color:#8a958d}
 .pill.warn{background:#fbf1e9;color:#a37b5d}
 @media(max-width:760px){.manager-row{align-items:flex-start;flex-direction:column;gap:8px}.manager-actions{justify-content:flex-start}.manager-list{max-height:60dvh}}
+
+.access-tip{display:block;margin-top:14px;font-size:10px;color:var(--muted);line-height:1.7;text-align:center}
+.login.access h1{margin-bottom:6px}

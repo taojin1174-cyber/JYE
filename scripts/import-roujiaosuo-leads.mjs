@@ -89,6 +89,8 @@ let snapshot = { fetched_at: raw.fetched_at, runs: [], items: [] };
 try { snapshot = JSON.parse(await readFile(snapshotPath, 'utf8')); } catch {}
 const kept = onlyFrozen ? [] : (snapshot.items || []).filter(i => i.source_id !== SOURCE_ID);
 snapshot.items = [...kept, ...items];
+// 顶层时间必须跟随本次抓取，否则页面显示的「最近采集」会一直停在首次导入的时间。
+snapshot.fetched_at = raw.fetched_at || new Date().toISOString();
 snapshot.runs = onlyFrozen
   ? [{ source_id: SOURCE_ID, ok: true, count: items.length }]
   : [...(snapshot.runs || []).filter(r => r.source_id !== SOURCE_ID), { source_id: SOURCE_ID, ok: true, count: items.length }];

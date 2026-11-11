@@ -2,12 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { settingsLock } from '../src/settings-lock.js';
+import { accessLock } from '../src/access-lock.js';
 
 const snapshot = JSON.parse(readFileSync(new URL('../data/discovery.json', import.meta.url), 'utf8'));
 
 // 最小 DOM 桩：只验证模块能完整启动、4 个 hash 页面都能渲染出正确结构。
-function stubDom(hash) {
-  const memory = new Map();
+function stubDom(hash, { unlocked = true } = {}) {
+  // 全站访问门：默认按「已解锁」启动，另有一条用例验证未解锁时只显示密码页。
+  const memory = new Map([[`hqt-access:/:${accessLock.verifier.slice(0, 16)}`, 'unlocked']]);
+  if (!unlocked) memory.clear();
   const unlockedKey = `hqt-settings:/:${settingsLock.verifier.slice(0, 16)}`;
   const session = new Map([[unlockedKey, 'unlocked']]);
   const el = () => ({ innerHTML: '', textContent: '', open: false, classList: { add() {}, remove() {} }, showModal() { this.open = true; }, close() { this.open = false; }, querySelector: () => null, addEventListener() {} });
@@ -44,3 +47,21 @@ for (const [hash, markers] of cases) {
     if (!hash.startsWith('settings')) assert.doesNotMatch(app.innerHTML, /roujiaosuo\.com|cnfowl\.com|禽网|畜牧总站|肉交所/);
   });
 }
+
+test('未解锁时只显示访问密码页，页面不含任何报价或线索', async () => {
+  const app = stubDom('#overview', { unlocked: false });
+  await import('../src/app.js?route=locked');
+  assert.match(app.innerHTML, /请输入访问密码/);
+  assert.match(app.innerHTML, /id="access-form"/);
+  assert.doesNotMatch(app.innerHTML, /产品参考均价|供货报价|待确认报价|自动采集线索/);
+});
+
+test('访问密码配置只含盐与派生值，且迭代次数达标', () => {
+  const source = readFileSync(new URL('../src/access-lock.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(source, /password\s*[:=]\s*['"][^'"]+['"]/i, '配置文件里不得出现明文密码');
+  assert.equal(accessLock.algorithm, 'PBKDF2');
+  assert.equal(accessLock.hash, 'SHA-256');
+  assert.ok(accessLock.iterations >= 100000, '迭代次数过低');
+  assert.match(accessLock.salt, /^[0-9a-f]{32}$/);
+  assert.match(accessLock.verifier, /^[0-9a-f]{64}$/);
+});

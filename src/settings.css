@@ -6,9 +6,11 @@
   gap: 8px 10px;
   margin-bottom: 16px;
 }
-.tabs-actions { display: flex; align-items: center; gap: 6px; }
-.settings-tabs .btn { min-height: 27px; padding: 4px 9px; font-size: 11px; gap: 5px; }
-.settings-tabs .segmented button { padding: 5px 13px; }
+/* 左侧栏目与右侧按钮统一 32px 高度，严格同一行、垂直居中 */
+.tabs-actions { display: flex; align-items: center; gap: 6px; height: 32px; }
+.settings-tabs .segmented { height: 32px; }
+.settings-tabs .segmented button { height: 100%; padding: 0 13px; display: inline-flex; align-items: center; }
+.settings-tabs .btn { height: 32px; min-height: 32px; padding: 0 11px; font-size: 11px; gap: 5px; }
 .lead-actions { flex-wrap: wrap; align-items: center; }
 .custom-product-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 15px; background: #f3f7f4; border: 1px solid #e2ebe5; border-radius: 5px; }
 .custom-product-fields[hidden] { display: none; }

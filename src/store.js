@@ -155,11 +155,17 @@ export const store={
    writePrefs(prefs);return viewData();
   },
   // 本机数据跨设备搬运：导出完整备份 → 在另一台设备导入（覆盖该设备数据）。
+  // 云端模式下改为「合并导入」：本机已有数据搬进共享库，不覆盖云端已有记录。
   async importBackup(text){
    requireAdmin();
-   if(cloud)throw new Error('共享数据库模式请在服务端导入，不要用本机备份覆盖');
    let raw;try{raw=JSON.parse(String(text));}catch{throw new Error('备份文件不是有效的 JSON');}
    if(!raw||!Array.isArray(raw.products)||!Array.isArray(raw.quotes))throw new Error('备份内容缺少产品库或报价数据');
+   if(cloud){
+    const stat=await pushBackupToCloud(raw);
+    const view=await this.reload();
+    this.lastImportMessage=`已合并到共享数据库：产品 ${stat.products} 个、报价 ${stat.quotes} 条`+(stat.failed?`，失败 ${stat.failed} 条`:'');
+    return view;
+   }
    const clean={products:raw.products,quotes:raw.quotes,leads:Array.isArray(raw.leads)?raw.leads:[],deletionRequests:Array.isArray(raw.deletionRequests)?raw.deletionRequests:[],audit:Array.isArray(raw.audit)?raw.audit:[]};
    if(raw.prefs){const prefs=readPrefs();const names=v=>Array.isArray(v)?[...new Set(v.filter(x=>typeof x==='string'))]:null;
     prefs.disabledCategories=names(raw.prefs.disabledCategories)??prefs.disabledCategories;
@@ -179,6 +185,53 @@ function persist(next){try{localStorage.setItem(DATA_KEY,JSON.stringify(next));}
 async function mergeDiscovery(){
   data.leads||=[];
   try{const response=await fetch(new URL('../data/discovery.json',import.meta.url),{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!response.ok)throw new Error('无法读取采集快照');const snapshot=await response.json();if(!Array.isArray(snapshot.items))throw new Error('采集快照格式错误');const states=new Map(data.leads.map(l=>[l.id,l.status]));const incoming=snapshot.items.map(l=>({...l,...decodeRef(l.ref),status:states.get(l.id)||'pending'}));const ids=new Set(incoming.map(l=>l.id));data.leads=[...incoming,...data.leads.filter(l=>!ids.has(l.id)&&l.status!=='pending')];store.discovery={fetched_at:snapshot.fetched_at,runs:snapshot.runs};}catch(error){store.discovery={error:error.message};}
+}
+// 本机备份 → 共享数据库：产品按 id 或「品类+名称+状态+规格」对齐后合并，
+// 报价按 id 去重插入；单条异常不影响整批，最后回报成功/失败数量。
+async function pushBackupToCloud(raw){
+ const productFields=['id','category','name','state','spec'];
+ const quoteFields=['id','product_id','supplier','province','city','price','basis','source','source_name','source_url','quoted_on','valid_until','min_order','freight','notes','status'];
+ const bases=new Set(['factory','delivered','untaxed']),sources=new Set(['manual','engine']),statuses=new Set(['pending','approved','rejected']);
+ const pick=(row,keys)=>{const out={};for(const k of keys){const v=row[k];if(v!==undefined&&v!==null&&v!=='')out[k]=v;}return out;};
+ const today=new Date(Date.now()+8*3600000).toISOString().slice(0,10);
+ const products=(raw.products||[]).map(p=>pick(p,productFields)).filter(p=>p.id&&p.category&&p.name&&p.state&&p.spec);
+ const existing=await request('/rest/v1/products?select=id,category,name,state,spec');
+ const byId=new Map(existing.map(p=>[p.id,p]));
+ const byKey=new Map(existing.map(p=>[[p.category,p.name,p.state,p.spec].join('\u0001'),p]));
+ const idMap=new Map(),toInsert=[];
+ for(const p of products){
+  if(byId.has(p.id)){idMap.set(p.id,p.id);continue;}
+  const key=[p.category,p.name,p.state,p.spec].join('\u0001');
+  if(byKey.has(key)){idMap.set(p.id,byKey.get(key).id);continue;}
+  idMap.set(p.id,p.id);toInsert.push(p);byKey.set(key,p);byId.set(p.id,p);
+ }
+ if(toInsert.length)await request('/rest/v1/products',{method:'POST',body:toInsert,headers:{Prefer:'return=minimal'}});
+ const quotes=(raw.quotes||[]).map(q=>pick(q,quoteFields)).filter(q=>{
+  const productId=idMap.get(q.product_id);
+  if(!q.id||!productId)return false;
+  q.product_id=productId;
+  if(!(Number(q.price)>0)||!q.quoted_on||q.quoted_on>today)return false;
+  if(!q.valid_until)q.valid_until=q.quoted_on;
+  if(q.valid_until<q.quoted_on)return false;
+  if(!bases.has(q.basis))return false;
+  q.source=sources.has(q.source)?q.source:'manual';
+  if(statuses.has(q.status)===false)q.status='pending';
+  return true;
+ });
+ let inserted=0,failed=0;
+ for(let i=0;i<quotes.length;i+=150){
+  const batch=quotes.slice(i,i+150);
+  try{
+   await request('/rest/v1/quotes?on_conflict=id',{method:'POST',body:batch,headers:{Prefer:'resolution=ignore-duplicates,return=minimal'}});
+   inserted+=batch.length;
+  }catch{
+   for(const one of batch){
+    try{await request('/rest/v1/quotes?on_conflict=id',{method:'POST',body:[one],headers:{Prefer:'resolution=ignore-duplicates,return=minimal'}});inserted++;}
+    catch{failed++;}
+   }
+  }
+ }
+ return {products:products.length,quotes:inserted,failed};
 }
 async function readAll(table,order){const all=[];for(let offset=0;;offset+=1000){const batch=await request(`/rest/v1/${table}?select=*&order=${order}.asc,id.asc&limit=1000&offset=${offset}`);all.push(...batch);if(batch.length<1000)return all;}}
 async function request(path,{method='GET',body,headers={},anonymous=false}={}){

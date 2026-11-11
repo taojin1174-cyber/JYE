@@ -5,6 +5,6 @@ export const config = {
   // 正式版禁止回退到本机演示数据。连接团队数据库后才能开放员工登录。
   allowDemo: false,
   localTrial: true,
-  supabaseUrl: '', // ← 粘贴 Project URL，例如 https://xxxxxxxx.supabase.co
-  supabaseKey: '', // ← 粘贴 publishable key(sb_publishable_...) 或旧版 anon(eyJ...)
+  supabaseUrl: 'https://gquwwbdvljelvlaovyih.supabase.co', // ← 粘贴 Project URL，例如 https://xxxxxxxx.supabase.co
+  supabaseKey: 'sb_publishable_efk9tPn2jOBaLv3YAuYtyg_7O3JukZq', // ← 粘贴 publishable key(sb_publishable_...) 或旧版 anon(eyJ...)
 };

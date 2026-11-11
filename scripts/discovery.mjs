@@ -213,8 +213,11 @@ export async function discover({cacheDir='',persistCloud=false}={}) {
  // 仅发布短标题、链接和明确标价等公开事实，不保存商户联系方式或全文。
  // 某个来源暂时失败时，保留上次该来源的线索，并标记本次失败。
  let previous=[];try{previous=JSON.parse(await readFile(new URL('../data/discovery.json',import.meta.url),'utf8')).items||[];}catch{}
+ const ranIds=new Set(runs.map(r=>r.source_id));
  const failed=new Set(runs.filter(r=>!r.ok).map(r=>r.source_id));
- const merged=[...items,...previous.filter(i=>failed.has(i.source_id))];
+ // 本次没有成功覆盖到的来源都保留历史：失败的，以及压根不在本轮源清单里的
+ // （例如肉交所四品类由 roujiaosuo-scrape 单独写入，source_id 为 roujiaosuo_cats）。
+ const merged=[...items,...previous.filter(i=>!ranIds.has(i.source_id)||failed.has(i.source_id))];
  if(!merged.length&&errors)throw new Error('全部来源失败，保留旧快照');
  await mkdir(new URL('../data/',import.meta.url),{recursive:true});
  await writeFile(new URL('../data/discovery.json',import.meta.url),JSON.stringify({fetched_at:new Date().toISOString(),runs,items:merged},null,2)+'\n');

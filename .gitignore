@@ -5,3 +5,7 @@ dist/
 !.env.example
 *.log
 artifacts/
+
+# 部署包产物
+deploy/*.tar.gz
+deploy/*.zip

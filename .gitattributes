@@ -4,3 +4,6 @@ data/discovery.json -text
 
 # Windows 批处理必须保持 CRLF 原样，不做任何换行转换。
 *.cmd -text
+
+# Linux 服务器脚本必须是 LF，一旦被转成 CRLF 会在 bash 里报 "$'\r': command not found"。
+*.sh text eol=lf

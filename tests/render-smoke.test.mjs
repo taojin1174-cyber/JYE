@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { settingsLock } from '../src/settings-lock.js';
 import { accessLock } from '../src/access-lock.js';
 import { config } from '../config.js';
+import { dayString, addMonths } from '../src/core.js';
 
 // 本机模式的数据键名，由 config.localTrial 决定；用于预置「已入库」等历史状态。
 const DATA_KEY = config.localTrial ? 'hqt-trial-data-v2' : 'hqt-data-v2';
@@ -168,4 +169,47 @@ test('行情总览不展示猪卡片，线索页有「处理方式」下拉', as
   assert.match(settings.innerHTML, /data-filter="leadUse"/);
   assert.match(settings.innerHTML, /可核实入库/);
   assert.match(settings.innerHTML, /仅作参考/);
+});
+
+test('采购比价：供货价表头点击可切换升降序', async () => {
+  const app = stubDom('#compare');
+  await import('../src/app.js?route=price-sort-header');
+  const prices = () => [...app.innerHTML.matchAll(/<td class="number[^"]*">([^<]+)</g)]
+    .map(m => Number(String(m[1]).replace(/[^\d.]/g, '')))
+    .filter(n => Number.isFinite(n) && n > 0);
+  assert.match(app.innerHTML, /data-sort-price/, '供货价表头应有排序按钮');
+  assert.match(app.innerHTML, /aria-sort="ascending"/, '默认按供货价从低到高');
+  assert.match(app.innerHTML, /供货价：从低到高/);
+  const asc = prices();
+  if (asc.length > 1) assert.deepEqual(asc, [...asc].sort((a, b) => a - b), '默认应为升序');
+
+  app.__click({ sortPrice: '' });
+  assert.match(app.innerHTML, /aria-sort="descending"/, '点击后应变为降序');
+  assert.match(app.innerHTML, /供货价：从高到低/);
+  const desc = prices();
+  if (desc.length > 1) assert.deepEqual(desc, [...desc].sort((a, b) => b - a), '降序排列应生效');
+
+  app.__click({ sortPrice: '' });
+  assert.match(app.innerHTML, /aria-sort="ascending"/, '再点一次应回到升序');
+});
+
+test('过期报价退出均价与最近入库，卡片标出有效至与剩余天数', async () => {
+  const today = dayString();
+  const base = { basis: 'factory', source: 'engine', source_name: '测试来源', source_url: '', min_order: '', freight: null, status: 'approved', city: '', created_at: '2020-03-01T00:00:00Z' };
+  const storage = { [DATA_KEY]: JSON.stringify({
+    products: [{ id: 'chicken-fresh', category: '鸡', name: '清远鸡', state: '鲜品', spec: '1.2kg/只' }],
+    quotes: [
+      { ...base, id: 'q-expired', product_id: 'chicken-fresh', supplier: '过期供应商', province: '广东', price: 20, quoted_on: '2020-03-01', valid_until: '2020-04-01', notes: '已经过期的旧报价' },
+      { ...base, id: 'q-live', product_id: 'chicken-fresh', supplier: '有效供应商', province: '广东', price: 10, quoted_on: today, valid_until: addMonths(today, 2), notes: '仍在有效期内的报价' },
+    ],
+  }) };
+  const app = stubDom('#overview', { storage });
+  await import('../src/app.js?route=validity-note');
+  const html = app.innerHTML;
+  const price = html.match(/class="card-price"><strong>([\d.]+)<\/strong>/)?.[1];
+  assert.equal(price, '10.00', '卡片均价只应统计未过期报价');
+  assert.doesNotMatch(html, /过期供应商/, '过期报价不应进入最近入库');
+  assert.match(html, /有效供应商/, '有效报价仍应出现在最近入库');
+  assert.match(html, /card-valid/, '卡片底部应给出有效期提示');
+  assert.match(html, /有效至 \d{2}-\d{2} · 剩 \d+ 天/, '提示里应写明到期日与剩余天数');
 });

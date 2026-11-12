@@ -22,9 +22,10 @@ test('前台四个页面不渲染来源、网址或渠道名', () => {
   }
 });
 
-test('报价详情的来源 / 原始链接只在解锁后显示，备注默认脱敏', () => {
+test('报价详情的出处只对管理员显示，其他角色连来源名称都不渲染', () => {
   const body = bodyOf(read('../src/app.js'), 'quoteDetail');
-  assert.match(body, /unlocked\(\)\?\[?'|unlocked\(\)\?field\('原始来源'/);
+  assert.match(body, /admin\(\)\?field\('出处'/);
+  assert.doesNotMatch(body, /unlocked\(\)/, '出处可见性不再由设置页解锁状态决定');
   assert.match(body, /safeNotes\(q\.notes\)/);
 });
 
@@ -34,9 +35,11 @@ test('录入表单的来源字段只在解锁后渲染，未解锁用隐藏域�
   assert.match(body, /type="hidden" name="source"/);
 });
 
-test('前台导出去掉来源与链接列，筛选导出仍需解锁', () => {
+test('导出的来源与链接列只给管理员，导出本身仍需解锁设置页', () => {
   const app = read('../src/app.js');
-  assert.match(bodyOf(app, 'exportData'), /showOrigin=unlocked\(\)/);
+  assert.match(bodyOf(app, 'exportData'), /showOrigin=admin\(\)/);
+  assert.doesNotMatch(bodyOf(app, 'exportData'), /showOrigin=unlocked\(\)/);
+  assert.match(bodyOf(app, 'exportSelected'), /showOrigin=admin\(\)/);
   assert.match(bodyOf(app, 'exportSelected'), /isUnlocked\(\)\)throw new Error/);
   assert.match(bodyOf(app, 'exportForm'), /isUnlocked\(\)\)return/);
 });

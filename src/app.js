@@ -20,7 +20,7 @@ const icon = (name,size=16) => `<svg width="${size}" height="${size}" viewBox="0
 const esc = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const app = document.querySelector('#app');
 const dialog = document.querySelector('#dialog');
-const state={page:location.hash.slice(1)||'overview',days:7,basis:'factory',category:'',province:'',product:'',source:'',search:'',sort:'price',reviewStatus:'pending',chartProduct:'chicken-fresh',pageNumber:1,sourceKind:'',leadKind:'',leadCategory:'',leadUse:'',leadSort:'date_desc',leadRange:30};
+const state={page:location.hash.slice(1)||'overview',days:7,basis:'factory',category:'',province:'',product:'',source:'',search:'',sort:'price',sortDir:'asc',reviewStatus:'pending',chartProduct:'chicken-fresh',pageNumber:1,sourceKind:'',leadKind:'',leadCategory:'',leadUse:'',leadSort:'date_desc',leadRange:30};
 let data={products:[],quotes:[],leads:[]};
 let busy=false;
 let sessionStore;
@@ -82,6 +82,16 @@ function deltaFor(id) {
  const delta=now-before; const pct=delta/before*100;
  return `<span class="delta ${Math.abs(pct)<.005?'':delta>0?'up':'down'}">${Math.abs(pct)<.005?'—':delta>0?'↗':'↘'} ${Math.abs(pct).toFixed(2)}% <span class="subtle">较昨日</span></span>`;
 }
+// 卡片底部的有效期提示：均价变成「—」时能看出是断供还是过期，不用猜。
+function validNote(id) {
+ const live=latestQuotes(data.quotes,{...queryOptions(id),days:3650});
+ const until=live.map(q=>q.valid_until).sort().at(-1);
+ if(!until) return '<div class="card-valid expired">暂无已入库的有效报价</div>';
+ const remain=Math.round((Date.parse(until)-Date.parse(dayString()))/86400000);
+ if(stats(id).count===0)
+  return `<div class="card-valid expired">当前范围无报价 · 有效至 ${until.slice(5)}</div>`;
+ return `<div class="card-valid${remain<=7?' soon':''}">有效至 ${until.slice(5)} · 剩 ${remain} 天</div>`;
+}
 function overview() {
  const visible=visibleProducts().filter(p=>!state.category||p.category===state.category);
  // 品类卡片：总览不展示猪（2026-11-12 用户要求）；其余品类取「已入库样本最多」的规格，
@@ -98,7 +108,7 @@ function overview() {
    return `<tr><td>${productCell(p)}</td><td class="number">${money(s.average)}</td><td class="number green">${money(s.min)}</td><td class="range">${s.count?`${money(s.min)} – ${money(s.max)}`:'—'}</td><td>${s.count}<span class="subtle"> 条 / ${s.provinceCount} 省</span>${s.count&&s.sparse?'<div class="subtle">样本较少</div>':''}</td><td>${spark(points.map(v=>v.average))}</td><td class="subtle">${latest?.slice(5)||'暂无'}</td><td><button class="row-action" data-compare="${esc(p.id)}">去比价 ${icon('arrow',13)}</button></td></tr>`;
  }).join('');
  return `<div class="filters"><span class="label">参考范围</span>${periodSelect()}${provinceSelect()}${basisSelect()}<span class="date-note">${icon('clock',13)} 北京时间 ${dayString().replaceAll('-','.')} · 元 / kg</span><div class="page-bar-actions">${pageActionButtons()}</div></div><div class="cards">${representatives.map(p=>{
- const s=stats(p.id);return `<button class="price-card ${state.chartProduct===p.id?'selected':''}" data-chart="${esc(p.id)}" title="只统计你已入库且未过期的报价，同供应商取最新一条后等权平均"><div class="card-head"><span><span class="category-dot">${esc(p.category)}</span>${esc(p.name)}</span><span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="card-sub">${esc(p.spec)}</div><div class="card-price"><strong>${money(s.average)}</strong><span>元 / kg</span></div><div class="card-bottom">${deltaFor(p.id)}<span>${s.count} 条已入库</span></div></button>`;
+ const s=stats(p.id);return `<button class="price-card ${state.chartProduct===p.id?'selected':''}" data-chart="${esc(p.id)}" title="只统计你已入库且未过期的报价，同供应商取最新一条后等权平均"><div class="card-head"><span><span class="category-dot">${esc(p.category)}</span>${esc(p.name)}</span><span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="card-sub">${esc(p.spec)}</div><div class="card-price"><strong>${money(s.average)}</strong>${s.average==null?'':'<span>元 / kg</span>'}</div><div class="card-bottom">${deltaFor(p.id)}<span>${s.count} 条已入库</span></div>${validNote(p.id)}</button>`;
  }).join('')}</div><section class="panel"><div class="panel-head"><h2>产品参考均价 <small>独立规格，独立统计</small></h2>${categoryTabs()}</div>${data.quotes.some(q=>q.status==='approved')?'':`<div class="review-intro">${icon('info',14)} 还没有已入库的供货报价，产品均价暂为空。录入一条报价后，这里才会出现供货均价。</div>`}<div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>样本均价</th><th>最低供货价</th><th>价格区间</th><th>有效样本 / 覆盖</th><th>7 日均价走势</th><th>最新报价</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">暂无产品，请在数据与设置中添加</td></tr>'}</tbody></table></div><div class="table-foot"><span>${icon('info',12)} ${esc(bases[state.basis])} · 同供应商、同省、同规格保留最新有效报价；均价按供应商等权计算。</span><span>${state.province?'区域样本':'全国采样'} · 非官方全国统计均价</span></div></section><div class="bottom-grid">${chartPanel()}${recentPanel()}</div>`;
 }
 function spark(values) {
@@ -121,17 +131,17 @@ function chartPanel() {
  return `<section class="panel"><div class="panel-head"><h2>均价走势 <small>最近 7 日</small></h2><select aria-label="走势产品" data-filter="chartProduct">${options(visibleProducts().map(p=>[p.id,`${p.name} · ${p.state} · ${p.spec}`]),state.chartProduct)}</select></div><div class="chart-wrap"><div class="chart-summary"><strong>${money(s.average)}</strong><span class="subtle">元 / kg</span>${deltaFor(p?.id)}</div>${svg}</div><div class="chart-legend"><i class="dot"></i>${esc(productLabel(p))} · ${esc(bases[state.basis])}</div></section>`;
 }
 function recentPanel() {
- const recent=data.quotes.filter(q=>q.status==='approved'&&quoteVisible(q)).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at)).slice(0,4);
+ const recent=data.quotes.filter(q=>q.status==='approved'&&quoteVisible(q)&&isValidQuote(q)).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at)).slice(0,4);
  return `<section class="panel"><div class="panel-head"><h2>最近入库</h2><button class="text-btn" data-page="compare">全部报价 ${icon('arrow',12)}</button></div><div class="recent-list">${recent.map(q=>`<div class="recent-row"><div class="recent-icon">${icon('check',15)}</div><div class="recent-text"><strong>${esc(product(q.product_id)?.name)} <span class="subtle">/ ${esc(product(q.product_id)?.state)} · ${esc(q.province)}</span></strong><p>${esc(q.supplier)} · ${esc(q.quoted_on.slice(5))}</p></div><button class="recent-price" data-detail="${esc(q.id)}">¥ ${money(q.price)}<small>已入库</small></button></div>`).join('')||'<div class="empty">还没有入库报价</div>'}</div></section>`;
 }
 function comparisonRows() {
- return latestQuotes(data.quotes,{...queryOptions(state.product),category:state.category,products:visibleProducts(),source:state.source}).filter(q=>quoteVisible(q)&&(!state.search||[q.supplier,q.city,q.province,productLabel(product(q.product_id))].join(' ').toLowerCase().includes(state.search.toLowerCase()))).sort((a,b)=>state.sort==='date'?b.quoted_on.localeCompare(a.quoted_on):a.price-b.price);
+ return latestQuotes(data.quotes,{...queryOptions(state.product),category:state.category,products:visibleProducts(),source:state.source}).filter(q=>quoteVisible(q)&&(!state.search||[q.supplier,q.city,q.province,productLabel(product(q.product_id))].join(' ').toLowerCase().includes(state.search.toLowerCase()))).sort((a,b)=>state.sort==='date'?(state.sortDir==='asc'?a.quoted_on.localeCompare(b.quoted_on):b.quoted_on.localeCompare(a.quoted_on)):(state.sortDir==='desc'?b.price-a.price:a.price-b.price));
 }
 function compare() {
  const rows=comparisonRows(); const p=product(state.product); const s=p?summarize(rows):null;
  const pageSize=20; const total=Math.max(1,Math.ceil(rows.length/pageSize)); state.pageNumber=Math.min(state.pageNumber,total);
  const pageRows=rows.slice((state.pageNumber-1)*pageSize,state.pageNumber*pageSize);
- return `<div class="filter-panel"><div class="filters compare-filters"><select aria-label="品类" data-filter="category">${options(categories(),state.category,'全部品类')}</select><select aria-label="产品规格" data-filter="product">${options(visibleProducts().filter(p=>!state.category||p.category===state.category).map(p=>[p.id,productLabel(p)]),state.product,'全部产品规格')}</select>${provinceSelect()}${periodSelect()}${basisSelect()}<label class="search">${icon('search',15)}<input aria-label="搜索供应商或地区" placeholder="搜索供应商、地区…" value="${esc(state.search)}" id="search"></label><button class="text-btn" data-action="reset-filters">重置筛选</button><div class="page-bar-actions">${pageActionButtons()}</div></div></div>${s?`<div class="summary-strip">${[['样本均价',money(s.average),'元/kg'],['最低供货价',money(s.min),'元/kg'],['中位价格',money(s.median),'元/kg'],['有效供应商样本',s.count,'个'],['覆盖省份',s.provinceCount,'省']].map(([label,val,unit])=>`<div class="summary-item"><p>${label}</p><strong>${val}</strong><small>${unit}</small></div>`).join('')}</div>`:''}<section class="panel"><div class="panel-head"><h2>${p?esc(p.name)+' · '+esc(p.state):'供货报价'} <small>${rows.length} 条最新有效报价${s?.sparse?' · 样本较少，请继续补充询价':''}</small></h2><select aria-label="排序方式" data-filter="sort">${options([['price','供货价：从低到高'],['date','报价日：从新到旧']],state.sort)}</select></div><div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>供应商 / 地区</th><th>供货价 · 元/kg</th><th>参考含运价</th><th>采购条件</th><th>报价日 / 有效期</th><th></th></tr></thead><tbody>${pageRows.map(q=>`<tr><td>${productCell(product(q.product_id))}</td><td><div>${esc(q.supplier)}</div><div class="product-spec">${esc(q.province)} · ${esc(q.city||'未填城市')}</div></td><td class="number ${p&&q.price===s?.min?'green':''}">${money(q.price)}${p&&q.price===s?.min?'<span class="tag fresh">最低</span>':''}</td><td>${q.basis==='delivered'?money(q.price):q.freight!=null?money(Number(q.price)+Number(q.freight)):'<span class="subtle">运费待询</span>'}${q.basis==='untaxed'?'<div class="subtle">未含税</div>':''}</td><td>${esc(q.min_order||'起订量待询')}<div class="product-spec">${esc(bases[q.basis])}</div></td><td>${esc(q.quoted_on)}<div class="product-spec">有效至 ${esc(q.valid_until)}</div></td><td><button class="row-action" data-detail="${esc(q.id)}">详情 ${icon('chevron',12)}</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">没有符合条件的有效报价，试试调整筛选或录入报价。</td></tr>'}</tbody></table></div><div class="pagination"><span>${rows.length} 条 · 已去重，过期与未确认报价不参与</span><div><button class="btn small" data-pagination="-1" ${state.pageNumber<=1?'disabled':''}>上一页</button><span>${state.pageNumber} / ${total}</span><button class="btn small" data-pagination="1" ${state.pageNumber>=total?'disabled':''}>下一页</button></div></div></section>`;
+ return `<div class="filter-panel"><div class="filters compare-filters"><select aria-label="品类" data-filter="category">${options(categories(),state.category,'全部品类')}</select><select aria-label="产品规格" data-filter="product">${options(visibleProducts().filter(p=>!state.category||p.category===state.category).map(p=>[p.id,productLabel(p)]),state.product,'全部产品规格')}</select>${provinceSelect()}${periodSelect()}${basisSelect()}<label class="search">${icon('search',15)}<input aria-label="搜索供应商或地区" placeholder="搜索供应商、地区…" value="${esc(state.search)}" id="search"></label><button class="text-btn" data-action="reset-filters">重置筛选</button><div class="page-bar-actions">${pageActionButtons()}</div></div></div>${s?`<div class="summary-strip">${[['样本均价',money(s.average),'元/kg'],['最低供货价',money(s.min),'元/kg'],['中位价格',money(s.median),'元/kg'],['有效供应商样本',s.count,'个'],['覆盖省份',s.provinceCount,'省']].map(([label,val,unit])=>`<div class="summary-item"><p>${label}</p><strong>${val}</strong><small>${unit}</small></div>`).join('')}</div>`:''}<section class="panel"><div class="panel-head"><h2>${p?esc(p.name)+' · '+esc(p.state):'供货报价'} <small>${rows.length} 条最新有效报价${s?.sparse?' · 样本较少，请继续补充询价':''}</small></h2><select aria-label="排序方式" data-filter="sort">${options([['price','供货价：'+(state.sortDir==='desc'?'从高到低':'从低到高')],['date','报价日：从新到旧']],state.sort)}</select></div><div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>供应商 / 地区</th><th aria-sort="${state.sort!=='price'?'none':state.sortDir==='asc'?'ascending':'descending'}"><button class="th-sort" type="button" data-sort-price title="按供货价${state.sort==='price'&&state.sortDir==='asc'?'从低到高排序，点击改为从高到低':'从高到低排序，点击改为从低到高'}">供货价 · 元/kg${icon(state.sort==='price'&&state.sortDir==='desc'?'sortNew':'sortOld',12)}</button></th><th>参考含运价</th><th>采购条件</th><th>报价日 / 有效期</th><th></th></tr></thead><tbody>${pageRows.map(q=>`<tr><td>${productCell(product(q.product_id))}</td><td><div>${esc(q.supplier)}</div><div class="product-spec">${esc(q.province)} · ${esc(q.city||'未填城市')}</div></td><td class="number ${p&&q.price===s?.min?'green':''}">${money(q.price)}${p&&q.price===s?.min?'<span class="tag fresh">最低</span>':''}</td><td>${q.basis==='delivered'?money(q.price):q.freight!=null?money(Number(q.price)+Number(q.freight)):'<span class="subtle">运费待询</span>'}${q.basis==='untaxed'?'<div class="subtle">未含税</div>':''}</td><td>${esc(q.min_order||'起订量待询')}<div class="product-spec">${esc(bases[q.basis])}</div></td><td>${esc(q.quoted_on)}<div class="product-spec">有效至 ${esc(q.valid_until)}</div></td><td><button class="row-action" data-detail="${esc(q.id)}">详情 ${icon('chevron',12)}</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">没有符合条件的有效报价，试试调整筛选或录入报价。</td></tr>'}</tbody></table></div><div class="pagination"><span>${rows.length} 条 · 已去重，过期与未确认报价不参与</span><div><button class="btn small" data-pagination="-1" ${state.pageNumber<=1?'disabled':''}>上一页</button><span>${state.pageNumber} / ${total}</span><button class="btn small" data-pagination="1" ${state.pageNumber>=total?'disabled':''}>下一页</button></div></div></section>`;
 }
 function review() {
  const rows=data.quotes.filter(q=>q.status===state.reviewStatus).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
@@ -236,7 +246,7 @@ function quoteForm(existing,lead) {
 function quoteDetail(id) {
  const q=data.quotes.find(q=>q.id===id); if(!q)return;
  const p=product(q.product_id);
- showDialog(dialogHead('报价详情',productLabel(p))+`<div class="form-body"><div class="form-grid">${[['供应商',q.supplier],['地区',`${q.province} ${q.city}`],['供货价格',`¥ ${money(q.price)} / kg`],['价格口径',bases[q.basis]],['报价日期',q.quoted_on],['有效期',q.valid_until],['起订量',q.min_order||'未填写'],['运费（元/kg）',q.freight!=null?`¥ ${money(q.freight)}`:'待询'],...(unlocked()?[['来源',`${q.source==='engine'?'引擎采集':'人工询价'} · ${q.source_name||'未填写'}`]]:[]),['状态',`${statuses[q.status]}${q.valid_until<dayString()?' · 已过期':''}`]].map(([l,v])=>field(l,`<div>${esc(v)}</div>`)).join('')}${unlocked()?field('原始来源',q.source_url&&/^https?:\/\//i.test(q.source_url)?`<a target="_blank" rel="noopener noreferrer" href="${esc(q.source_url)}">查看原文 ↗</a>`:'<span class="muted">未提供</span>',true):''}${field('备注',`<div style="white-space:pre-wrap;line-height:1.8">${esc(safeNotes(q.notes))}</div>`,true)}${q.reviewed_at?field('最近审核时间',`<span class="subtle">${esc(new Date(q.reviewed_at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</span>`,true):''}</div></div><div class="dialog-foot">${admin()?`<button class="btn" data-edit="${esc(q.id)}">编辑报价</button>${q.status==='pending'?`<button class="btn danger" data-review="rejected" data-id="${esc(q.id)}">忽略</button><button class="btn primary" data-review="approved" data-id="${esc(q.id)}">确认入库</button>`:''}`:''}<button class="btn" data-action="close">关闭</button></div>`);
+ showDialog(dialogHead('报价详情',productLabel(p))+`<div class="form-body"><div class="form-grid">${[['供应商',q.supplier],['地区',`${q.province} ${q.city}`],['供货价格',`¥ ${money(q.price)} / kg`],['价格口径',bases[q.basis]],['报价日期',q.quoted_on],['有效期',q.valid_until],['起订量',q.min_order||'未填写'],['运费（元/kg）',q.freight!=null?`¥ ${money(q.freight)}`:'待询'],['状态',`${statuses[q.status]}${q.valid_until<dayString()?' · 已过期':''}`]].map(([l,v])=>field(l,`<div>${esc(v)}</div>`)).join('')}${admin()?field('出处',`<div>${esc(q.source==='engine'?'引擎采集':'人工询价')} · ${esc(q.source_name||'未填写')}</div>${q.source_url&&/^https?:\/\//i.test(q.source_url)?`<div class="source-url"><a target="_blank" rel="noopener noreferrer" href="${esc(q.source_url)}">${esc(q.source_url)}</a></div>`:'<div class="source-url subtle">未提供源网址</div>'}`,true):''}${field('备注',`<div style="white-space:pre-wrap;line-height:1.8">${esc(safeNotes(q.notes))}</div>`,true)}${q.reviewed_at?field('最近审核时间',`<span class="subtle">${esc(new Date(q.reviewed_at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</span>`,true):''}</div></div><div class="dialog-foot">${admin()?`<button class="btn" data-edit="${esc(q.id)}">编辑报价</button>${q.status==='pending'?`<button class="btn danger" data-review="rejected" data-id="${esc(q.id)}">忽略</button><button class="btn primary" data-review="approved" data-id="${esc(q.id)}">确认入库</button>`:''}`:''}<button class="btn" data-action="close">关闭</button></div>`);
 }
 // 核价品类管理：改名 / 停用 / 删除（可恢复），停用后全站核价入口一并移除。
 function categoryDialog() {
@@ -301,8 +311,11 @@ function exportSelected(fields) {
   const labels={new:'待核对',converted:'已转为报价',dismissed:'已忽略'};
   rows=records.map(l=>[l.category,l.source_name,sourceKinds[l.kind],l.title,l.price_text,l.region_text,l.published_on,l.url,labels[l.status]||l.status]);
  }else{
-  header=['品类','产品','状态','规格','供应商','省份','城市','供货价（元/kg）','报价口径','运费（元/kg）','起订量','报价日期','有效至','来源方式','来源名称','原始链接','审核状态','备注'];
-  rows=records.map(q=>{const p=product(q.product_id);return [p?.category,p?.name,p?.state,p?.spec,q.supplier,q.province,q.city,q.price,bases[q.basis],q.freight,q.min_order,q.quoted_on,q.valid_until,q.source==='engine'?'引擎采集':'人工询价',q.source_name,q.source_url,statuses[q.status],q.notes];});
+  // 出处只对管理员导出，其他角色导出的 CSV 不含来源名称与源网址。
+  const showOrigin=admin();
+  const base=['品类','产品','状态','规格','供应商','省份','城市','供货价（元/kg）','报价口径','运费（元/kg）','起订量','报价日期','有效至'];
+  header=showOrigin?[...base,'来源方式','来源名称','原始链接','审核状态','备注']:[...base,'审核状态','备注'];
+  rows=records.map(q=>{const p=product(q.product_id);const core=[p?.category,p?.name,p?.state,p?.spec,q.supplier,q.province,q.city,q.price,bases[q.basis],q.freight,q.min_order,q.quoted_on,q.valid_until];return showOrigin?[...core,q.source==='engine'?'引擎采集':'人工询价',q.source_name,q.source_url,statuses[q.status],q.notes]:[...core,statuses[q.status],q.notes];});
  }
  download('\uFEFF'+[header,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n'),`行情跳动-${fields.type==='leads'?'采集线索':'供货报价'}-${fields.category||'全部品类'}-${dayString()}.csv`);
  dialog.close();toast(`已导出 ${records.length} 条记录`);
@@ -316,7 +329,7 @@ function exportData() {
   header=['品类','产品','状态','规格','地区范围','报价口径','参考周期（天）','均价（元/kg）','最低价','最高价','中位价','样本数','省份数','统计日'];
   rows=visibleProducts().filter(p=>!state.category||p.category===state.category).map(p=>{const s=stats(p.id);return [p.category,p.name,p.state,p.spec,state.province||'全国采样',bases[state.basis],state.days,s.average?.toFixed(4),s.min,s.max,s.median,s.count,s.provinceCount,dayString()];});
  } else {
-  const showOrigin=unlocked();
+  const showOrigin=admin();
   const base=['品类','产品','状态','规格','供应商','省份','城市','供货价（元/kg）','报价口径','运费（元/kg）','起订量','报价日期','有效至'];
   header=showOrigin?[...base,'来源','原始链接','审核状态','备注']:[...base,'审核状态','备注'];
   const quotes=state.page==='review'?data.quotes.filter(q=>q.status===state.reviewStatus):state.page==='settings'?data.quotes:comparisonRows();
@@ -379,6 +392,12 @@ document.addEventListener('click',event=>{
  if(el.dataset.catDeleteConfirm){execute(async()=>{if(!admin())throw new Error('需要管理员权限');data=await store.deleteCategory(el.dataset.catDeleteConfirm);render();categoryDialog();toast('品类已删除，可在管理里恢复');},el);return;}
  if(el.dataset.leadKind!==undefined){changeValue({leadKind:el.dataset.leadKind});return;}
  if(el.dataset.leadSort!==undefined){changeValue({leadSort:state.leadSort==='date_asc'?'date_desc':'date_asc'});return;}
+ if(el.dataset.sortPrice!==undefined){
+  // 点一次按从低到高，再点一次翻成从高到低；若当前按日期排，则先切回价格升序。
+  if(state.sort==='price')changeValue({sortDir:state.sortDir==='asc'?'desc':'asc'});
+  else changeValue({sort:'price',sortDir:'asc'});
+  return;
+ }
  if(el.dataset.detail){quoteDetail(el.dataset.detail);return;}
  if(el.dataset.edit){quoteForm(data.quotes.find(q=>q.id===el.dataset.edit));return;}
  if(el.dataset.reviewStatus){changeValue({reviewStatus:el.dataset.reviewStatus});return;}
@@ -396,7 +415,7 @@ document.addEventListener('click',event=>{
  if(action==='backup')download(store.backup(),`行情跳动-完整备份-${dayString()}.json`,'application/json');
  if(action==='account')accountDialog();
  if(action==='lock-access')execute(async()=>{settingsAccess.lock();accessGate.lock();if(store.cloud)await store.logout();dialog.close();accessPage();toast('已退出访问，需重新输入密码');},el);
- if(action==='reset-filters')changeValue({category:'',product:'',province:'',source:'',search:'',basis:'factory',days:7,sort:'price'});
+ if(action==='reset-filters')changeValue({category:'',product:'',province:'',source:'',search:'',basis:'factory',days:7,sort:'price',sortDir:'asc'});
  if(action==='refresh')execute(async()=>{data=await store.reload();render();toast('记录已刷新');},el);
  if(action==='logout')execute(async()=>{settingsAccess.lock();await store.logout();loginPage();},el);
  if(action==='members')execute(showMembers,el);
@@ -415,6 +434,7 @@ document.addEventListener('change',event=>{
  const filter=event.target.dataset.filter;
  if(filter==='leadCategory'){state.leadKind='';state.page='settings';state.settingsView='sources';location.hash='settings';}
  if(filter==='leadUse'){changeValue({leadUse:event.target.value});return;}
+ if(filter==='sort'){changeValue({sort:event.target.value,sortDir:event.target.value==='date'?'desc':'asc'});return;}
  if(filter)changeValue(filter==='category'?{category:event.target.value,product:''}:{[filter]:['days','leadRange'].includes(filter)?Number(event.target.value):event.target.value});
 });
 let searchTimer;

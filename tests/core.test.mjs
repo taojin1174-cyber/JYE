@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizePrice,normalizeFreight,latestQuotes,summarize,trend,validateQuote,shiftDay,dayString,csvCell } from '../src/core.js';
+import { normalizePrice,normalizeFreight,latestQuotes,summarize,trend,validateQuote,shiftDay,dayString,csvCell,addMonths,monthsBetween } from '../src/core.js';
 import { parseCSV,mapRecord } from '../scripts/collect.mjs';
 import { parseDiscovery } from '../scripts/discovery.mjs';
 import { matchesLeadCategory } from '../src/core.js';
@@ -81,4 +81,18 @@ test('市场和官方标题保持参考用途，原文日期不改为抓取日',
  assert.equal(market.published_on,'2026-01-02');assert.equal(market.kind,'market');assert.equal(market.price_text,'');
  const [macro]=parseDiscovery('<a href="./jghq/202601/t20260102_123.htm" title="第1周畜产品价格">周报</a>',{id:'nahs',name:'总站',adapter:'nahs',kind:'macro',url:'https://www.nahs.org.cn/jcyj/'});
  assert.equal(macro.published_on,'2026-01-02');assert.equal(macro.kind,'macro');
+});
+test('有效期按整月推算：跨年正确，月末自动对齐，可反查月数',()=>{
+ assert.equal(addMonths('2026-11-12',1),'2026-12-12');
+ assert.equal(addMonths('2026-11-12',3),'2027-02-12');
+ assert.equal(addMonths('2026-12-15',2),'2027-02-15');
+ // 1/31 加一个月落到 2 月末，不能溢出到 3 月。
+ assert.equal(addMonths('2026-01-31',1),'2026-02-28');
+ assert.equal(addMonths('2028-01-31',1),'2028-02-29');
+ assert.equal(monthsBetween('2026-11-12','2026-12-12'),1);
+ assert.equal(monthsBetween('2026-11-12','2027-01-12'),2);
+ assert.equal(monthsBetween('2026-11-12','2027-02-12'),3);
+ // 对不上整月的旧到期日返回 0，由界面保留原值而不是强行改期。
+ assert.equal(monthsBetween('2026-11-12','2027-01-13'),0);
+ assert.throws(()=>addMonths('',1));
 });

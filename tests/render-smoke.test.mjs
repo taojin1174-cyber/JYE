@@ -155,3 +155,17 @@ test('访问密码配置只含盐与派生值，且迭代次数达标', () => {
   assert.match(accessLock.salt, /^[0-9a-f]{32}$/);
   assert.match(accessLock.verifier, /^[0-9a-f]{64}$/);
 });
+
+test('行情总览不展示猪卡片，线索页有「处理方式」下拉', async () => {
+  const overview = stubDom('#overview');
+  await import('../src/app.js?route=no-pig-card');
+  const cards = overview.innerHTML.match(/<button class="price-card/g) || [];
+  assert.equal(cards.length, 4, '去掉猪之后应只剩鸡鸭鹅羊四张卡');
+  assert.doesNotMatch(overview.innerHTML, /category-dot">猪</);
+
+  const settings = stubDom('#settings');
+  await import('../src/app.js?route=lead-use-filter');
+  assert.match(settings.innerHTML, /data-filter="leadUse"/);
+  assert.match(settings.innerHTML, /可核实入库/);
+  assert.match(settings.innerHTML, /仅作参考/);
+});

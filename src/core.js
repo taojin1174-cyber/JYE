@@ -6,6 +6,21 @@ export function dayString(date = new Date()) {
 }
 // 日期偏移使用中午，避免 UTC 切日。所有行情日期均为北京时间自然日。
 export function shiftDay(day, delta) { return dayString(new Date(Date.parse(day + 'T12:00:00+08:00') + delta * 86400000)); }
+// 有效期按整月计：报价日 + N 个月。目标月没有该日时对齐到当月最后一天（1/31 + 1 月 = 2/28 或 2/29）。
+export function addMonths(day, months) {
+  const [y, m, d] = String(day || '').split('-').map(Number);
+  if (!y || !m || !d) throw new Error('有效期需要合法的报价日期');
+  const total = y * 12 + (m - 1) + Number(months);
+  const year = Math.floor(total / 12);
+  const month = total % 12;
+  const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  return `${year}-${String(month + 1).padStart(2, '0')}-${String(Math.min(d, lastDay)).padStart(2, '0')}`;
+}
+// 报价日到某到期日之间是否为整月（1–3 个月）。用于编辑旧报价时判断能否回显为月数。
+export function monthsBetween(day, until) {
+  for (const n of [1, 2, 3]) if (addMonths(day, n) === until) return n;
+  return 0;
+}
 export function normalizePrice(price, unit) {
   const n = Number(price);
   if (!Number.isFinite(n) || n <= 0) throw new Error('价格须大于 0');

@@ -48,7 +48,7 @@ export function buildQuickQuote(lead, products, today = dayString()) {
   const notes = [
     `产品：${lead.title || ''}；标价：${lead.price_text || '待核实'}；信息日期：${originalDate || '未注明'}（价格需向供货商复核）`,
     `地区：${region || '未注明'}；规格 / 单个重量：${specClue || '待核实'}；货量：${volume || '未注明'}（发布量，不是起订量）`,
-    `★ 系统补全（可修改）：产品规格按「${preset.category} / ${preset.name} / ${state} / 规格待核实」归类；计价口径暂按「${bases.factory}」记录，税运条件未注明；报价日按核实当天 ${quoted_on}，有效期默认 +7 天；起订量与运费待询。`,
+    `★ 系统补全（可修改）：产品规格按「${preset.category} / ${preset.name} / ${state} / 规格待核实」归类；计价口径暂按「${bases.factory}」记录，税运条件未注明；报价日按核实当天 ${quoted_on}，有效期由录入人现场选择 1 / 2 / 3 个月；起订量与运费待询。`,
   ].join('\n');
 
   const quote = {
@@ -81,7 +81,7 @@ export function buildQuickQuote(lead, products, today = dayString()) {
     { label: '供货价', value: price ? `¥ ${price} / kg` : '待填写', note: `标价 ${lead.price_text || '待核实'}` },
     { label: '供应商', value: supplier, note: contact ? '供货方联系人' : '按产品名暂记' },
     { label: '地区', value: `${province}${city ? ' · ' + city : ''}`, note: '仓库所在地' },
-    { label: '报价日 / 有效期', value: `${quoted_on} → 待填写`, note: '有效期由你填写，系统不预设' },
+    { label: '报价日 / 有效期', value: `${quoted_on} → 待选择`, note: '报价日 + 你选的 1/2/3 个月，到期自动退出统计' },
     { label: '计价口径', value: bases.factory, note: '默认值，税运条件待核实' },
   ];
 

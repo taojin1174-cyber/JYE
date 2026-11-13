@@ -16,6 +16,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # 凭证缺失时 discovery.mjs 会静默跳过写库、整步仍显示成功，等于采集白跑。
+      # 这里先硬失败一次，让「没写进数据库」在页面上立刻可见。
+      - name: Check cloud credentials
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::缺少 SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY，本次采集不会写入数据库。请在 Settings → Secrets and variables → Actions 中补齐。"
+            exit 1
+          fi
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       - name: Fetch public lists
         id: fetch
         continue-on-error: true
@@ -23,15 +35,22 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      # 肉交所快照不再进仓库（含供应商联系方式），本机采集时直接入库；
-      # 有这个文件才合并，没有就跳过，避免工作流因为缺文件而失败。
-      - name: Merge frozen-poultry leads
+
+      # 肉交所四品类（清远鸡 / 白条鹅 / 清远麻鸡 / 鸽子）过去只在本机抓，
+      # 本机不开机就断更。这里改为云端直接抓公开页面，抓完写库，快照不落仓库。
+      - name: Scrape frozen-poultry marketplace
+        continue-on-error: true
         run: |
-          if [ -f data/roujiaosuo-leads.json ]; then
-            node scripts/import-roujiaosuo-leads.mjs --cloud --only-frozen
-          else
-            echo "无本地肉交所快照，跳过合并（该品类由本机采集后直接写库）"
-          fi
+          mkdir -p data
+          node scripts/roujiaosuo-scrape.mjs
+
+      - name: Build frozen-poultry sheet
+        if: hashFiles('data/roujiaosuo-leads.json') != ''
+        run: node scripts/roujiaosuo-build.mjs
+
+      - name: Import frozen-poultry leads
+        if: hashFiles('data/roujiaosuo-leads.json') != ''
+        run: node scripts/import-roujiaosuo-leads.mjs --cloud --only-frozen
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizePrice,normalizeFreight,latestQuotes,summarize,trend,validateQuote,shiftDay,dayString,csvCell,addMonths,monthsBetween } from '../src/core.js';
+import { normalizePrice,normalizeFreight,latestQuotes,summarize,trend,validateQuote,shiftDay,dayString,csvCell,addMonths,monthsBetween,leadPriceKg } from '../src/core.js';
 import { parseCSV,mapRecord } from '../scripts/collect.mjs';
 import { parseDiscovery } from '../scripts/discovery.mjs';
 import { matchesLeadCategory } from '../src/core.js';
@@ -95,4 +95,22 @@ test('有效期按整月推算：跨年正确，月末自动对齐，可反查�
  // 对不上整月的旧到期日返回 0，由界面保留原值而不是强行改期。
  assert.equal(monthsBetween('2026-11-12','2027-01-13'),0);
  assert.throws(()=>addMonths('',1));
+});
+
+test('线索标价原文折算成元/kg 后再比较',()=>{
+ assert.equal(leadPriceKg('12.90元/公斤'),12.9);
+ assert.equal(leadPriceKg('12.9 元/kg'),12.9);
+ // 按斤报价折半换到公斤。
+ assert.equal(leadPriceKg('9.80元/斤'),19.6);
+ // 按吨报价除一千。
+ assert.equal(leadPriceKg('8500元/吨'),8.5);
+ // 区间价取中值。
+ assert.equal(leadPriceKg('12.20-12.60元/公斤'),12.4);
+ // 只认紧贴「元」的数字，标题里的年份不算价格。
+ assert.equal(leadPriceKg('2026年11月 白条鹅 15.90元/公斤'),15.9);
+ // 按只 / 羽计价与重量单位不可比，返回空值由界面沉底。
+ assert.equal(leadPriceKg('18.50元/只'),null);
+ assert.equal(leadPriceKg('4.2元/羽'),null);
+ assert.equal(leadPriceKg('见原文'),null);
+ assert.equal(leadPriceKg(''),null);
 });

@@ -71,6 +71,11 @@ test('基础设置页：四个面板是可折叠卡片，产品库带删除入�
   assert.ok(!/<section class="panel">/.test(html), '基础设置不应再有不可折叠的面板');
   assert.match(html, /data-delete-product="/, '产品库应提供删除按钮');
   assert.match(html, /data-action="add-product"/, '产品库应保留添加按钮');
+  // 收起态是紧凑入口卡：图标块 + 标题 + 一行副标题，副标题不能放在 h2 里（会被窄屏样式隐藏）。
+  assert.equal((html.match(/class="fold-icon"/g) || []).length, 4, '四张卡都应有图标块');
+  assert.equal((html.match(/class="fold-title"/g) || []).length, 4, '四张卡都应有标题容器');
+  assert.match(html, /<small>[\d]+ 个规格<\/small>/, '产品库应显示规格数量');
+  assert.match(html, /<small>人工确认后入库<\/small>/);
 });
 
 test('数据设置页的导出与录入按钮并入栏目行，不再单独占一行', async () => {
@@ -113,24 +118,75 @@ test('已入库的线索不消失，改为沉到列表末尾并标注', async ()
   assert.equal(rows.filter(r => !/lead-done/.test(r)).length, rows.length - 1, '只有已入库的那一行被淡化');
 });
 
-test('线索表可按发布日期升降序切换', async () => {
+test('线索表可按标题、标价、地区与发布日期排序', async () => {
   const app = stubDom('#settings');
   await import('../src/app.js?route=lead-sort');
   const rows = () => {
     const start = app.innerHTML.indexOf('<tbody>') + 7;
     return app.innerHTML.slice(start, app.innerHTML.indexOf('</tbody>')).split('<tr').filter(Boolean);
   };
-  // 默认从新到旧：表头可点，且首行是样本里最新的 2026-11-10。
-  assert.match(app.innerHTML, /<th aria-sort="descending"><button class="th-sort"[^>]*data-lead-sort/, '发布日期列头应可点击排序');
+  const regions = () => rows().map(r => (r.match(/<td>([^<]*)<div class="product-spec">\d{4}-\d{2}-\d{2}/) || [])[1]);
+
+  // 三列都可点击排序。
+  for (const col of ['title', 'price', 'date']) {
+    assert.match(app.innerHTML, new RegExp(`<button class="th-sort" type="button" data-lead-sort="${col}"`), `${col} 列应可点击排序`);
+  }
+
+  // 默认按发布日期从新到旧：首行是样本里最新的 2026-11-10。
+  assert.match(app.innerHTML, /<th aria-sort="descending"><button class="th-sort"[^>]*data-lead-sort="date"/, '发布日期列头应标为降序');
   assert.match(rows()[0], /2026-11-10/, '默认应按发布日期从新到旧');
-  // 点一次改为从早到晚：首行变成最早的 2026-11-07，表头状态跟着翻转。
-  app.__click({ leadSort: '' });
-  assert.match(app.innerHTML, /<th aria-sort="ascending">/, '点击后应切换为升序');
+
+  // 点一次改为从早到晚：首行变成最早的 2026-11-07。
+  app.__click({ leadSort: 'date' });
+  assert.match(app.innerHTML, /<th aria-sort="ascending"><button class="th-sort"[^>]*data-lead-sort="date"/, '点击后应切换为升序');
   assert.match(rows()[0], /2026-11-07/, '升序时最早的线索应排在第一行');
-  // 再点一次回到从新到旧。
-  app.__click({ leadSort: '' });
-  assert.match(app.innerHTML, /<th aria-sort="descending">/, '再次点击应切回降序');
-  assert.match(rows()[0], /2026-11-10/, '降序时最新的线索应排在第一行');
+
+  // 再点一次改为按地区拼音，顺序应与地区拼音升序一致。
+  app.__click({ leadSort: 'date' });
+  const byRegion = regions();
+  assert.deepEqual(byRegion, [...byRegion].sort((a, b) => a.localeCompare(b, 'zh-Hans-CN')), '第三态应按地区拼音排序');
+
+  // 第三次点回到从新到旧。
+  app.__click({ leadSort: 'date' });
+  assert.match(rows()[0], /2026-11-10/, '第三次点击应切回从新到旧');
+});
+
+test('线索表「标价原文」按折算后的元/kg 排序，按只计价的沉底', async () => {
+  const app = stubDom('#settings');
+  await import('../src/app.js?route=lead-sort-price');
+  const rows = () => {
+    const start = app.innerHTML.indexOf('<tbody>') + 7;
+    return app.innerHTML.slice(start, app.innerHTML.indexOf('</tbody>')).split('<tr').filter(Boolean);
+  };
+
+  // 从低到高：4.35 元/斤（=8.70 元/kg）最低。
+  app.__click({ leadSort: 'price' });
+  assert.match(rows()[0], /毛鸡 4\.35 元\/斤/, '升序首行应是最便宜的 8.70 元/kg');
+  assert.match(app.innerHTML, /<th aria-sort="ascending"><button class="th-sort"[^>]*data-lead-sort="price"/);
+
+  // 从高到低：10.50 元/斤 折 21.00 元/kg，高于 16.00 元/公斤，应排第一。
+  app.__click({ leadSort: 'price' });
+  assert.match(rows()[0], /10\.50元\/斤/, '按斤计价需折算后比较，21.00 元/kg 应排第一');
+  assert.doesNotMatch(rows()[0], /元\/只/, '按只计价的苗价不参与重量单位排序');
+
+  // 按只计价与「见原文」的线索沉在末尾，不随方向翻转。
+  assert.match(rows().at(-1), /见原文|元\/只/, '无可用单价的线索应排在最后');
+});
+
+test('线索表「原文产品 / 标题」可切换升降序', async () => {
+  const app = stubDom('#settings');
+  await import('../src/app.js?route=lead-sort-title');
+  const rows = () => {
+    const start = app.innerHTML.indexOf('<tbody>') + 7;
+    return app.innerHTML.slice(start, app.innerHTML.indexOf('</tbody>')).split('<tr').filter(Boolean);
+  };
+  app.__click({ leadSort: 'title' });
+  const ascFirst = rows()[0], ascLast = rows().at(-1);
+  assert.match(app.innerHTML, /<th aria-sort="ascending"><button class="th-sort"[^>]*data-lead-sort="title"/);
+  app.__click({ leadSort: 'title' });
+  assert.match(app.innerHTML, /<th aria-sort="descending"><button class="th-sort"[^>]*data-lead-sort="title"/);
+  assert.equal(rows()[0], ascLast, '标题倒序时首行应等于升序时的末行');
+  assert.notEqual(rows()[0], ascFirst, '切换方向后首行应改变');
 });
 
 test('线索默认只显示近 30 天，更早的折叠但可切到全部时间', async () => {

@@ -36,6 +36,24 @@ export function normalizeFreight(value, unit = 'kg') {
   return Math.round(n * (unit === 'ton' ? 0.001 : 1) * 10000) / 10000;
 }
 export const money = value => value == null ? '—' : Number(value).toFixed(2);
+// 线索「标价原文」是自由文本，单位混杂（元/公斤、元/斤、元/吨、元/只）。
+// 排序前统一折算成元/kg：按斤 ×2、按吨 ÷1000，区间价取中值；
+// 按只/羽计价（苗价）与重量单位不可比，返回 null，排序时沉底。
+export function leadPriceKg(text) {
+  const s = String(text || '');
+  if (!s.trim()) return null;
+  if (/元\s*\/\s*(只|羽|个|枚|箱|件)/.test(s)) return null;
+  // 只认紧贴「元」的那段数字，避免把标题里的年份、规格数字当价格。
+  const m = s.match(/(\d+(?:\.\d+)?)(?:\s*[-~至到]\s*(\d+(?:\.\d+)?))?\s*元/);
+  if (!m) return null;
+  const low = Number(m[1]), high = m[2] ? Number(m[2]) : low;
+  if (!Number.isFinite(low) || low <= 0) return null;
+  const raw = Number.isFinite(high) && high >= low ? (low + high) / 2 : low;
+  const value = Math.round(raw * 10000) / 10000;
+  if (/元\s*\/\s*斤/.test(s)) return Math.round(value * 2 * 10000) / 10000;
+  if (/元\s*\/\s*吨/.test(s)) return Math.round(value / 1000 * 10000) / 10000;
+  return value;
+}
 export function matchesLeadCategory(lead,category) {
   return !category || lead.category===category || String(lead.title||'').includes(category);
 }

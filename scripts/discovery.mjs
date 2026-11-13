@@ -1,7 +1,12 @@
 import { readFile,mkdir,writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
+import { setDefaultResultOrder } from 'node:dns';
 import { dayString, provinces } from '../src/core.js';
+
+// GitHub Actions 等云端环境可能优先解析 IPv6，而国内行情站的 IPv6 常常不通，
+// 表现为整站 ETIMEDOUT。强制 IPv4 优先，本机与云端行为一致。
+setDefaultResultOrder('ipv4first');
 
 const ENTITIES={'&nbsp;':' ','&#160;':' ','&amp;':'&','&quot;':'"','&#39;':"'",'&lt;':'<','&gt;':'>','&ge;':'≥','&le;':'≤','&plusmn;':'±','&mdash;':'—','&hellip;':'…','&ldquo;':'“','&rdquo;':'”','&middot;':'·'};
 const clean=value=>String(value).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]*>/g,' ').replace(/&(?:#160|nbsp|amp|quot|#39|lt|gt|ge|le|plusmn|mdash|hellip|ldquo|rdquo|middot);/gi,m=>ENTITIES[m.toLowerCase()]??' ').replace(/\s+/g,' ').trim();
@@ -210,12 +215,13 @@ const BROWSER_HEADERS={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) A
 // 否则 Node 只报 "fetch failed"，无法判断是 DNS、连接还是站点拦截。
 async function getHTML(url,attempt=0) {
  try{
-  const response=await fetch(url,{headers:BROWSER_HEADERS,signal:AbortSignal.timeout(20000)});
+  const response=await fetch(url,{headers:BROWSER_HEADERS,signal:AbortSignal.timeout(30000)});
   if(!response.ok)throw Object.assign(new Error(`HTTP ${response.status}`),{noRetry:true});
   const html=await response.text();if(html.length>3_000_000)throw new Error('页面过大');return html;
  }catch(e){
-  if(!e.noRetry&&attempt<2){
-   await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
+  // 境外节点访问国内站点偶发长时间无响应，多给两次机会并拉长退避。
+  if(!e.noRetry&&attempt<3){
+   await new Promise(resolve=>setTimeout(resolve,1500*(attempt+1)));
    return getHTML(url,attempt+1);
   }
   const code=e?.cause?.code||e?.cause?.errno||'';
@@ -244,6 +250,8 @@ export async function discover({cacheDir='',persistCloud=false}={}) {
  const {sources}=JSON.parse(await readFile(new URL('../collector/web-sources.json',import.meta.url),'utf8'));
  const items=[],runs=[];let errors=0;
  for(const source of sources.filter(s=>s.enabled)) {
+  // 多个源指向同一站点的不同栏目，连续请求容易被判为爬虫；每个源之间留一点间隔。
+  await new Promise(resolve=>setTimeout(resolve,600));
   try {
    // 搜猪网每天每省一篇，先读频道列表，再逐篇取正文均价；单篇失败不影响其它省份。
    if(source.adapter==='soozhu-province'&&!cacheDir) {
@@ -276,9 +284,29 @@ export async function discover({cacheDir='',persistCloud=false}={}) {
  await mkdir(new URL('../data/',import.meta.url),{recursive:true});
  await writeFile(new URL('../data/discovery.json',import.meta.url),JSON.stringify({fetched_at:new Date().toISOString(),runs,items:merged},null,2)+'\n');
  if(persistCloud&&process.env.SUPABASE_URL&&process.env.SUPABASE_SERVICE_ROLE_KEY&&items.length) {
+  // 直接整批插入会被 PostgREST 拒掉（400）：不同来源的字段集合不一致，批量插入要求每行键完全相同。
+  // 这里复用 pickLead 过滤非法记录，并给每行补齐全部字段（缺值填空串，日期允许 null）。
+  const { pickLead, FIELDS } = await import('./import-leads-to-cloud.mjs');
+  const rows = items.map(pickLead).filter(Boolean)
+   .map(row => Object.fromEntries(FIELDS.map(field => [field, row[field] ?? (field === 'published_on' ? null : '')])));
+  if(!rows.length) throw new Error(`线索写入数据库失败：${items.length} 条记录均不完整（缺标题 / 链接 / 类型）`);
   const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const response=await fetch(process.env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/collection_items?on_conflict=id',{method:'POST',headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json',Prefer:'resolution=ignore-duplicates'},body:JSON.stringify(items),signal:AbortSignal.timeout(30000)});
-  if(!response.ok)throw new Error(`线索写入数据库失败 (${response.status})`);
+  const endpoint=process.env.SUPABASE_URL.replace(/\/$/,'');
+  const headers={apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json'};
+  let sent=0;
+  for(let i=0;i<rows.length;i+=100) {
+   const batch=rows.slice(i,i+100);
+   const response=await fetch(endpoint+'/rest/v1/collection_items?on_conflict=id',{
+    method:'POST',
+    // 只补云端没有的线索，绝不覆盖已审核状态。
+    headers:{...headers,Prefer:'resolution=ignore-duplicates,return=minimal'},
+    body:JSON.stringify(batch),
+    signal:AbortSignal.timeout(30000),
+   });
+   if(!response.ok)throw new Error(`线索写入数据库失败 (${response.status})：${(await response.text()).slice(0,300)}`);
+   sent+=batch.length;
+  }
+  console.log(`[云端] 已写入 ${sent} 条线索（跳过 ${items.length-rows.length} 条不完整记录）`);
  }
  return {count:merged.length,errors};
 }

@@ -12,7 +12,7 @@ if (existsSync('.env')) {
   }
 }
 
-const FIELDS = ['id', 'source_id', 'source_name', 'title', 'url', 'price_text', 'region_text', 'published_on', 'category', 'kind', 'details', 'status', 'fetched_at'];
+export const FIELDS = ['id', 'source_id', 'source_name', 'title', 'url', 'price_text', 'region_text', 'published_on', 'category', 'kind', 'details', 'status', 'fetched_at'];
 const KINDS = new Set(['supply', 'market', 'macro']);
 const STATUSES = new Set(['pending', 'converted', 'dismissed']);
 

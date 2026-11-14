@@ -52,6 +52,12 @@ jobs:
       # 只有入库成功才会删掉队列文件；失败则原样留在仓库里，下次运行自动重试。
       - name: Drop consumed queue files
         run: |
+          # 队列消费完后目录可能整个消失（git 不保留空目录），
+          # 此时 git add 会报 pathspec 不匹配并把后续步骤全部跳过。
+          if [ ! -d data/pending ]; then
+            echo "队列目录不存在，无需清理"
+            exit 0
+          fi
           git add -A data/pending
           if git diff --cached --quiet; then
             echo "队列无变化"

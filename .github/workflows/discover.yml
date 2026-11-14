@@ -7,8 +7,12 @@ on:
     paths:
       - '.github/workflows/discover.yml'
       - 'scripts/discovery.mjs'
+      - 'scripts/consume-pending.mjs'
+      - 'scripts/queue-leads.mjs'
       - 'scripts/roujiaosuo-*.mjs'
       - 'collector/**'
+      # 本机排队的线索一推上来就立刻入库，不必等到下一次定时。
+      - 'data/pending/**'
   schedule:
     - cron: '10 0,6,12 * * *'
 permissions:
@@ -35,6 +39,29 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      # 国内行情站对境外机房 IP 基本不通，本机又连不上 *.supabase.co，
+      # 于是拆成两段：本机抓、仓库中转、云端写。先把队列消化掉，再抓新数据。
+      - name: Consume leads queued by local runs
+        continue-on-error: true
+        run: node scripts/consume-pending.mjs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      # 只有入库成功才会删掉队列文件；失败则原样留在仓库里，下次运行自动重试。
+      - name: Drop consumed queue files
+        run: |
+          git add -A data/pending
+          if git diff --cached --quiet; then
+            echo "队列无变化"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "chore: 清空已入库的待处理线索队列"
+          git pull --rebase --autostash origin main || true
+          git push || echo "::warning::队列清理提交推送失败，下次运行会重试"
 
       - name: Fetch public lists
         id: fetch

@@ -54,8 +54,20 @@ export const store={
     if(password===undefined||password===null){password=email;email=config.loginEmail||'';}
     if(!email)throw new Error('尚未配置登录账号，请联系管理员');
     // 口令只来自用户输入。前端不保存、不派生、不缓存，避免随静态站一起公开。
-    try{session=await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email,password},anonymous:true});session.expires_at=Math.floor(Date.now()/1000)+session.expires_in;localStorage.setItem(SESSION_KEY,JSON.stringify(session));return await this.init();}
-    catch(error){this.clearSession();throw error;}
+    let token;
+    try{token=await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email,password},anonymous:true});}
+    catch(error){
+      this.clearSession();
+      // Supabase 口令错返回 invalid_grant / invalid_credentials，此前直接抛英文，
+      // 看着像「登录坏了」。这里翻成人话，和网络故障区分开。
+      if(/invalid_grant|invalid_credentials|credentials/i.test(String(error?.message||'')))throw new Error('口令不正确，请确认大小写与符号后重试');
+      throw error;
+    }
+    // 口令已验证通过：后面读数据再出错也不能清掉会话，
+    // 否则每刷新一次都要重输密码，表现得像「怎么都登不进去」。
+    session=token;session.expires_at=Math.floor(Date.now()/1000)+token.expires_in;localStorage.setItem(SESSION_KEY,JSON.stringify(session));
+    try{return await this.init();}
+    catch(error){throw new Error(`已通过口令验证，但数据加载失败：${error.message}`);}
   },
   clearSession(){session=null;data=null;this.user=null;this.member=null;this.role=null;this.requiresPasswordChange=false;localStorage.removeItem(SESSION_KEY);},
   async logout(){try{if(cloud&&session)await request('/auth/v1/logout',{method:'POST'});}catch{}finally{this.clearSession();}},
@@ -260,8 +272,26 @@ async function pushBackupToCloud(raw){
 async function readAll(table,order){const all=[];for(let offset=0;;offset+=1000){const batch=await request(`/rest/v1/${table}?select=*&order=${order}.asc,id.asc&limit=1000&offset=${offset}`);all.push(...batch);if(batch.length<1000)return all;}}
 async function request(path,{method='GET',body,headers={},anonymous=false}={}){
   if(!anonymous&&session?.refresh_token&&session.expires_at<Date.now()/1000+60){if(!refreshTask)refreshTask=request('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token},anonymous:true}).then(value=>{session={...value,expires_at:Math.floor(Date.now()/1000)+value.expires_in};localStorage.setItem(SESSION_KEY,JSON.stringify(session));}).finally(()=>{refreshTask=null;});await refreshTask;}
-  const response=await fetch(config.supabaseUrl.replace(/\/$/,'')+path,{method,headers:{apikey:config.supabaseKey,Authorization:`Bearer ${!anonymous&&session?.access_token?session.access_token:config.supabaseKey}`,'Content-Type':'application/json',...headers},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(20000)});
+  let response;
+  try{
+    // 20 秒对手机移动网络偏紧：跨境首包有时就要十几秒，超时会被误判成「登录失败」。
+    response=await fetch(config.supabaseUrl.replace(/\/$/,'')+path,{method,headers:{apikey:config.supabaseKey,Authorization:`Bearer ${!anonymous&&session?.access_token?session.access_token:config.supabaseKey}`,'Content-Type':'application/json',...headers},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(45000)});
+  }catch(error){
+    // 网络层失败与口令错误必须分开报：过去都落成一句英文 abort，用户无从判断该改密码还是换网络。
+    const timeout=error?.name==='AbortError'||error?.name==='TimeoutError';
+    throw new Error(timeout?'连接数据库超时（45 秒）。国内网络访问云端数据库时常不稳定，请切换 Wi-Fi / 移动网络后重试':'连不上云端数据库，请检查手机网络后重试');
+  }
   const raw=await response.text();let value;try{value=raw?JSON.parse(raw):null;}catch{throw new Error('服务器返回了无法识别的数据');}if(!response.ok)throw new Error(value?.error||value?.msg||value?.message||value?.error_description||'操作未获授权或连接失败');return value;
+}
+
+// 登录页用：单独探一次数据库是否可达，避免「到底是密码错还是网断了」分不清。
+// 返回 ok / fail，任何异常都吞掉，只用于提示，不影响正常流程。
+export async function probeCloud(){
+  try{
+    const response=await fetch(config.supabaseUrl.replace(/\/$/,'')+'/auth/v1/health',{headers:{apikey:config.supabaseKey},signal:AbortSignal.timeout(10000)});
+    // 401 / 404 说明域名和 TLS 都通了，只是没带凭证，同样算「能连上」。
+    return response.status<500?'ok':'fail';
+  }catch{return 'fail';}
 }
 
 function viewData(){

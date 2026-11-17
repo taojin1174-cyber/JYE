@@ -2,7 +2,7 @@ import { dayString, shiftDay, addMonths, monthsBetween, provinces, bases, status
 import { leadPrefill } from './lead-prefill.js';
 import { buildQuickQuote } from './lead-quick.js';
 import { filterExport } from './export-filter.js';
-import { store } from './store.js';
+import { store, probeCloud } from './store.js';
 import { sourceCatalog,sourceKinds } from './sources.js';
 import { createSettingsAccess } from './settings-access.js';
 import { accessGate } from './access-gate.js';
@@ -524,7 +524,10 @@ async function showMembers() {
  const members=await store.members();
  showDialog(dialogHead('团队成员','新增成员请先在 Supabase Authentication 中邀请，再加入 members 表授权。')+`<form id="members-form"><div class="form-body"><p class="form-error" role="alert"></p>${members.map(m=>`<div class="settings-row"><span>${esc(m.display_name||m.email||m.id)}${m.id===store.user?.id?'（你）':''}</span>${m.id===store.user?.id?'<span class="muted">管理员</span>':`<select name="${esc(m.id)}" aria-label="${esc(m.display_name||m.email)}的角色" data-original="${esc(m.role)}">${options([['viewer','只读成员'],['editor','编辑人员'],['admin','管理员']],m.role)}</select>`}</div>`).join('')}</div><div class="dialog-foot"><button class="btn" type="button" data-action="close">取消</button><button class="btn primary" type="submit">保存权限</button></div></form>`);
 }
-function loginPage(error='') {app.innerHTML=`<main class="login"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>验证数据库口令</h1><p>首次在这台设备打开，或登录状态已过期。<br>口令由你自己保管，网页不保存、不缓存。</p><form id="login-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="password">数据库口令</label><input id="password" name="password" type="password" autocomplete="current-password" required autofocus></div><button class="btn primary" type="submit">验证并进入</button></form><small class="access-tip">验证通过后本设备会记住登录状态，之后只输访问密码即可。</small></main>`;}
+function loginPage(error='') {app.innerHTML=`<main class="login"><img src="./favicon.svg" width="40" height="40" alt="行情跳动"><h1>验证数据库口令</h1><p>首次在这台设备打开，或登录状态已过期。<br>口令由你自己保管，网页不保存、不缓存。</p><form id="login-form"><p class="form-error" role="alert">${esc(error)}</p><div class="field"><label for="password">数据库口令</label><input id="password" name="password" type="password" autocomplete="current-password" required autofocus></div><button class="btn primary" type="submit">验证并进入</button></form><small class="access-tip">验证通过后本设备会记住登录状态，之后只输访问密码即可。</small><p class="net-hint" hidden></p></main>`;
+ // 静默探一次数据库是否可达：手机网络连不上 supabase.co 时，
+ // 以前只能反复试密码，看不出是网络问题。这里直接说清楚。
+ setTimeout(async()=>{try{if(typeof window==='undefined')return;const hint=app.querySelector?.('.net-hint');if(!hint)return;if(await probeCloud()==='fail'){hint.hidden=false;hint.textContent='当前网络连不到云端数据库（supabase.co）。这不是口令问题——请切换 Wi-Fi 或移动网络后重试。';}}catch{}},80);}
 function accountDialog() {
  const who = store.cloud ? (store.user?.email || '团队账号') : '正式版';
  const roleName = ({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role] || '';

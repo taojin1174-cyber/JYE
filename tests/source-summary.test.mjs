@@ -122,3 +122,47 @@ test('错误信息里的竖线不会撑坏表格', () => {
   });
   assert.match(markdown, /HTTP 403 \\\| blocked/);
 });
+
+test('本轮状态单独落盘时以它为准，不被后续步骤改写过的快照带偏', () => {
+  // 真实故障：肉交所导入用 --only-frozen 把 discovery.json 的 runs 重写成只剩自己，
+  // 摘要据此报「8 个来源本轮未执行」，真正的失败源反而看不见。
+  const { markdown, warnings } = buildSummary({
+    discovery: {
+      fetched_at: '2026-11-18T02:08:11.017Z',
+      runs: [{ source_id: 'roujiaosuo_cats', ok: true, count: 183 }],
+    },
+    runs: {
+      fetched_at: '2026-11-18T02:07:00.000Z',
+      runs: [
+        { source_id: 'cnfowl_rouji', ok: true, count: 35 },
+        { source_id: 'soozhu_pig', ok: false, error: 'HTTP 403' },
+      ],
+    },
+    sources: [
+      { id: 'cnfowl_rouji', name: '禽网·肉鸡行情', enabled: true },
+      { id: 'soozhu_pig', name: '搜猪网·生猪出栏价', enabled: true },
+    ],
+  });
+  assert.match(markdown, /采集结果 · 2026-11-18 10:07（北京时间）/, '时间应取本轮状态文件');
+  assert.match(markdown, /禽网·肉鸡行情 \| ✅ \| 35/);
+  assert.match(markdown, /搜猪网·生猪出栏价 \| ❌ 失败 \| — \| HTTP 403/);
+  assert.doesNotMatch(markdown, /未运行/, '已抓取过的来源不得报成未执行');
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /1 个来源失败：搜猪网·生猪出栏价/);
+});
+
+test('肉交所明细滞后时标出抓取时间，不让人误以为是本次结果', () => {
+  const { markdown } = buildSummary({
+    discovery: {
+      fetched_at: '2026-11-18T02:08:11.017Z',
+      runs: [{ source_id: 'cnfowl_rouji', ok: true, count: 35 }],
+    },
+    sources: onlyFowl,
+    roujiaosuo: {
+      fetched_at: '2026-11-17T10:00:00Z',
+      stats: [{ keyword: '白条鹅', total: 86 }],
+      rows: [{ detail_ok: true }],
+    },
+  });
+  assert.match(markdown, /抓取于 11-17 18:00（非本次，抓取步骤可能未运行）/);
+});

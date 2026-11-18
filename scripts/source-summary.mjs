@@ -17,25 +17,29 @@ const beijing = (iso) => {
   return new Date(d.getTime() + 8 * 3600e3).toISOString().slice(0, 16).replace('T', ' ');
 };
 
-export function buildSummary({ discovery, sources = [], roujiaosuo = null, expectRoujiaosuo = false }) {
+export function buildSummary({ discovery, runs = null, sources = [], roujiaosuo = null, expectRoujiaosuo = false }) {
   const lines = [];
   const warnings = [];
 
-  if (!discovery || !Array.isArray(discovery.runs)) {
+  // 优先用本轮单独落盘的来源状态；discovery.json 的 runs 会被后续导入步骤改写，不能作为唯一依据。
+  const latestRuns = Array.isArray(runs) ? runs : Array.isArray(runs?.runs) ? runs.runs : null;
+  const runList = latestRuns || (Array.isArray(discovery?.runs) ? discovery.runs : null);
+  const stamp = (runs && !Array.isArray(runs) && runs.fetched_at) || discovery?.fetched_at;
+
+  if (!runList) {
     lines.push('## 采集结果：本次未生成快照');
     lines.push('');
-    lines.push('采集脚本没有产出 `data/discovery.json`，说明抓取步骤在写快照之前就中断了。');
+    lines.push('采集脚本没有产出 `data/discovery.json` 或 `data/discovery-runs.json`，说明抓取步骤在写快照之前就中断了。');
     lines.push('页面已沿用上一次成功快照的数据，请按上方失败步骤的日志排查。');
     return { markdown: lines.join('\n'), warnings: ['本次采集未生成快照，所有来源均未更新'] };
   }
 
-  const runs = discovery.runs;
-  const byId = new Map(runs.map((run) => [run.source_id, run]));
+  const byId = new Map(runList.map((run) => [run.source_id, run]));
   const nameOf = new Map(sources.map((source) => [source.id, source.name || source.id]));
   // 源清单里的启用项 + 本轮出现过但清单里没有的项，都要列出来，避免漏看。
   const ordered = [
     ...sources.filter((source) => source.enabled !== false).map((source) => source.id),
-    ...runs.map((run) => run.source_id).filter((id) => !sources.some((source) => source.id === id)),
+    ...runList.map((run) => run.source_id).filter((id) => !sources.some((source) => source.id === id)),
   ];
 
   const rows = [];
@@ -69,7 +73,7 @@ export function buildSummary({ discovery, sources = [], roujiaosuo = null, expec
     }
   }
 
-  const head = `## 采集结果 · ${beijing(discovery.fetched_at) || '时间未知'}（北京时间）`;
+  const head = `## 采集结果 · ${beijing(stamp) || '时间未知'}（北京时间）`;
   const tally = [`${okCount} 个来源正常，共 ${total} 条`];
   if (empty.length) tally.push(`${empty.length} 个来源 0 条`);
   if (failed.length) tally.push(`${failed.length} 个来源失败`);
@@ -81,10 +85,17 @@ export function buildSummary({ discovery, sources = [], roujiaosuo = null, expec
     const stats = Array.isArray(roujiaosuo.stats) ? roujiaosuo.stats : [];
     const detailFailed = (roujiaosuo.rows || []).filter((row) => row.detail_ok === false).length;
     const parts = stats.map((item) => `${item.keyword} ${item.total}`);
+    // 明细是独立文件，本机不跑抓取时它会是上一次的结果，必须标出抓取时间。
+    const fetchedAt = beijing(roujiaosuo.fetched_at);
+    const lagHours = fetchedAt && stamp ? (Date.parse(stamp) - Date.parse(roujiaosuo.fetched_at)) / 3600e3 : 0;
+    const timing = fetchedAt
+      ? ` · 抓取于 ${fetchedAt.slice(5)}${lagHours > 3 ? '（非本次，抓取步骤可能未运行）' : ''}`
+      : '';
     lines.push(
       '',
       `**肉交所明细抓取**：${roujiaosuo.rows ? roujiaosuo.rows.length : 0} 条（${parts.join(' · ') || '无品类统计'}）` +
-        (detailFailed ? `；详情页失败 ${detailFailed} 条` : '；详情页全部成功'),
+        (detailFailed ? `；详情页失败 ${detailFailed} 条` : '；详情页全部成功') +
+        timing,
     );
     if (!stats.length || !(roujiaosuo.rows || []).length) {
       warnings.push('肉交所四品类本次没有抓到明细，请检查 roujiaosuo-scrape 日志');
@@ -111,6 +122,7 @@ const readJson = async (relative) => {
 
 async function main() {
   const discoveryFile = await readJson('../data/discovery.json');
+  const runsFile = await readJson('../data/discovery-runs.json');
   const sourceFile = await readJson('../collector/web-sources.json');
   const sources = (sourceFile?.sources || []).map((source) => ({
     id: source.id,
@@ -120,6 +132,7 @@ async function main() {
   const roujiaosuo = await readJson('../data/roujiaosuo-leads.json');
   const { markdown, warnings } = buildSummary({
     discovery: discoveryFile,
+    runs: runsFile,
     sources,
     roujiaosuo,
     expectRoujiaosuo: process.argv.includes('--expect-roujiaosuo'),

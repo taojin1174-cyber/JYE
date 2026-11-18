@@ -272,7 +272,16 @@ export async function discover({cacheDir='',persistCloud=false}={}) {
    console.log(`${source.id}: ${parsed.length} 条公开线索（未进入供货均价）`);
   }catch(e){errors++;runs.push({source_id:source.id,ok:false,error:e.message});console.error(`${source.id}: ${e.message}`);}
  }
+ // 本轮各源状态单独落盘，不与 discovery.json 混在一起。
+ // 原因：后面的肉交所导入步骤会重写 discovery.json 的 runs，只剩它自己一条，
+ // 导致运行摘要里其余来源全显示成「未执行」，真正的失败源反而看不见。
+ // 这份文件只在本机与 Actions 运行期间存在（data/* 不进仓库），不承载业务数据。
+ try {
+  await mkdir(new URL('../data/', import.meta.url), {recursive:true});
+  await writeFile(new URL('../data/discovery-runs.json', import.meta.url),JSON.stringify({fetched_at:new Date().toISOString(),runs},null,2)+'\n');
+ } catch(e) { console.error(`本轮来源状态落盘失败：${e.message}`); }
  // 仅发布短标题、链接和明确标价等公开事实，不保存商户联系方式或全文。
+
  // 某个来源暂时失败时，保留上次该来源的线索，并标记本次失败。
  let previous=[];try{previous=JSON.parse(await readFile(new URL('../data/discovery.json',import.meta.url),'utf8')).items||[];}catch{}
  const ranIds=new Set(runs.map(r=>r.source_id));

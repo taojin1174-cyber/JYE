@@ -100,9 +100,10 @@ const kept = onlyFrozen ? [] : (snapshot.items || []).filter(i => i.source_id !=
 snapshot.items = [...kept, ...items];
 // 顶层时间必须跟随本次抓取，否则页面显示的「最近采集」会一直停在首次导入的时间。
 snapshot.fetched_at = raw.fetched_at || new Date().toISOString();
-snapshot.runs = onlyFrozen
-  ? [{ source_id: SOURCE_ID, ok: true, count: items.length }]
-  : [...(snapshot.runs || []).filter(r => r.source_id !== SOURCE_ID), { source_id: SOURCE_ID, ok: true, count: items.length }];
+// runs 记的是「本轮各源抓取状态」，与快照留哪些条目无关：
+// --only-frozen 只该清空 items 里的其它来源，不能连带清掉它们的抓取记录，
+// 否则运行摘要里其余来源会全部显示成「未执行」，失败源被掩盖。
+snapshot.runs = [...(snapshot.runs || []).filter(r => r.source_id !== SOURCE_ID), { source_id: SOURCE_ID, ok: true, count: items.length }];
 await writeFile(snapshotPath, JSON.stringify(snapshot, null, 2) + '\n', 'utf8');
 console.log(`[合并${onlyFrozen ? ' · 仅冻品' : ''}] ${SOURCE_NAME} ${items.length} 条待审线索 → data/discovery.json（快照合计 ${snapshot.items.length} 条）`);
 

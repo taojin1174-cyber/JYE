@@ -104,3 +104,12 @@ th[aria-sort="ascending"] .th-sort,th[aria-sort="descending"] .th-sort{color:#6d
 /* 报价详情里的出处网址：管理员可见，长链接自动换行 */
 .source-url{margin-top:7px;font-size:11px;line-height:1.6;word-break:break-all}
 .source-url a{color:var(--green)}
+
+/* 2026-11-18 版面收敛：总览单栏走势、可比均价弹窗、最近入库折叠 */
+.bottom-grid.single{grid-template-columns:1fr}
+.comparable-body{padding:0}
+.comparable-note{display:flex;gap:7px;align-items:flex-start;margin:16px 20px 0;padding:10px 12px;background:#f7f9f7;border:1px solid var(--line);border-radius:5px;font-size:11px;color:#6f7d74;line-height:1.75}
+.comparable-body .table-wrap table{white-space:nowrap}
+.recent-fold .recent-list{padding:0}
+.recent-fold .recent-row:first-child{padding-top:2px}
+@media(max-width:760px){.bottom-grid.single{grid-template-columns:1fr}.comparable-note{margin:12px 14px 0}}

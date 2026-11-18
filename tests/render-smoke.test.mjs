@@ -45,8 +45,9 @@ const cases = [
   ['overview', ['参考范围', '产品参考均价', '导出数据', '录入报价']],
   ['compare', ['供货报价', '全部产品规格']],
   ['review', ['待确认', '刷新记录']],
+  ['settings/review', ['待确认', '刷新记录', '数据中心', '基础设置']],
   ['settings', ['自动采集线索', '已处理', '数据中心', '基础设置']],
-  ['settings/general', ['管理品类', '导入备份', '此设备（未上传）', '产品库']],
+  ['settings/general', ['管理品类', '导入备份', '此设备（未上传）', '产品库', '最近入库']],
 ];
 
 for (const [hash, markers] of cases) {
@@ -62,20 +63,21 @@ for (const [hash, markers] of cases) {
   });
 }
 
-test('基础设置页：四个面板是可折叠卡片，产品库带删除入口', async () => {
+test('基础设置页：五个面板是可折叠卡片，产品库带删除入口', async () => {
   const app = stubDom('#settings/general');
   await import('../src/app.js?route=settings-fold');
   const html = app.innerHTML;
-  const folds = html.match(/<details class="panel fold"/g) || [];
-  assert.equal(folds.length, 4, '产品库/数据来源/统计口径/团队与访问都应是折叠卡片');
+  const folds = html.match(/<details class="panel fold[ "]/g) || [];
+  assert.equal(folds.length, 5, '产品库/数据来源/统计口径/团队与访问/最近入库都应是折叠卡片');
   assert.ok(!/<section class="panel">/.test(html), '基础设置不应再有不可折叠的面板');
   assert.match(html, /data-delete-product="/, '产品库应提供删除按钮');
   assert.match(html, /data-action="add-product"/, '产品库应保留添加按钮');
   // 收起态是紧凑入口卡：图标块 + 标题 + 一行副标题，副标题不能放在 h2 里（会被窄屏样式隐藏）。
-  assert.equal((html.match(/class="fold-icon"/g) || []).length, 4, '四张卡都应有图标块');
-  assert.equal((html.match(/class="fold-title"/g) || []).length, 4, '四张卡都应有标题容器');
+  assert.equal((html.match(/class="fold-icon"/g) || []).length, 5, '五张卡都应有图标块');
+  assert.equal((html.match(/class="fold-title"/g) || []).length, 5, '五张卡都应有标题容器');
   assert.match(html, /<small>[\d]+ 个规格<\/small>/, '产品库应显示规格数量');
   assert.match(html, /<small>人工确认后入库<\/small>/);
+  assert.match(html, /<h2>最近入库<\/h2>/, '最近入库应作为折叠卡收在这里，不再占用总览页');
 });
 
 test('数据设置页的导出与录入按钮并入栏目行，不再单独占一行', async () => {
@@ -85,9 +87,11 @@ test('数据设置页的导出与录入按钮并入栏目行，不再单独占�
   assert.doesNotMatch(html, /class="page-actions/, '不应再输出独立的操作行');
   const start = html.indexOf('<div class="settings-tabs">');
   assert.ok(start >= 0, '缺少栏目行');
-  const bar = html.slice(start, start + 900);
+  // 栏目行现在有三个视图（数据中心 / 报价审核 / 基础设置），窗口相应放宽。
+  const bar = html.slice(start, start + 1600);
   assert.match(bar, /data-settings-view="general"/, '栏目行应含基础设置');
   assert.match(bar, /data-settings-view="sources"/, '栏目行应含数据中心');
+  assert.match(bar, /data-settings-view="review"/, '栏目行应含报价审核');
   assert.match(bar, /data-action="export"/, '导出按钮应在栏目行内');
   assert.match(bar, /data-action="add"/, '录入按钮应在栏目行内');
   assert.match(bar, /data-action="lock-settings"/, '锁定按钮应在栏目行内');
@@ -259,13 +263,48 @@ test('过期报价退出均价与最近入库，卡片标出有效至与剩余�
       { ...base, id: 'q-live', product_id: 'chicken-fresh', supplier: '有效供应商', province: '广东', price: 10, quoted_on: today, valid_until: addMonths(today, 2), notes: '仍在有效期内的报价' },
     ],
   }) };
-  const app = stubDom('#overview', { storage });
+  const overviewApp = stubDom('#overview', { storage });
   await import('../src/app.js?route=validity-note');
-  const html = app.innerHTML;
+  const html = overviewApp.innerHTML;
   const price = html.match(/class="card-price"><strong>([\d.]+)<\/strong>/)?.[1];
   assert.equal(price, '10.00', '卡片均价只应统计未过期报价');
-  assert.doesNotMatch(html, /过期供应商/, '过期报价不应进入最近入库');
-  assert.match(html, /有效供应商/, '有效报价仍应出现在最近入库');
   assert.match(html, /card-valid/, '卡片底部应给出有效期提示');
   assert.match(html, /有效至 \d{2}-\d{2} · 剩 \d+ 天/, '提示里应写明到期日与剩余天数');
+  assert.doesNotMatch(html, /最近入库/, '最近入库已移到数据设置，总览页不再出现');
+
+  // 最近入库移到「数据设置 → 基础设置」，默认折叠，展开后仍只含未过期报价。
+  const settingsApp = stubDom('#settings/general', { storage });
+  await import('../src/app.js?route=validity-note-settings');
+  const settingsHtml = settingsApp.innerHTML;
+  assert.match(settingsHtml, /<details class="panel fold full">[\s\S]*最近入库/, '最近入库应以折叠卡形式出现在基础设置');
+  assert.doesNotMatch(settingsHtml, /过期供应商/, '过期报价不应进入最近入库');
+  assert.match(settingsHtml, /有效供应商/, '有效报价仍应出现在最近入库');
+});
+
+test('点击品类卡片打开可比均价：多规格逐行比较，不跨规格混算', async () => {
+  const today = dayString();
+  const base = { basis: 'factory', source: 'engine', source_name: '测试来源', source_url: '', min_order: '', freight: null, status: 'approved', city: '', created_at: '2020-03-01T00:00:00Z' };
+  const storage = { [DATA_KEY]: JSON.stringify({
+    products: [
+      { id: 'goose-a', category: '鹅', name: '白条鹅', state: '冻品', spec: '3-4 斤/只' },
+      { id: 'goose-b', category: '鹅', name: '白条鹅', state: '冻品', spec: '4-5 斤/只' },
+    ],
+    quotes: [
+      { ...base, id: 'g1', product_id: 'goose-a', supplier: '甲', province: '广东', price: 20, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+      { ...base, id: 'g2', product_id: 'goose-b', supplier: '乙', province: '广东', price: 26, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+    ],
+  }) };
+  const app = stubDom('#overview', { storage });
+  await import('../src/app.js?route=comparable');
+  app.__click({ chart: 'goose-a' });
+  const html = globalThis.document.querySelector('#dialog').innerHTML;
+  assert.match(html, /可比均价/, '应打开可比均价弹窗');
+  assert.match(html, /3-4 斤\/只/, '第一个规格应单独成行');
+  assert.match(html, /4-5 斤\/只/, '第二个规格应单独成行');
+  assert.match(html, /20\.00/, '3-4 斤规格显示自己的均价');
+  assert.match(html, /26\.00/, '4-5 斤规格显示自己的均价');
+  assert.match(html, /较 30 日前/, '应给出同比列');
+  assert.match(html, /不混算|不能直接相减/, '应提示跨规格不可直接比价');
+  // 两个规格各自只有 1 条样本，不能出现合并后的 23.00 均价。
+  assert.doesNotMatch(html, /23\.00/, '不得把不同重量合并成一个均价');
 });

@@ -15,7 +15,7 @@ const bodyOf = (src, name) => {
 
 test('前台四个页面不渲染来源、网址或渠道名', () => {
   const app = read('../src/app.js');
-  for (const name of ['overview', 'recentPanel', 'compare', 'review']) {
+  for (const name of ['overview', 'recentRows', 'compare', 'review']) {
     const body = bodyOf(app, name);
     assert.doesNotMatch(body, FORBIDDEN, `${name} 不应出现渠道名`);
     assert.doesNotMatch(body, /source_name|source_url|sourcePill|引擎采集|原始链接|查看原文/, `${name} 不应渲染来源字段`);

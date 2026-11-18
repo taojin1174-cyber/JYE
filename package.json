@@ -12,7 +12,8 @@
     "leads": "node scripts/roujiaosuo-scrape.mjs && node scripts/roujiaosuo-build.mjs && node scripts/import-roujiaosuo-leads.mjs --only-frozen",
     "leads:build": "node scripts/roujiaosuo-build.mjs",
     "leads:import": "node scripts/import-roujiaosuo-leads.mjs",
-    "preview:offline": "node scripts/preview.mjs"
+    "preview:offline": "node scripts/preview.mjs",
+    "archive": "node scripts/sync-archive.mjs"
   },
   "engines": {
     "node": ">=22"

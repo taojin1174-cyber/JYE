@@ -27,13 +27,17 @@ if (existsSync('.env')) {
 const url = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
+// 默认写 backups/（本机，保留 30 份）；CI 里用 --out cloud-backup 输出到临时目录再上传 artifact。
+const outIndex = process.argv.indexOf('--out');
+const outRoot = outIndex >= 0 && process.argv[outIndex + 1] ? process.argv[outIndex + 1] : 'backups';
+
 if (!url || !key) {
   console.error('缺少配置：请在仓库根目录 .env 中填写 SUPABASE_URL 与 SUPABASE_SERVICE_ROLE_KEY');
   process.exit(1);
 }
 
 const stamp = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 16);
-const dir = `backups/${stamp}`;
+const dir = `${outRoot}/${stamp}`;
 await mkdir(dir, { recursive: true });
 
 const all = {};
@@ -61,6 +65,14 @@ for (const table of TABLES) {
 }
 
 const total = Object.values(all).reduce((n, rows) => n + rows.length, 0);
+
+// 全部表都失败时不留下空快照，否则会被当成"今天的备份"上传，掩盖真实故障。
+if (!total) {
+  await rm(dir, { recursive: true, force: true });
+  console.error('全部表备份失败，已删除空目录，不生成快照。');
+  process.exit(2);
+}
+
 await writeFile(
   `${dir}/all.json`,
   JSON.stringify({ exported_at: new Date().toISOString(), source: url, total, tables: all }, null, 1) + '\n'
@@ -68,10 +80,12 @@ await writeFile(
 
 console.log(`已备份 ${total} 条记录到 ${dir}/`);
 
-// 只保留最近 30 份，避免无限堆积
-const kept = (await readdir('backups')).sort();
-for (const old of kept.slice(0, Math.max(0, kept.length - 30))) {
-  await rm(`backups/${old}`, { recursive: true, force: true });
+// 只保留最近 30 份，避免无限堆积。--out 指定的一次性目录不做清理（每次都是新的空目录）。
+if (outRoot === 'backups') {
+  const kept = (await readdir('backups')).sort();
+  for (const old of kept.slice(0, Math.max(0, kept.length - 30))) {
+    await rm(`backups/${old}`, { recursive: true, force: true });
+  }
 }
 
 if (failed) {

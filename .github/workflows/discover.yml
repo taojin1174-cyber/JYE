@@ -97,6 +97,38 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
+      # 每天第一次运行（UTC 06:00 前）把云端全库导出一份留档。
+      # 本地备份只有偶尔手工做，一旦云端数据库出问题，最近的人工快照可能已经很旧。
+      # 公开仓库不能提交业务数据，所以只上传 artifact，不进 git；保留 14 天，随时可下载。
+      - name: Decide backup window
+        id: window
+        if: always()
+        run: |
+          hour=$(date -u +%H)
+          if [ "$hour" -lt 6 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "备份时段（UTC ${hour} 时），本次会导出全库快照。"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "非备份时段（UTC ${hour} 时），跳过全库快照。"
+          fi
+
+      - name: Export cloud database snapshot
+        if: always() && steps.window.outputs.run == 'true'
+        continue-on-error: true
+        run: node scripts/backup-cloud.mjs --out cloud-backup
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Upload cloud snapshot
+        if: always() && steps.window.outputs.run == 'true' && hashFiles('cloud-backup/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-backup-${{ github.run_id }}
+          path: cloud-backup
+          retention-days: 14
+
       # 每次运行都写摘要，不只在失败时写。
       # 单源失败属于常态（站点改版、地区网络限制、限流），不应把整次运行标红；
       # 但「某个源返回 0 条」不会抛错，过去完全不可见，只能等数据变少才发现。

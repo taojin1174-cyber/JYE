@@ -41,6 +41,8 @@ const product=id=>data.products.find(p=>p.id===id);
 const excludedCats=()=>new Set([...(data.prefs?.disabledCategories||[]),...(data.prefs?.deletedCategories||[])]);
 const visibleProducts=()=>data.products.filter(p=>!excludedCats().has(p.category));
 const categories=()=>[...new Set([...['猪','鸡','鸭','鹅','羊'].filter(c=>!excludedCats().has(c)),...visibleProducts().map(p=>p.category)])];
+// 总览默认只看主力三类。2026-11-18 用户要求：产品参考均价默认只显示鹅、鸡、鸭，其余品类收起。
+const CORE_CATS=['鹅','鸡','鸭'];
 const productOptions=current=>{const list=visibleProducts();const cur=product(current);if(cur&&!list.includes(cur))list.unshift(cur);return list;};
 const quoteVisible=q=>!excludedCats().has(product(q.product_id)?.category);
 const HANDLED_LEADS=new Set(['converted','dismissed','deleted']);
@@ -62,7 +64,13 @@ const safeNotes=notes=>{
 const periodSelect=()=>`<select aria-label="参考周期" data-filter="days">${options([[1,'当日报价'],[7,'近 7 天'],[30,'近 30 天']],state.days)}</select>`;
 const basisSelect=()=>`<select aria-label="计价口径" data-filter="basis">${options(Object.entries(bases),state.basis)}</select>`;
 const provinceSelect=()=>`<select aria-label="地区" data-filter="province">${options(provinces,state.province,'全国地区')}</select>`;
-const categoryTabs=()=>`<div class="segmented" aria-label="品类筛选">${['',...categories()].map(c=>`<button data-category="${esc(c)}" class="${state.category===c?'active':''}" aria-pressed="${state.category===c}">${c?esc(c):'全部'}</button>`).join('')}</div>`;
+// 品类筛选：常用（鹅 / 鸡 / 鸭）为默认，全部放在其次，其余每个品类各一个标签，
+// 避免把蛋品、豆制品等低频品类平铺在默认视图里。
+const categoryTabs=()=>{
+ const rest=categories().filter(c=>!CORE_CATS.includes(c));
+ const tabs=[['','常用'],['*','全部'],...rest.map(c=>[c,c])];
+ return `<div class="segmented" aria-label="品类筛选">${tabs.map(([value,label])=>`<button data-category="${esc(value)}" class="${state.category===value?'active':''}" aria-pressed="${state.category===value}">${esc(label)}</button>`).join('')}</div>`;
+};
 function changeValue(values) { Object.assign(state,values,{pageNumber:1}); render(); }
 
 // 主导航只留三页：报价审核收进「数据设置」，待审数量以角标提示，避免顶部拥挤。
@@ -95,11 +103,15 @@ function validNote(id) {
  return `<div class="card-valid${remain<=7?' soon':''}">有效至 ${until.slice(5)} · 剩 ${remain} 天</div>`;
 }
 function overview() {
- const visible=visibleProducts().filter(p=>!state.category||p.category===state.category);
+ const cat=state.category;
+ // 默认（cat 为空）只列主力三类鹅 / 鸡 / 鸭；cat 为 '*' 表示「全部」；否则为某个具体品类。
+ const inScope=p=>cat==='*'?true:cat?p.category===cat:CORE_CATS.includes(p.category);
+ const visible=visibleProducts().filter(inScope);
  // 品类卡片：总览不展示猪（2026-11-12 用户要求）；其余品类取「已入库样本最多」的规格，
  // 保证卡片显示的是你实际在询价、入库最多的那个规格，而不是产品库里的排序第一个。
  const CARD_HIDDEN=new Set(['猪']);
- const representatives=categories().filter(c=>!CARD_HIDDEN.has(c)).map(c=>{
+ const cardCats=cat==='*'?categories():cat?[cat]:CORE_CATS;
+ const representatives=cardCats.filter(c=>!CARD_HIDDEN.has(c)).map(c=>{
   const list=visibleProducts().filter(p=>p.category===c);
   if(!list.length)return null;
   return list.map(p=>({p,count:stats(p.id).count})).sort((a,b)=>b.count-a.count)[0].p;
@@ -109,9 +121,9 @@ function overview() {
    const latest=latestQuotes(data.quotes,queryOptions(p.id)).map(q=>q.quoted_on).sort().at(-1);
    return `<tr><td>${productCell(p)}</td><td class="number">${money(s.average)}</td><td class="number green">${money(s.min)}</td><td class="range">${s.count?`${money(s.min)} – ${money(s.max)}`:'—'}</td><td>${s.count}<span class="subtle"> 条 / ${s.provinceCount} 省</span>${s.count&&s.sparse?'<div class="subtle">样本较少</div>':''}</td><td>${spark(points.map(v=>v.average))}</td><td class="subtle">${latest?.slice(5)||'暂无'}</td><td><button class="row-action" data-compare="${esc(p.id)}">去比价 ${icon('arrow',13)}</button></td></tr>`;
  }).join('');
- return `<div class="filters"><span class="label">参考范围</span>${periodSelect()}${provinceSelect()}${basisSelect()}<span class="date-note">${icon('clock',13)} 北京时间 ${dayString().replaceAll('-','.')} · 元 / kg</span><div class="page-bar-actions">${pageActionButtons()}</div></div><div class="cards">${representatives.map(p=>{
+ return `<div class="filters"><span class="label">参考范围</span>${periodSelect()}${provinceSelect()}${basisSelect()}<span class="date-note">${icon('clock',13)} 北京时间 ${dayString().replaceAll('-','.')} · 元 / kg</span><div class="page-bar-actions">${pageActionButtons()}</div></div><div class="bottom-grid single chart-top">${chartPanel()}</div><div class="cards">${representatives.map(p=>{
  const s=stats(p.id);return `<button class="price-card ${state.chartProduct===p.id?'selected':''}" data-chart="${esc(p.id)}" title="只统计你已入库且未过期的报价，同供应商取最新一条后等权平均"><div class="card-head"><span><span class="category-dot">${esc(p.category)}</span>${esc(p.name)}</span><span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="card-sub">${esc(p.spec)}</div><div class="card-price"><strong>${money(s.average)}</strong>${s.average==null?'':'<span>元 / kg</span>'}</div><div class="card-bottom">${deltaFor(p.id)}<span>${s.count} 条已入库</span></div>${validNote(p.id)}</button>`;
- }).join('')}</div><section class="panel"><div class="panel-head"><h2>产品参考均价 <small>独立规格，独立统计</small></h2>${categoryTabs()}</div>${data.quotes.some(q=>q.status==='approved')?'':`<div class="review-intro">${icon('info',14)} 还没有已入库的供货报价，产品均价暂为空。录入一条报价后，这里才会出现供货均价。</div>`}<div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>样本均价</th><th>最低供货价</th><th>价格区间</th><th>有效样本 / 覆盖</th><th>7 日均价走势</th><th>最新报价</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">暂无产品，请在数据与设置中添加</td></tr>'}</tbody></table></div><div class="table-foot"><span>${icon('info',12)} ${esc(bases[state.basis])} · 同供应商、同省、同规格保留最新有效报价；均价按供应商等权计算。</span><span>${state.province?'区域样本':'全国采样'} · 非官方全国统计均价</span></div></section><div class="bottom-grid single">${chartPanel()}</div>`;
+ }).join('')}</div><section class="panel"><div class="panel-head"><h2>产品参考均价 <small>独立规格，独立统计</small></h2>${categoryTabs()}</div>${data.quotes.some(q=>q.status==='approved')?'':`<div class="review-intro">${icon('info',14)} 还没有已入库的供货报价，产品均价暂为空。录入一条报价后，这里才会出现供货均价。</div>`}<div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>样本均价</th><th>最低供货价</th><th>价格区间</th><th>有效样本 / 覆盖</th><th>7 日均价走势</th><th>最新报价</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">暂无产品，请在数据与设置中添加</td></tr>'}</tbody></table></div><div class="table-foot"><span>${icon('info',12)} ${esc(bases[state.basis])} · 同供应商、同省、同规格保留最新有效报价；均价按供应商等权计算。</span><span>${state.province?'区域样本':'全国采样'} · 非官方全国统计均价</span></div></section>`;
 }
 function spark(values) {
  const valid=values.filter(v=>v!=null); if(valid.length<2) return '<span class="subtle">暂无走势</span>';

@@ -217,12 +217,14 @@ test('访问密码配置只含盐与派生值，且迭代次数达标', () => {
   assert.match(accessLock.verifier, /^[0-9a-f]{64}$/);
 });
 
-test('行情总览不展示猪卡片，线索页有「处理方式」下拉', async () => {
+test('行情总览不展示猪卡片，默认只放鹅鸡鸭三张卡', async () => {
   const overview = stubDom('#overview');
   await import('../src/app.js?route=no-pig-card');
   const cards = overview.innerHTML.match(/<button class="price-card/g) || [];
-  assert.equal(cards.length, 4, '去掉猪之后应只剩鸡鸭鹅羊四张卡');
+  // 2026-11-18 起默认只看主力三类，羊等其余品类点标签才出现。
+  assert.equal(cards.length, 3, '默认应只有鹅 / 鸡 / 鸭三张卡');
   assert.doesNotMatch(overview.innerHTML, /category-dot">猪</);
+  assert.doesNotMatch(overview.innerHTML.slice(0, overview.innerHTML.indexOf('产品参考均价')), /category-dot">羊</, '羊默认不进卡片');
 
   const settings = stubDom('#settings');
   await import('../src/app.js?route=lead-use-filter');
@@ -307,4 +309,54 @@ test('点击品类卡片打开可比均价：多规格逐行比较，不跨规�
   assert.match(html, /不混算|不能直接相减/, '应提示跨规格不可直接比价');
   // 两个规格各自只有 1 条样本，不能出现合并后的 23.00 均价。
   assert.doesNotMatch(html, /23\.00/, '不得把不同重量合并成一个均价');
+});
+
+test('总览默认只显示鹅、鸡、鸭，其余品类收进标签；均价走势排在产品参考均价之前', async () => {
+  const storage = { [DATA_KEY]: JSON.stringify({
+    products: [
+      { id: 'goose', category: '鹅', name: '白条鹅', state: '冻品', spec: '3-4 斤/只' },
+      { id: 'chicken', category: '鸡', name: '清远鸡', state: '冻品', spec: '2-3 斤/只' },
+      { id: 'duck', category: '鸭', name: '白条鸭', state: '冻品', spec: '3 斤/只' },
+      { id: 'lamb', category: '羊', name: '羊肉', state: '鲜品', spec: '胴体' },
+      { id: 'egg', category: '蛋品', name: '鲜鸡蛋', state: '鲜品', spec: '30 斤/箱' },
+    ],
+    quotes: [],
+  }) };
+  const app = stubDom('#overview', { storage });
+  await import('../src/app.js?route=overview-core');
+  const html = app.innerHTML;
+
+  // 走势在参考均价之前
+  const chartAt = html.indexOf('均价走势');
+  const panelAt = html.indexOf('产品参考均价');
+  assert.ok(chartAt > 0 && panelAt > 0, '两个板块都应存在');
+  assert.ok(chartAt < panelAt, '均价走势应排在产品参考均价之前');
+  const cardsAt = html.indexOf('<div class="cards">');
+  assert.ok(chartAt < cardsAt && cardsAt < panelAt, '顺序应为：筛选 → 均价走势 → 品类卡片 → 产品参考均价');
+
+  // 卡片区只放主力三类
+  const cards = html.slice(html.indexOf('<div class="cards">'), panelAt);
+  assert.match(cards, /白条鹅/);
+  assert.match(cards, /清远鸡/);
+  assert.match(cards, /白条鸭/);
+  assert.doesNotMatch(cards, /羊肉/, '羊默认不进卡片');
+  assert.doesNotMatch(cards, /鲜鸡蛋/, '蛋品默认不进卡片');
+
+  // 表格默认也只列主力三类
+  const table = html.slice(panelAt);
+  assert.doesNotMatch(table, /羊肉/, '羊默认不进明细表');
+  assert.doesNotMatch(table, /鲜鸡蛋/, '蛋品默认不进明细表');
+
+  // 标签：常用 / 全部 / 其余品类各一个，主力三类不再重复占位
+  assert.match(html, /data-category=""[^>]*>常用</);
+  assert.match(html, /data-category="\*"[^>]*>全部</);
+  assert.match(html, /data-category="羊"[^>]*>羊</);
+  assert.doesNotMatch(html, /data-category="鸡"/, '鸡属于常用三品类，不再单独成标签');
+
+  // 点「羊」能看到羊；点「全部」能看到所有品类
+  app.__click({ category: '羊' });
+  assert.match(app.innerHTML, /羊肉/, '选中羊后应显示羊的规格');
+  app.__click({ category: '*' });
+  assert.match(app.innerHTML, /羊肉/, '全部视图应包含羊');
+  assert.match(app.innerHTML, /鲜鸡蛋/, '全部视图应包含蛋品');
 });

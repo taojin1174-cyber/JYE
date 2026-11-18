@@ -360,3 +360,19 @@ test('总览默认只显示鹅、鸡、鸭，其余品类收进标签；均价�
   assert.match(app.innerHTML, /羊肉/, '全部视图应包含羊');
   assert.match(app.innerHTML, /鲜鸡蛋/, '全部视图应包含蛋品');
 });
+
+test('选中不展示卡片的品类时不输出空卡片容器，避免留出空白块', async () => {
+  const storage = { [DATA_KEY]: JSON.stringify({
+    products: [
+      { id: 'goose', category: '鹅', name: '白条鹅', state: '冻品', spec: '3-4 斤/只' },
+      { id: 'pig', category: '猪', name: '白条猪', state: '鲜品', spec: '胴体' },
+    ],
+    quotes: [],
+  }) };
+  const app = stubDom('#overview', { storage });
+  await import('../src/app.js?route=empty-cards');
+  assert.match(app.innerHTML, /<div class="cards">/, '默认视图应有卡片容器');
+  app.__click({ category: '猪' });
+  assert.doesNotMatch(app.innerHTML, /<div class="cards">/, '猪不出卡片，不应留空容器');
+  assert.match(app.innerHTML, /白条猪/, '猪的规格仍应出现在明细表');
+});

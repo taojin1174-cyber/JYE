@@ -117,3 +117,7 @@ th[aria-sort="ascending"] .th-sort,th[aria-sort="descending"] .th-sort{color:#6d
 /* 2026-11-18 总览：均价走势上移到筛选行下面，主力三品类（鹅/鸡/鸭）优先，其余品类收进标签 */
 .bottom-grid.single.chart-top{margin-top:0;margin-bottom:20px}
 @media(max-width:760px){.bottom-grid.single.chart-top{margin-top:0;margin-bottom:17px}}
+
+/* 品类标签随品类增长自动换行，不让窄屏横向溢出（2026-11-18 界面审查） */
+.filters .segmented{flex-wrap:wrap}
+@media(max-width:760px){.filters .segmented{width:100%}}

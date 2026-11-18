@@ -94,7 +94,7 @@ test('数据设置页的导出与录入按钮并入栏目行，不再单独占�
   assert.match(bar, /data-settings-view="review"/, '栏目行应含报价审核');
   assert.match(bar, /data-action="export"/, '导出按钮应在栏目行内');
   assert.match(bar, /data-action="add"/, '录入按钮应在栏目行内');
-  assert.match(bar, /data-action="lock-settings"/, '锁定按钮应在栏目行内');
+  assert.doesNotMatch(bar, /data-action="lock-settings"/, '锁定按钮已去掉，栏目行只留导出与录入');
 });
 
 test('未解锁时只显示访问密码页，页面不含任何报价或线索', async () => {
@@ -375,4 +375,27 @@ test('选中不展示卡片的品类时不输出空卡片容器，避免留出�
   app.__click({ category: '猪' });
   assert.doesNotMatch(app.innerHTML, /<div class="cards">/, '猪不出卡片，不应留空容器');
   assert.match(app.innerHTML, /白条猪/, '猪的规格仍应出现在明细表');
+});
+
+test('数据中心：筛选组排在最左，标题与类型切换在其后', async () => {
+  const app = stubDom('#settings');
+  await import('../src/app.js?route=lead-head-order');
+  const html = app.innerHTML;
+  const headAt = html.indexOf('class="panel-head lead-head"');
+  assert.ok(headAt > 0, '缺少线索面板头部');
+  const head = html.slice(headAt, headAt + 1400);
+
+  const filtersAt = head.indexOf('class="lead-filters"');
+  const titleAt = head.indexOf('自动采集线索');
+  const kindAt = head.indexOf('class="segmented"');
+
+  assert.ok(filtersAt >= 0 && titleAt >= 0 && kindAt >= 0, '三个部分都应存在');
+  assert.ok(filtersAt < titleAt, '筛选组应在标题之前（放最左边）');
+  assert.ok(titleAt < kindAt, '标题应在类型切换之前');
+
+  // 四个筛选项都要在筛选组里，顺序保持原样
+  const filters = head.slice(filtersAt, titleAt);
+  const order = ['全部品类', '全部处理方式', '近 30 天'].map((t) => filters.indexOf(t));
+  assert.ok(order.every((i) => i >= 0), '三个下拉都应保留');
+  assert.deepEqual(order, [...order].sort((a, b) => a - b), '筛选顺序应保持不变');
 });

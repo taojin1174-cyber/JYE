@@ -27,7 +27,7 @@ const INCLUDE_DIRS = ['src', 'scripts', 'tests', 'collector', 'supabase', '.gith
 const INCLUDE_FILES = [
   'index.html', 'rescue.html', 'config.js', 'favicon.svg',
   'package.json', 'package-lock.json',
-  'README.md', 'HANDOFF.md', '换电脑开工说明.md', '启动本地预览.cmd',
+  'README.md', 'HANDOFF.md', '换电脑开工说明.md', 'AGENTS.md', 'CLAUDE.md', '启动本地预览.cmd',
   '.env', '.gitignore', '.gitattributes',
 ];
 // 这些目录是运行环境或本机产物，传上去只会污染归档、还会冲掉 NAS 上 Linux 的可执行位。

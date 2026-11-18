@@ -166,3 +166,20 @@ test('肉交所明细滞后时标出抓取时间，不让人误以为是本次�
   });
   assert.match(markdown, /抓取于 11-17 18:00（非本次，抓取步骤可能未运行）/);
 });
+
+test('多个国内源失败时说明补抓链路，避免把常态当故障', () => {
+  const { markdown, warnings } = buildSummary({
+    discovery: {
+      fetched_at: '2026-11-18T02:08:11.017Z',
+      runs: [
+        { source_id: 'cnfowl_rouji', ok: false, error: 'HTTP 403' },
+        { source_id: 'soozhu_pig', ok: false, error: 'HTTP 403' },
+      ],
+    },
+    sources: [sources[0], sources[1]],
+  });
+  assert.match(markdown, /对 GitHub 海外机房 IP 通常不可达，属于常态/);
+  assert.match(markdown, /本机每日采集 → 仓库队列 → 云端入库/);
+  assert.match(markdown, /本机整天未开机时，这些来源不会更新/);
+  assert.equal(warnings.length, 1);
+});

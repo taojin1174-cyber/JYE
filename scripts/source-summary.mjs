@@ -109,6 +109,16 @@ export function buildSummary({ discovery, runs = null, sources = [], roujiaosuo 
   if (empty.length) warnings.push(`${empty.length} 个来源返回 0 条：${empty.join('、')}`);
   if (missing.length) warnings.push(`${missing.length} 个来源本轮未执行：${missing.join('、')}`);
 
+  // 国内行情站对 GitHub 海外机房 IP 基本不可达，这类失败是常态而不是故障。
+  // 写清补抓链路，否则每次看到多个红叉会误判成系统坏了。
+  if (failed.length >= 2) {
+    lines.push(
+      '',
+      '> 这些站点多为国内站，对 GitHub 海外机房 IP 通常不可达，属于常态。',
+      '> 它们的更新依赖「本机每日采集 → 仓库队列 → 云端入库」这条链路；本机整天未开机时，这些来源不会更新。',
+    );
+  }
+
   return { markdown: lines.join('\n'), warnings };
 }
 

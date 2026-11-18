@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/discover.yml'
       - 'scripts/discovery.mjs'
+      - 'scripts/source-summary.mjs'
       - 'scripts/consume-pending.mjs'
       - 'scripts/queue-leads.mjs'
       - 'scripts/roujiaosuo-*.mjs'
@@ -95,6 +96,14 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      # 每次运行都写摘要，不只在失败时写。
+      # 单源失败属于常态（站点改版、地区网络限制、限流），不应把整次运行标红；
+      # 但「某个源返回 0 条」不会抛错，过去完全不可见，只能等数据变少才发现。
+      # 这里把每个源的状态和条数列成表，异常源带 ⚠️/❌，并发 warning 注解。
+      - name: Write source summary
+        if: always()
+        run: node scripts/source-summary.mjs --expect-roujiaosuo
       # 采集结果只写数据库，不回写仓库：公开仓库不得留有任何业务数据快照。
       # GITHUB_TOKEN 推送不会触发另一个 push 工作流，因此在此明确构建与发布。
       - run: npm ci
@@ -104,19 +113,6 @@ jobs:
         with:
           name: discovered-site
           path: dist
-      # 单个来源失败属于常态（站点改版、地区网络限制、限流），不应把整次运行标红。
-      # 失败源保留上一版线索，页面照常发布；失败明细写入运行摘要，便于事后核对。
-      - name: Report partial source failure
-        if: steps.fetch.outcome == 'failure'
-        run: |
-          echo "::warning::部分公开来源本次未取到数据，已沿用上一版线索，页面照常发布。"
-          {
-            echo "### 部分来源抓取失败"
-            echo ""
-            echo "以下来源本次未取到数据，页面继续使用上一次成功快照里的对应线索："
-            echo ""
-            node -e "const d=require('./data/discovery.json');const bad=(d.runs||[]).filter(r=>!r.ok);if(bad.length){for(const r of bad)console.log('- \`'+r.source_id+'\`：'+r.error)}else{console.log('（快照内未记录失败源）')}"
-          } >> "$GITHUB_STEP_SUMMARY"
   publish:
     needs: discover
     if: always() && needs.discover.result != 'cancelled'

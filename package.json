@@ -13,7 +13,8 @@
     "leads:build": "node scripts/roujiaosuo-build.mjs",
     "leads:import": "node scripts/import-roujiaosuo-leads.mjs",
     "preview:offline": "node scripts/preview.mjs",
-    "archive": "node scripts/sync-archive.mjs"
+    "archive": "node scripts/sync-archive.mjs",
+    "summary": "node scripts/source-summary.mjs"
   },
   "engines": {
     "node": ">=22"

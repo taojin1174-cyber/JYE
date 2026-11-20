@@ -7,8 +7,11 @@
 //
 // 用法：
 //   node scripts/local-git-backup.mjs
-//   node scripts/local-git-backup.mjs --dir "E:/W工作区/Git备份/行情跳动"
-//   node scripts/local-git-backup.mjs --label 行情跳动 --quiet
+//   node scripts/local-git-backup.mjs --dir "D:/YPSP【2026】/【云端网站】/01-行情跳动/03-Git备份"
+//   node scripts/local-git-backup.mjs --quiet
+//
+// 默认写到归档文件夹的 03-Git备份\，这样「01-行情跳动」这一个文件夹
+// 就等于「源码 + 数据 + 完整 Git 历史」，换电脑只复制它。BASE 可用环境变量 ARCHIVE_ROOT 覆盖。
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
@@ -26,7 +29,8 @@ const git = (args, cwd) =>
 
 const repo = git(['rev-parse', '--show-toplevel']);
 const label = opt('label', basename(repo));
-const root = resolve(opt('dir', `E:/W工作区/Git备份/${label}`));
+const ARCHIVE_ROOT = process.env.ARCHIVE_ROOT || 'D:/YPSP【2026】/【云端网站】/01-行情跳动';
+const root = resolve(opt('dir', `${ARCHIVE_ROOT}/03-Git备份`));
 
 // ---- 先看有没有没提交的改动：bundle 只含已提交对象，未提交的会丢 ----
 let dirty = '';

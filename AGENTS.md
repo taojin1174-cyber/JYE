@@ -18,7 +18,7 @@
 | 采集 | GitHub Actions 定时跑 `scripts/discovery.mjs`，写回 Supabase |
 | 运行时 | Node **≥ 22**（`package.json` 已声明 `engines`） |
 | 数据库 | Supabase 项目 `gquwwbdvljelvlaovyih`，8 张表 |
-| 测试基线 | **99 项**，`npm test` 必须 `# pass 99 / # fail 0` |
+| 测试基线 | **105 项**，`npm test` 必须 `# pass 105 / # fail 0` |
 | 站点密码 | 明文不存在任何文件里，只有 PBKDF2 校验值在 `src/access-lock.js`、`src/settings-lock.js` |
 
 ⚠️ **本仓库是公开仓库**。任何密钥、客户信息、供应商联系方式都不得写进任何被 git 跟踪的文件。
@@ -29,9 +29,9 @@
 
 ```bash
 cd <仓库目录>
-git pull origin main          # 多台电脑/多个 AI 在用，先拉
+git pull origin main          # 先拉，确保和线上一致
 npm ci                        # 首次或依赖变动时
-npm test                      # 基线：99 项全过
+npm test                      # 基线：105 项全过
 ```
 
 测试数字对不上 → 代码不是最新，先 pull，别急着改。
@@ -83,7 +83,7 @@ npm test                      # 基线：99 项全过
 ## 6. 改完必须做的四步
 
 ```bash
-npm test          # 必须 99 项全过
+npm test          # 必须 105 项全过
 npm run build     # 全量重建 dist/，自带 scanLeak 自检（查有没有把来源名/网址漏进前端）
 git add -A
 git commit -m "一句话说清改了什么"
@@ -99,10 +99,11 @@ curl -s "https://bbroot01.bbroot.com/" | grep -o 'src/app.js?v=[a-z0-9]*'
 
 浏览器验证必须用**无痕窗口**或 `Ctrl+Shift+R`——GitHub Pages 缓存很顽固，普通刷新会看到旧版。
 
-改完一批、确认线上没问题后，跑一次本地 Git 备份（固定 3 份轮转）：
+改完一批、确认线上没问题后，跑两条本地归档命令（都会写到 D 盘的同一个文件夹）：
 
 ```bash
-npm run backup:git      # 写入 E:/W工作区/Git备份/行情跳动/slot-1~3，覆盖最旧
+npm run archive       # 源码同步到 01-行情跳动\01-网站源码
+npm run backup:git    # Git 快照写到 01-行情跳动\03-Git备份\slot-1~3，覆盖最旧
 ```
 
 ### 本机网络三个坑（中国境内网络）
@@ -192,6 +193,7 @@ D:\YPSP【2026】\【云端网站】\01-行情跳动\
 
 | 文件 | 内容 | 状态 |
 |---|---|---|
+| `交接说明-给接手的AI.md` | **换 AI 接手时先给这一份**：自包含，含开工校验、网络坑、口径、边界 | 有效 |
 | `README.md` | 项目概览、页面结构、功能清单 | 有效 |
 | `换电脑开工说明.md` | 换电脑/换 AI 的完整操作步骤、网络坑、报错对照 | 有效，**路径与命令以它为准** |
 | `HANDOFF.md` | 2026-11-11 的交接快照 | **部分过期**（路径、测试数、部署状态），业务口径章节仍有效 |

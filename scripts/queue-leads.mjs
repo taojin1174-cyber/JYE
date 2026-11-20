@@ -20,8 +20,10 @@ const QUEUE_DIR = new URL('../data/pending/', import.meta.url);
 const SENT_DB = new URL('../data/queued-ids.json', import.meta.url);
 const SENT_TTL_DAYS = 3;
 // 云端自己抓得到的来源不必经本机转手，避免同一批线索两边重复排队。
+// 云端自己抓得到的来源不必经本机转手，避免同一批线索两边重复排队。
 // 肉交所的下游有 roujiaosuo / roujiaosuo_cats 等多个 id，按前缀判断。
-const CLOUD_COVERED = /^roujiaosuo/;
+// 惠农网与顺企网实测云端可直连（顺企网需带 Referer），同样不排队。
+const CLOUD_COVERED = /^(?:roujiaosuo|cnhnb|qiye11467)/;
 const KEEP_DAYS = 7;
 
 const stamp = (date = new Date()) => {

@@ -1,6 +1,8 @@
 {
   "sources": [
     {"id":"roujiaosuo","name":"肉交所","url":"https://www.roujiaosuo.com/","adapter":"roujiaosuo","kind":"supply","enabled":true,"limit":48},
+    {"id":"cnhnb","name":"惠农网","url":"https://www.cnhnb.com/p/erou/","listUrls":["https://www.cnhnb.com/p/erou/","https://www.cnhnb.com/p/jirou/","https://www.cnhnb.com/p/yarou/","https://www.cnhnb.com/p/zhurou/"],"adapter":"cnhnb","kind":"supply","enabled":true,"limit":60},
+    {"id":"qiye11467","name":"顺企网","url":"https://b2b.11467.com/search/-51b751bb767d67619e45.htm","adapter":"qiye11467","kind":"supply","enabled":true,"limit":30,"headers":{"Referer":"https://b2b.11467.com/"}},
     {"id":"cnfowl_rouji","name":"禽网·肉鸡行情","url":"https://www.cnfowl.com/quote/list-22.html","listUrl":"https://www.cnfowl.com/quote/list-22.html","match":"全国肉鸡（鸡苗、毛鸡）参考价格","adapter":"cnfowl-price","kind":"market","enabled":true,"limit":70},
     {"id":"cnfowl_rouya","name":"禽网·肉鸭行情","url":"https://www.cnfowl.com/quote/list-22.html","listUrl":"https://www.cnfowl.com/quote/list-22.html","match":"全国肉鸭（鸭苗、毛鸭）参考价格","adapter":"cnfowl-price","kind":"market","enabled":true,"limit":90},
     {"id":"cnfowl_baotiao","name":"禽网·白条鸡批发","url":"https://www.cnfowl.com/quote/list-24.html","listUrl":"https://www.cnfowl.com/quote/list-24.html","match":"全国各主要批发市场白条鸡批发价格","adapter":"cnfowl-price","kind":"market","enabled":true,"limit":60},

@@ -174,10 +174,100 @@ export function soozhuArticles(listHtml,base='https://www.soozhu.com/c/zhujiage/
  return out;
 }
 
+// ---- 供货类来源（可核实入库）：只收「有具体卖家 + 明确标价」的公开条目 ----
+// 共同红线：绝不提取商户联系人、电话、微信（AGENTS.md 第 5 节，有测试守着）。
+
+// 报价单位必须能折算成元/kg 才收。元/个、元/箱、元/件 与毛重不可比，
+// 收了只会让「核实入库」录进一条无法比较的价格，所以直接丢弃。
+const NORMALIZED_UNIT=unit=>{
+ const u=String(unit||'').replace(/\s/g,'');
+ const hit=u.match(/元\s*\/\s*(公斤|千克|斤|吨)/);
+ if(!hit)return '';
+ return `元/${hit[1]==='千克'?'公斤':hit[1]}`;
+};
+
+// 供货站的标题常被卖家塞进电话（「白条鹅 13800138000」）。
+// 标题会进数据库、也会显示在线索表里，所以入库前必须把号码本身抹掉，
+// 只留产品描述。座机一并处理，避免只挡手机号留后门。
+const stripContact=value=>clean(String(value||'')
+ .replace(/1[3-9]\d{9}/g,' ')
+ .replace(/0\d{2,3}[-\s]?\d{7,8}/g,' ')
+ .replace(/[（(]\s*[)）]/g,'')
+ .replace(/\s{2,}/g,' ')
+ .trim());
+
+// 惠农网供应列表页（Vue 服务端渲染），一页 20 条。
+// 结构：<div class="supply-item"> → <a href="/gongying/数字/"> → 价格 / 标题 / 店铺 / 城市 / 成交量
+export function parseCnhnb(html){
+ const out=[];
+ for(const block of String(html).split(/<div class="supply-item"[^>]*>/).slice(1)){
+  const path=attr(block,'href');
+  if(!path||!/^\/gongying\/\d+\/$/.test(path))continue;
+  const price=block.match(/<span class="sp1"[^>]*>([\d.]+)<\/span>\s*([^<]*)/);
+  if(!price)continue;
+  const unit=NORMALIZED_UNIT(price[2]);
+  if(!unit)continue;
+  const title=stripContact(block.match(/<h2[^>]*>([\s\S]*?)<\/h2>/)?.[1]||'');
+  if(!title)continue;
+  const category=inferCategory(title);
+  if(!category)continue;
+  const region=clean(block.match(/<div class="r-shop-btm"[^>]*>([\s\S]*?)<\/div>/)?.[1]||'');
+  const shop=stripContact(block.match(/<a href="\/homepage\/\d+\/"[^>]*>([\s\S]*?)<\/a>/)?.[1]||'');
+  const turnover=clean(block.match(/<div class="turnover"[^>]*>([\s\S]*?)<\/div>/)?.[1]||'');
+  // 列表页不发布日期，抓取日即最新快照日；真实发布日需打开原文核对。
+  out.push({
+   title,
+   url:`https://www.cnhnb.com${path}`,
+   published_on:null,
+   price_text:`${price[1]}${unit}`,
+   region_text:region,
+   category,
+   details:`原文标价：${price[1]}${unit}；起批量与规格待打开原文核对。店铺：${shop||'未注明'}；${turnover?`${turnover}；`:'交易记录未公开；'}列表页不提供发布日期，以抓取日为准。`,
+  });
+ }
+ return out;
+}
+
+// 顺企网（11467）分类黄页里的产品条目。
+// 结构：<li><span class="plistimg"> → <dl> → dt 标题 / 报价 ￥金额/单位 / 公司 + 地区
+// ⚠ 该页含 <div class="btn-mobile">手机号</div>，一律不读。
+export function parse11467(html){
+ const out=[];
+ for(const block of String(html).split(/<li>\s*<span class="plistimg"/).slice(1)){
+  const url=block.match(/href="(https:\/\/product\.11467\.com\/info\/\d+\.htm)"/)?.[1];
+  if(!url)continue;
+  const title=stripContact(block.match(/<dt><a[^>]*>([\s\S]*?)<\/a><\/dt>/)?.[1]||'');
+  if(!title)continue;
+  const category=inferCategory(title);
+  if(!category)continue;
+  const money=block.match(/报价<em>￥<span>([\d,.]+)<\/span><\/em>\s*\/\s*([^<\s]*)/);
+  if(!money)continue;
+  const unit=NORMALIZED_UNIT(`元/${money[2]}`);
+  if(!unit)continue;
+  const amount=money[1].replace(/,/g,'');
+  const company=stripContact(block.match(/<dd><a href="https:\/\/[a-z0-9]+\.11467\.com"[^>]*>([\s\S]*?)<\/a>/)?.[1]||'');
+  const region=clean(block.match(/<span class="weizhi">([\s\S]*?)<\/span>/)?.[1]||'');
+  out.push({
+   title,
+   url,
+   published_on:null,
+   price_text:`${amount}${unit}`,
+   region_text:region,
+   category,
+   details:`原文报价：${amount}${unit}（企业挂牌价，非当日成交价）；规格与起订量待打开原文核对。供货企业：${company||'未注明'}；黄页不提供发布日期。`,
+  });
+ }
+ return out;
+}
+
 export function parseDiscovery(html,source) {
  const records=[];
  const published_on=dateIn(html.match(/<h1[^>]*id=["']title["'][^>]*>([\s\S]*?)<\/h1>/i)?.[1])||dateIn(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1])||null;
- if(source.adapter==='cnfowl-price'||source.adapter==='cnfowl-offer') {
+ if(source.adapter==='cnhnb') {
+  records.push(...parseCnhnb(html));
+ } else if(source.adapter==='qiye11467') {
+  records.push(...parse11467(html));
+ } else if(source.adapter==='cnfowl-price'||source.adapter==='cnfowl-offer') {
   const rows=source.adapter==='cnfowl-price'?parsePriceTables(html):parseDailyOffer(html);
   for(const row of rows)records.push({...row,published_on:row.published_on||published_on,url:source.url});
  } else if(source.adapter==='roujiaosuo') {
@@ -213,16 +303,17 @@ export function parseDiscovery(html,source) {
 const BROWSER_HEADERS={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',Accept:'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8','Accept-Language':'zh-CN,zh;q=0.9'};
 // 网络类失败重试两次；HTTP 4xx 不重试。错误信息带上 cause 码（ENOTFOUND / ECONNRESET / 证书等），
 // 否则 Node 只报 "fetch failed"，无法判断是 DNS、连接还是站点拦截。
-async function getHTML(url,attempt=0) {
+async function getHTML(url,attempt=0,extra={}) {
  try{
-  const response=await fetch(url,{headers:BROWSER_HEADERS,signal:AbortSignal.timeout(30000)});
-  if(!response.ok)throw Object.assign(new Error(`HTTP ${response.status}`),{noRetry:true});
+  const response=await fetch(url,{headers:{...BROWSER_HEADERS,...extra},signal:AbortSignal.timeout(30000)});
+  // 429 是站点限流（顺企网常见），等一会儿重试是有意义的；其余 4xx 重试没用。
+  if(!response.ok)throw Object.assign(new Error(`HTTP ${response.status}`),{noRetry:response.status!==429,status:response.status});
   const html=await response.text();if(html.length>3_000_000)throw new Error('页面过大');return html;
  }catch(e){
   // 境外节点访问国内站点偶发长时间无响应，多给两次机会并拉长退避。
   if(!e.noRetry&&attempt<3){
-   await new Promise(resolve=>setTimeout(resolve,1500*(attempt+1)));
-   return getHTML(url,attempt+1);
+   await new Promise(resolve=>setTimeout(resolve,e.status===429?8000*(attempt+1):1500*(attempt+1)));
+   return getHTML(url,attempt+1,extra);
   }
   const code=e?.cause?.code||e?.cause?.errno||'';
   throw new Error(code?`${e.message}（${code}）`:e.message);
@@ -240,11 +331,11 @@ function findArticleLink(listHtml,source){
  return '';
 }
 async function loadSourceHTML(source){
- if(!source.listUrl)return {html:await getHTML(source.url),url:source.url};
- const listHtml=await getHTML(source.listUrl);
+ if(!source.listUrl)return {html:await getHTML(source.url,0,source.headers),url:source.url};
+ const listHtml=await getHTML(source.listUrl,0,source.headers);
  const article=findArticleLink(listHtml,source);
  if(!article)throw new Error(`列表页未找到“${source.match||source.name}”文章`);
- return {html:await getHTML(article),url:article};
+ return {html:await getHTML(article,0,source.headers),url:article};
 }
 export async function discover({cacheDir='',persistCloud=false}={}) {
  const {sources}=JSON.parse(await readFile(new URL('../collector/web-sources.json',import.meta.url),'utf8'));
@@ -267,9 +358,27 @@ export async function discover({cacheDir='',persistCloud=false}={}) {
     console.log(`${source.id}: ${parsed.length} 条公开线索（未进入供货均价）`);
     continue;
    }
+   // 供货类来源按品类分多页抓取（惠农网 /p/erou、/p/jirou…），页面之间合并去重。
+   if(source.listUrls?.length&&!cacheDir) {
+    const parsed=[],seen=new Set();
+    for(const listUrl of source.listUrls) {
+     try {
+      for(const row of parseDiscovery(await getHTML(listUrl,0,source.headers),{...source,url:listUrl})) {
+       if(seen.has(row.id))continue;
+       seen.add(row.id);parsed.push(row);
+      }
+     } catch(e) { console.error(`${source.id} ${listUrl}: ${e.message}`); }
+     // 同一站点连续请求多个分类页，留间隔，避免被判定为爬虫。
+     await new Promise(resolve=>setTimeout(resolve,900));
+    }
+    if(!parsed.length)throw new Error('各分类页均未解析到有效记录，页面结构可能变化');
+    items.push(...parsed);runs.push({source_id:source.id,ok:true,count:parsed.length});
+    console.log(`${source.id}: ${parsed.length} 条供货线索（可核实入库）`);
+    continue;
+   }
    const {html,url}=cacheDir?{html:await readFile(`${cacheDir}/${source.id}.html`,'utf8'),url:source.url}:await loadSourceHTML(source);
    const parsed=parseDiscovery(html,{...source,url});items.push(...parsed);runs.push({source_id:source.id,ok:true,count:parsed.length});
-   console.log(`${source.id}: ${parsed.length} 条公开线索（未进入供货均价）`);
+   console.log(`${source.id}: ${parsed.length} 条${source.kind==='supply'?'供货线索（可核实入库）':'公开线索（未进入供货均价）'}`);
   }catch(e){errors++;runs.push({source_id:source.id,ok:false,error:e.message});console.error(`${source.id}: ${e.message}`);}
  }
  // 本轮各源状态单独落盘，不与 discovery.json 混在一起。

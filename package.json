@@ -15,7 +15,8 @@
     "preview:offline": "node scripts/preview.mjs",
     "archive": "node scripts/sync-archive.mjs",
     "summary": "node scripts/source-summary.mjs",
-    "backup": "node scripts/backup-cloud.mjs"
+    "backup": "node scripts/backup-cloud.mjs",
+    "backup:git": "node scripts/local-git-backup.mjs"
   },
   "engines": {
     "node": ">=22"

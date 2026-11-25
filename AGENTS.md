@@ -18,7 +18,7 @@
 | 采集 | GitHub Actions 定时跑 `scripts/discovery.mjs`，写回 Supabase |
 | 运行时 | Node **≥ 22**（`package.json` 已声明 `engines`） |
 | 数据库 | Supabase 项目 `gquwwbdvljelvlaovyih`，8 张表 |
-| 测试基线 | **109 项**，`npm test` 必须 `# pass 109 / # fail 0` |
+| 测试基线 | **111 项**，`npm test` 必须 `# pass 111 / # fail 0` |
 | 站点密码 | 明文不存在任何文件里，只有 PBKDF2 校验值在 `src/access-lock.js`、`src/settings-lock.js` |
 
 ⚠️ **本仓库是公开仓库**。任何密钥、客户信息、供应商联系方式都不得写进任何被 git 跟踪的文件。
@@ -31,7 +31,7 @@
 cd <仓库目录>
 git pull origin main          # 先拉，确保和线上一致
 npm ci                        # 首次或依赖变动时
-npm test                      # 基线：109 项全过
+npm test                      # 基线：111 项全过
 ```
 
 测试数字对不上 → 代码不是最新，先 pull，别急着改。
@@ -83,7 +83,7 @@ npm test                      # 基线：109 项全过
 ## 6. 改完必须做的四步
 
 ```bash
-npm test          # 必须 109 项全过
+npm test          # 必须 111 项全过
 npm run build     # 全量重建 dist/，自带 scanLeak 自检（查有没有把来源名/网址漏进前端）
 git add -A
 git commit -m "一句话说清改了什么"

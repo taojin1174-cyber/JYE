@@ -60,11 +60,17 @@ export function matchesLeadCategory(lead,category) {
 export function isValidQuote(q, day = dayString()) {
   return !q.deleted_at && q.status === 'approved' && q.quoted_on <= day && q.valid_until >= day && Number.isFinite(Number(q.price)) && Number(q.price) > 0;
 }
+// 未核实规格不能被当成同一个可比规格；仅排除统计，不删除报价。
+export function hasComparableSpec(product) {
+  return Boolean(product?.spec?.trim()) && !/待核实|待确认|待填写|未填|未注明|未知/.test(product.spec);
+}
 export function latestQuotes(quotes, {day = dayString(), days = 7, productId = '', category = '', products = [], province = '', basis = 'factory', source = ''} = {}) {
   const start = shiftDay(day, -(days - 1));
   const bySupplier = new Map();
   for (const q of quotes) {
     if (!isValidQuote(q, day) || q.quoted_on < start) continue;
+    const definition=products.find(p=>p.id===q.product_id);
+    if (products.length && !hasComparableSpec(definition)) continue;
     if (productId && q.product_id !== productId) continue;
     if (category && products.find(p => p.id === q.product_id)?.category !== category) continue;
     if (province && q.province !== province) continue;

@@ -9,7 +9,7 @@ test('核价筛选跨来源包含多品类标题，未采集到的鹅信息不�
  assert.equal(matchesLeadCategory({category:'鹅',title:'今日供货'},'鹅'),true);
  assert.equal(matchesLeadCategory({category:'鸡',title:'鸡腿报价'},'鹅'),false);
 });
-const products=[{id:'a',category:'鸡'},{id:'b',category:'鸡'}];
+const products=[{id:'a',category:'鸡',spec:'整鸡 · 1 kg/只'},{id:'b',category:'鸡',spec:'整鸡 · 2 kg/只'}];
 const quote=(extra={})=>({id:'q',product_id:'a',supplier:'供应商甲',province:'山东',price:10,basis:'factory',source:'manual',status:'approved',quoted_on:'2026-11-09',valid_until:'2026-11-11',created_at:'2026-11-09T08:00:00Z',...extra});
 const opts={productId:'a',day:'2026-11-09',days:7,basis:'factory'};
 test('北京时间跨月、跨年及单位换算',()=>{
@@ -34,6 +34,17 @@ test('运费可按吨录入，统一折算成元/kg',()=>{
 test('同规格同口径，只保留周期内最新有效供应商样本',()=>{
  const quotes=[quote(),quote({id:'old',price:50,quoted_on:'2026-11-08'}),quote({id:'pending',supplier:'待审',status:'pending'}),quote({id:'rejected',supplier:'拒绝',status:'rejected'}),quote({id:'expired',supplier:'过期',valid_until:'2026-11-08'}),quote({id:'future',supplier:'未来',quoted_on:'2026-11-10'}),quote({id:'different',supplier:'另一规格',product_id:'b'}),quote({id:'basis',supplier:'含运',basis:'delivered'}),quote({id:'old-period',supplier:'周期外',quoted_on:'2026-10-31',valid_until:'2026-11-15'})];
  assert.deepEqual(latestQuotes(quotes,opts).map(q=>q.id),['q']);
+});
+
+test('规格待核实或空规格的报价保留原记录，但不参与可比样本及历史均价',()=>{
+ const definitions=[{id:'unknown',category:'鹅',spec:'冻品 · 规格待核实'},{id:'blank',category:'鹅',spec:''},{id:'verified',category:'鹅',spec:'整鹅 · 3 kg/只'}];
+ const records=[quote({id:'u1',product_id:'unknown',supplier:'甲',price:7.5}),quote({id:'u2',product_id:'unknown',supplier:'乙',price:11.6}),quote({id:'blank',product_id:'blank'}),quote({id:'v',product_id:'verified',price:20})];
+ const original=structuredClone(records);
+ const options={...opts,productId:'',products:definitions};
+ assert.deepEqual(latestQuotes(records,options).map(q=>q.id),['v']);
+ assert.equal(summarize(latestQuotes(records,{...options,productId:'unknown'})).average,null);
+ assert.equal(trend(records,{...options,productId:'unknown'},1)[0].average,null);
+ assert.deepEqual(records,original,'不能删除或改写原报价');
 });
 test('不同供应商和省份保留独立样本，筛选来源和地区',()=>{
  const quotes=[quote(),quote({id:'2',supplier:'供应商乙',province:'河南',price:14,source:'engine'}),quote({id:'3',province:'江苏',price:12})];

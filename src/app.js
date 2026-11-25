@@ -1,4 +1,4 @@
-import { dayString, shiftDay, addMonths, monthsBetween, provinces, bases, statuses, money, normalizePrice, normalizeFreight, latestQuotes, summarize, trend, validateQuote, csvCell, isValidQuote, matchesLeadCategory, leadPriceKg } from './core.js';
+import { dayString, shiftDay, addMonths, monthsBetween, provinces, bases, statuses, money, normalizePrice, normalizeFreight, latestQuotes, summarize, trend, validateQuote, csvCell, isValidQuote, matchesLeadCategory, leadPriceKg, hasComparableSpec } from './core.js';
 import { leadPrefill } from './lead-prefill.js';
 import { buildQuickQuote } from './lead-quick.js';
 import { filterExport } from './export-filter.js';
@@ -52,8 +52,8 @@ const HANDLED_LEADS=new Set(['converted','dismissed','deleted']);
 const matchesLeadUse=l=>!state.leadUse||(state.leadUse==='convertible'?l.kind==='supply':l.kind!=='supply');
 const options=(values,current,first)=>`${first!==undefined?`<option value="">${esc(first)}</option>`:''}${values.map(v=>{const [value,label]=Array.isArray(v)?v:[v,v];return `<option value="${esc(value)}" ${current===value?'selected':''}>${esc(label)}</option>`;}).join('')}`;
 const productLabel=p=>p?`${p.name} / ${p.state} / ${p.spec}`:'产品已移除';
-const productCell=p=>p?`<div class="product-name">${esc(p.name)}<span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="product-spec">${esc(p.spec)}</div>`:'未知产品';
-const queryOptions=(id,extra={})=>({days:state.days,basis:state.basis,province:state.province,productId:id,...extra});
+const productCell=p=>p?`<div class="product-name">${esc(p.name)}<span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="product-spec">${esc(p.spec)}</div>${hasComparableSpec(p)?'':'<div class="product-spec">规格待核实，暂不统计</div>'}`:'未知产品';
+const queryOptions=(id,extra={})=>({days:state.days,basis:state.basis,province:state.province,productId:id,products:data.products,...extra});
 const stats=id=>summarize(latestQuotes(data.quotes,queryOptions(id)));
 // 来源 / 网址 / 采集痕迹一律只在「数据设置」输入密码解锁后出现。
 const unlocked=()=>settingsAccess.isUnlocked();

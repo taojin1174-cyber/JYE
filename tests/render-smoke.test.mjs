@@ -437,3 +437,17 @@ test('手机隐藏导出文字后，操作按钮仍有独立的可读名称', as
  const button=app.innerHTML.match(/<button[^>]*data-action="export"[^>]*>/)?.[0];
  assert.match(button||'',/aria-label="导出数据"/);
 });
+
+test('总览对待核实规格显示原因，不能把两条未知规格报价显示为均价', async () => {
+ const today=dayString();
+ const definitions=[{id:'unknown-goose',category:'鹅',name:'验收未核实鹅',state:'冻品',spec:'冻品 · 规格待核实'}];
+ const quotes=[7.5,11.6].map((price,i)=>({id:'unverified-'+i,product_id:'unknown-goose',supplier:'验收供应商'+i,province:'广东',price,basis:'factory',source:'manual',status:'approved',quoted_on:today,valid_until:addMonths(today,1),created_at:new Date().toISOString()}));
+ const saved={products:definitions,quotes,leads:[],audit:[],deletionRequests:[]};
+ const app=stubDom('#overview',{storage:{[DATA_KEY]:JSON.stringify(saved)}});
+ await import('../src/app.js?route=unknown-spec-averages');
+ assert.doesNotMatch(app.innerHTML,/>9\.55</,'未知规格不能显示混合均价');
+ assert.match(app.innerHTML,/规格待核实，暂不统计/);
+ const compare=stubDom('#compare',{storage:{[DATA_KEY]:JSON.stringify(saved)}});
+ await import('../src/app.js?route=unknown-spec-comparison');
+ assert.doesNotMatch(compare.innerHTML,/验收供应商[01]/,'未核实规格不应出现在可采购比价列表');
+});

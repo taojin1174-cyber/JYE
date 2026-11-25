@@ -137,36 +137,6 @@ jobs:
         if: always()
         run: node scripts/source-summary.mjs --expect-roujiaosuo
       # 采集结果只写数据库，不回写仓库：公开仓库不得留有任何业务数据快照。
-      # GITHUB_TOKEN 推送不会触发另一个 push 工作流，因此在此明确构建与发布。
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: discovered-site
-          path: dist
-  publish:
-    needs: discover
-    if: always() && needs.discover.result != 'cancelled'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: discovered-site
-          path: dist
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v5
-        with:
-          path: dist
-      - id: deploy
-        uses: actions/deploy-pages@v5
+      # 所以这里不构建、不发布：站点代码没变，pages.yml 已在代码变动时部署过。
+      # 两个工作流抢同一个 github-pages 环境会让 deploy-pages 报 500（实测 59b3a4c），
+      # 部署入口只保留 pages.yml 一个。

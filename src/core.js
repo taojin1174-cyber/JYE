@@ -42,16 +42,16 @@ export const money = value => value == null ? '—' : Number(value).toFixed(2);
 export function leadPriceKg(text) {
   const s = String(text || '');
   if (!s.trim()) return null;
-  if (/元\s*\/\s*(只|羽|个|枚|箱|件)/.test(s)) return null;
+  if ((s.match(/元/g)||[]).length!==1) return null;
   // 只认紧贴「元」的那段数字，避免把标题里的年份、规格数字当价格。
-  const m = s.match(/(\d+(?:\.\d+)?)(?:\s*[-~至到]\s*(\d+(?:\.\d+)?))?\s*元/);
+  const m = s.match(/(?<![\d.,])([+-]?\s*\d+(?:\.\d+)?)(?:\s*[-~至到]\s*(\d+(?:\.\d+)?))?\s*元\s*\/\s*(公斤|千克|kg|斤|吨)(?![a-z])/i);
   if (!m) return null;
   const low = Number(m[1]), high = m[2] ? Number(m[2]) : low;
-  if (!Number.isFinite(low) || low <= 0) return null;
-  const raw = Number.isFinite(high) && high >= low ? (low + high) / 2 : low;
+  if (!Number.isFinite(low) || low <= 0 || !Number.isFinite(high) || high < low) return null;
+  const raw = (low + high) / 2;
   const value = Math.round(raw * 10000) / 10000;
-  if (/元\s*\/\s*斤/.test(s)) return Math.round(value * 2 * 10000) / 10000;
-  if (/元\s*\/\s*吨/.test(s)) return Math.round(value / 1000 * 10000) / 10000;
+  if (m[3]==='斤') return Math.round(value * 2 * 10000) / 10000;
+  if (m[3]==='吨') return Math.round(value / 1000 * 10000) / 10000;
   return value;
 }
 export function matchesLeadCategory(lead,category) {

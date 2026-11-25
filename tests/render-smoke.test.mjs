@@ -399,3 +399,41 @@ test('数据中心：筛选组排在最左，标题与类型切换在其后', as
   assert.ok(order.every((i) => i >= 0), '三个下拉都应保留');
   assert.deepEqual(order, [...order].sort((a, b) => a - b), '筛选顺序应保持不变');
 });
+
+test('总览 CSV 与常用、全部和单品类表格范围一致，零报价规格仍可导出', async () => {
+ const app=stubDom('#overview');
+ await import('../src/app.js?route=export-category-regression');
+ const createObjectURL=URL.createObjectURL;
+ const revokeObjectURL=URL.revokeObjectURL;
+ let captured;
+ URL.createObjectURL=blob=>{captured=blob;return 'blob:qa-export';};
+ URL.revokeObjectURL=()=>{};
+ document.createElement=()=>({click(){}});
+ try{
+  for(const [category,allowed] of [['',['鹅','鸡','鸭']],['*',['猪','鸡','鸭','鹅','羊']],['猪',['猪']]]){
+   app.__click({category});
+   const tableHtml=app.innerHTML.slice(app.innerHTML.indexOf('<h2>产品参考均价'));
+   const expected=(tableHtml.match(/data-compare="/g)||[]).length;
+   app.__click({action:'export'});
+   const lines=(await captured.text()).trim().split('\r\n');
+   assert.equal(lines.length-1,expected,category||'常用');
+   for(const line of lines.slice(1))assert.ok(allowed.includes(line.match(/^"([^"]+)"/)[1]),line);
+   assert.ok(expected>0,'零报价产品也应显示及导出');
+  }
+ }finally{URL.createObjectURL=createObjectURL;URL.revokeObjectURL=revokeObjectURL;}
+});
+
+test('线索品类包含产品档案与采集到的扩展物种', async () => {
+ const custom=structuredClone(snapshot);
+ custom.items.push({...custom.items[0],id:'qa-pigeon',title:'白羽鸽',category:'鸽'});
+ const app=stubDom('#settings',{data:custom});
+ await import('../src/app.js?route=lead-category-regression');
+ assert.match(app.innerHTML,/<select aria-label="线索品类"[^>]*>[\s\S]*?<option value="鸽"/);
+});
+
+test('手机隐藏导出文字后，操作按钮仍有独立的可读名称', async () => {
+ const app=stubDom('#settings');
+ await import('../src/app.js?route=export-accessible-label');
+ const button=app.innerHTML.match(/<button[^>]*data-action="export"[^>]*>/)?.[0];
+ assert.match(button||'',/aria-label="导出数据"/);
+});

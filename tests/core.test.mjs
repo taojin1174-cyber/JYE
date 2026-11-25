@@ -114,3 +114,11 @@ test('线索标价原文折算成元/kg 后再比较',()=>{
  assert.equal(leadPriceKg('见原文'),null);
  assert.equal(leadPriceKg(''),null);
 });
+
+test('未知或缺失计重单位、负价和倒置区间不能当作元/kg排序',()=>{
+ for(const text of ['18 元','18 元/袋','18 元/500g','-18 元/公斤','18-12 元/公斤','18 元/公斤，20 元/斤']) {
+  assert.equal(leadPriceKg(text),null,text);
+ }
+ assert.equal(leadPriceKg('12 元/千克'),12);
+ assert.equal(leadPriceKg('12 元/KG'),12);
+});

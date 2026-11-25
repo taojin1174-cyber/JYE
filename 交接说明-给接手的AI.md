@@ -33,7 +33,7 @@
 | 采集 | GitHub Actions 定时跑 `scripts/discovery.mjs`，把结果写回 Supabase |
 | 运行时 | Node **≥ 22** |
 | 数据库 | Supabase 项目 `gquwwbdvljelvlaovyih`，8 张表 |
-| 测试 | **105 项**，`npm test` 必须 `# pass 105 / # fail 0` |
+| 测试 | **111 项**，`npm test` 必须 `# pass 111 / # fail 0` |
 
 ⚠️ **这是公开仓库**。任何密钥、密码、供应商电话/微信，都不得写进被 git 跟踪的文件。
 私钥只走 GitHub Secrets，前端只能有 `sb_publishable_` 开头的公钥。
@@ -45,7 +45,7 @@
 ```bash
 git pull origin main    # 先拉，和线上对齐
 npm ci                  # 依赖（首次或 package-lock 变了才需要）
-npm test                # 必须 105 项全过、0 失败
+npm test                # 必须 111 项全过、0 失败
 ```
 
 测试数字对不上 → 代码不是最新，先 `git pull`，**不要急着改代码去凑数字**。
@@ -211,7 +211,7 @@ curl -s "https://bbroot01.bbroot.com/" | grep -o 'src/app.js?v=[a-z0-9]*'
 | 项 | 状态 |
 |---|---|
 | 最新提交 | `d44da5f` |
-| 测试 | 105 项全过 |
+| 测试 | 111 项全过 |
 | 线上版本 | `https://bbroot01.bbroot.com/` → `src/app.js?v=4687badc41c9` |
 | 主导航 | 3 项：总览 / 对比 / 数据设置 |
 | 数据源 | 共 8 个；其中 **3 个可核实入库**（肉交所、惠农网、顺企网） |

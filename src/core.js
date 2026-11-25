@@ -64,13 +64,13 @@ export function isValidQuote(q, day = dayString()) {
 export function hasComparableSpec(product) {
   return Boolean(product?.spec?.trim()) && !/待核实|待确认|待填写|未填|未注明|未知/.test(product.spec);
 }
-export function latestQuotes(quotes, {day = dayString(), days = 7, productId = '', category = '', products = [], province = '', basis = 'factory', source = ''} = {}) {
+export function latestQuotes(quotes, {day = dayString(), days = 7, productId = '', category = '', products = [], province = '', basis = 'factory', source = '', includeUnconfirmedSpecs = false} = {}) {
   const start = shiftDay(day, -(days - 1));
   const bySupplier = new Map();
   for (const q of quotes) {
     if (!isValidQuote(q, day) || q.quoted_on < start) continue;
     const definition=products.find(p=>p.id===q.product_id);
-    if (products.length && !hasComparableSpec(definition)) continue;
+    if (products.length && (!definition || (!includeUnconfirmedSpecs && !hasComparableSpec(definition)))) continue;
     if (productId && q.product_id !== productId) continue;
     if (category && products.find(p => p.id === q.product_id)?.category !== category) continue;
     if (province && q.province !== province) continue;

@@ -449,5 +449,9 @@ test('总览对待核实规格显示原因，不能把两条未知规格报价�
  assert.match(app.innerHTML,/规格待核实，暂不统计/);
  const compare=stubDom('#compare',{storage:{[DATA_KEY]:JSON.stringify(saved)}});
  await import('../src/app.js?route=unknown-spec-comparison');
- assert.doesNotMatch(compare.innerHTML,/验收供应商[01]/,'未核实规格不应出现在可采购比价列表');
+ assert.match(compare.innerHTML,/验收供应商0/);
+ assert.match(compare.innerHTML,/验收供应商1/);
+ assert.match(compare.innerHTML,/规格待核实，暂不统计/);
+ compare.__change({filter:'product'},'unknown-goose');
+ assert.doesNotMatch(compare.innerHTML,/>9\.55</,'单选待核实规格也不能计算均价');
 });

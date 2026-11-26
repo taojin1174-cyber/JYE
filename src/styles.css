@@ -121,3 +121,45 @@ th[aria-sort="ascending"] .th-sort,th[aria-sort="descending"] .th-sort{color:#6d
 /* 品类标签随品类增长自动换行，不让窄屏横向溢出（2026-11-18 界面审查） */
 .filters .segmented{flex-wrap:wrap}
 @media(max-width:760px){.filters .segmented{width:100%}}
+
+/* 采购比价：筛选与操作同区，窄屏按报价逐条阅读。 */
+.compare-page .compare-toolbar{background:#fff;border:1px solid var(--line);padding:14px 16px;margin-bottom:16px}
+.compare-page .compare-filters{margin:0;gap:8px}
+.compare-page .compare-filters select{min-width:0;min-height:38px}
+.compare-page .compare-filters .search{flex:1 1 150px;max-width:220px}
+.compare-page .compare-filters input{min-width:0;width:100%}
+.compare-page .compare-filters .page-bar-actions{margin-left:auto}
+.compare-results .panel-head{padding:14px 18px;gap:10px}
+.compare-count{display:inline-block;margin-left:10px;font-size:12px;font-weight:400;color:#506158}
+.compare-results td,.compare-results th{padding-inline:14px}
+.compare-results td{padding-block:12px}
+.compare-results tbody tr:hover{background:#f6f9f7}
+.compare-results td:nth-child(3){font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:#174d3a}
+.compare-mobile-unit{display:none}
+.compare-page :is(button,input,select):focus-visible{outline:2px solid #237250;outline-offset:2px}
+@media(max-width:760px){
+ .compare-page .compare-toolbar{padding:10px}
+ .compare-page .compare-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .compare-page .compare-filters select{width:100%;min-height:42px}
+ .compare-page .compare-filters .search{max-width:none;width:100%}
+ .compare-page .compare-filters .page-bar-actions{grid-column:1/-1;width:100%}
+ .compare-page .compare-filters .export-label{display:inline}
+ .compare-results .table-wrap{overflow:visible}
+ .compare-results table{display:block;min-width:0;width:100%;white-space:normal}
+ .compare-results thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .compare-results thead:focus-within{position:static;width:auto;height:auto;clip-path:none;display:block}
+ .compare-results tbody{display:block}
+ .compare-results tbody tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:14px;border-bottom:1px solid var(--line)}
+ .compare-results tbody td{min-width:0;padding:0;border:0;white-space:normal;overflow-wrap:anywhere}
+ .compare-results td:nth-child(1){grid-area:1/1}
+ .compare-results td:nth-child(2){grid-area:2/1}
+ .compare-results td:nth-child(3){grid-area:1/2;text-align:right;align-self:start}
+ .compare-results td:nth-child(4){grid-area:2/2;text-align:right}
+ .compare-results td:nth-child(5){grid-area:3/1}
+ .compare-results td:nth-child(6){grid-area:4/1}
+ .compare-results td:nth-child(7){grid-area:4/2;align-self:end;text-align:right}
+ .compare-results .row-action{min-height:38px}
+ .compare-results td.empty{grid-column:1/-1;padding:20px 0}
+ .compare-mobile-unit{display:inline;font-size:11px;font-weight:400;color:#506158}
+}
+.compare-results .quote-phone{color:#17674b;font-weight:600;white-space:nowrap;text-decoration:underline;text-underline-offset:3px}

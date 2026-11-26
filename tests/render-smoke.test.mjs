@@ -447,9 +447,12 @@ test('总览对待核实规格显示原因，不能把两条未知规格报价�
  await import('../src/app.js?route=unknown-spec-averages');
  assert.doesNotMatch(app.innerHTML,/>9\.55</,'未知规格不能显示混合均价');
  assert.match(app.innerHTML,/规格待核实，暂不统计/);
+ saved.quotes[0].notes='联系手机：13800000000';
  const compare=stubDom('#compare',{storage:{[DATA_KEY]:JSON.stringify(saved)}});
  await import('../src/app.js?route=unknown-spec-comparison');
  assert.match(compare.innerHTML,/验收供应商0/);
+ assert.match(compare.innerHTML,/<th>联系方式<\/th>/);
+ assert.match(compare.innerHTML,/href="tel:13800000000"/);
  assert.match(compare.innerHTML,/验收供应商1/);
  assert.match(compare.innerHTML,/规格待核实，暂不统计/);
  compare.__change({filter:'product'},'unknown-goose');

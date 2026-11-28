@@ -29,10 +29,13 @@
 
 ```bash
 cd <仓库目录>
-git pull origin main          # 先拉，确保和线上一致
+npm run check                 # 自检：Node 版本 / 依赖 / .env / 落后远程 / 未提交改动
+git pull --rebase origin main # 先拉，确保和线上一致
 npm ci                        # 首次或依赖变动时
 npm test                      # 基线：111 项全过
 ```
+
+`npm run check` 换电脑时尤其重要：它会直接告出「落后远程几个提交」「有未提交文件」「缺 .env 哪个键」，比人工 `git status` 更不容易漏。网络差时用 `npm run check -- --no-fetch`。
 
 测试数字对不上 → 代码不是最新，先 pull，别急着改。
 

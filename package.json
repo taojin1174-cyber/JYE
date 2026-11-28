@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
+    "check": "node scripts/dev-check.mjs",
     "test": "node --import ./tests/setup-config.mjs --test tests/*.test.mjs",
     "build": "node scripts/build.mjs",
     "collect": "node scripts/collect.mjs",

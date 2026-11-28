@@ -107,3 +107,42 @@ test('顺企网：按件计价丢弃，手机号不入库', () => {
   assert.equal(rows[0].price_text, '7600.00元/吨');
   assert.doesNotMatch(JSON.stringify(rows), /15620376669/, '红线：页面上有手机号也不能读');
 });
+
+// 2026-11-28：可核价来源只覆盖四类禽肉时，线索量偏少；把牛羊肉与白条鸭一并抓，
+// 同时锁住配置，避免以后精简清单时又把这几页删掉。
+test('采集清单包含牛羊肉与白条鸭页，且顺企网仍带 Referer', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const raw = JSON.parse(await readFile(new URL('../collector/web-sources.json', import.meta.url), 'utf8'));
+  const items = Array.isArray(raw) ? raw : raw.sources;
+  const byId = new Map(items.map(s => [s.id, s]));
+
+  const cnhnb = byId.get('cnhnb');
+  assert.equal(cnhnb.kind, 'supply');
+  for (const path of ['erou', 'jirou', 'yarou', 'zhurou', 'niurou', 'yangrou']) {
+    assert.ok(cnhnb.listUrls.includes(`https://www.cnhnb.com/p/${path}/`), `惠农网应抓取 /p/${path}/`);
+  }
+
+  const qiye = byId.get('qiye11467');
+  assert.equal(qiye.kind, 'supply');
+  assert.equal(qiye.listUrls.length, 2, '顺企网应抓「冻白条鹅」与「白条鸭」两页');
+  assert.ok(qiye.listUrls.some(u => u.includes('-51b751bb767d67619e45')), '应保留冻白条鹅页');
+  assert.ok(qiye.listUrls.some(u => u.includes('-767d67619e2d')), '应包含白条鸭页');
+  assert.equal(qiye.headers?.Referer, 'https://b2b.11467.com/', '缺 Referer 会被 429');
+});
+
+test('顺企网列表页只留能折成元/kg 的报价，设备与服务类不计入', () => {
+  const block = ({ url, title, price, unit, company = '某某食品有限公司', region = '山东-临沂' }) => `
+<li><span class="plistimg"><a href="${url}"><img src="x.jpg"></a></span>
+<dl><dt><a href="${url}" target="_blank">${title}</a></dt>
+<dd>报价<em>￥<span>${price}</span></em>/${unit}</dd>
+<dd><a href="https://abc.11467.com">${company}</a><span class="weizhi">${region}</span></dd></dl></li>`;
+  const html = [
+    block({ url: 'https://product.11467.com/info/1.htm', title: '冷冻白条鸭 鸭副产品批发', price: '7,000.00', unit: '吨' }),
+    block({ url: 'https://product.11467.com/info/2.htm', title: '白条鸭分级分选机 流水线设备', price: '66,000.00', unit: '台' }),
+    block({ url: 'https://product.11467.com/info/3.htm', title: '白条鸭检测 肌苷酸检测服务', price: '128.00', unit: '件' }),
+  ].join('');
+  const rows = parseDiscovery(html, { ...source(), id: 'qiye11467', adapter: 'qiye11467' });
+  assert.equal(rows.length, 1, '只保留按吨计价的白条鸭货源');
+  assert.equal(rows[0].price_text, '7000.00元/吨');
+  assert.equal(rows[0].category, '鸭');
+});

@@ -13,9 +13,10 @@ const bodyOf = (src, name) => {
   return src.slice(a, b < 0 ? src.length : b);
 };
 
-test('前台四个页面不渲染来源、网址或渠道名', () => {
+test('总览（含并入的供货报价表）与审核页不渲染来源、网址或渠道名', () => {
   const app = read('../src/app.js');
-  for (const name of ['overview', 'recentRows', 'compare', 'review']) {
+  // 2026-11-28 采购比价并入总览后，渲染拆成筛选行 / 卡片 / 走势 / 报价表四块，逐块检查。
+  for (const name of ['overview', 'marketToolbar', 'categoryCards', 'chartPanel', 'quotePanel', 'recentRows', 'review']) {
     const body = bodyOf(app, name);
     assert.doesNotMatch(body, FORBIDDEN, `${name} 不应出现渠道名`);
     assert.doesNotMatch(body, /source_name|source_url|sourcePill|引擎采集|原始链接|查看原文/, `${name} 不应渲染来源字段`);

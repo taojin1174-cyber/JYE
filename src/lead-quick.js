@@ -9,11 +9,43 @@ const FROZEN = {
   '清远麻鸡': { id: 'frozen-qingyuan-ma-chicken', category: '鸡', name: '清远麻鸡' },
   '鸽子': { id: 'frozen-pigeon', category: '鸽', name: '鸽子' },
 };
+// 2026-11-28 用户反馈：采购比价里筛选「鹅」，产品名却显示「其他冻品」，而且鸭 / 鸡 / 牛的
+// 报价都被并进了同一条产品。根因是旧兜底把产品 id 写死成 'frozen-other'，品类只能由第一条
+// 入库报价锁定，后面别的品类全都复用这条记录。现在按品类解析成规范产品，兜底 id 带品类后缀，
+// 只在真的判断不出品类时才落到「其他冻品」。
+// 命名跟产品库现有习惯一致：禽类白条整只叫「白条X」，畜类叫「X肉」。
+const SPECIES_ORDER = ['鸽', '鹅', '鸭', '鸡', '猪', '羊', '牛'];
+const SPECIES_NAME = { 鸽: '鸽子', 鹅: '白条鹅', 鸭: '白条鸭', 鸡: '白条鸡', 猪: '猪肉', 羊: '羊肉', 牛: '牛肉' };
+const SPECIES_ID = { 鸽: 'frozen-pigeon', 鹅: 'frozen-white-goose', 鸭: 'frozen-white-duck', 鸡: 'frozen-white-chicken', 猪: 'frozen-white-pig', 羊: 'frozen-white-lamb', 牛: 'frozen-white-beef' };
+const speciesOf = text => SPECIES_ORDER.find(s => String(text || '').includes(s)) || '';
 const SPEC = '冻品 · 规格待核实';
 const pick = (details, key) => {
   const m = String(details || '').match(new RegExp(`${key}：([^；。]*)[；。]`));
   return m ? m[1].trim() : '';
 };
+
+// 把一条线索归到具体产品：先认预设的四个货源品类，再按品类（鹅 / 鸭 / 鸡 / 猪 / 羊 / 牛）
+// 归到规范产品；同类同鲜冻状态复用库里已有记录，避免同一个品类反复新建产品。
+function resolveProduct(lead, products, catLabel, state) {
+  const list = Array.isArray(products) ? products : [];
+  const known = FROZEN[catLabel];
+  if (known) return list.find(p => p.id === known.id) || { ...known, state, spec: SPEC };
+
+  // 原文「品类」字段最可信，其次才看标题与采集时的粗判；蛋 / 苗 / 活禽 / 毛禽不是白条胴体，
+  // 不往「白条X」上硬套，按原文品类单独记一条。
+  const head = catLabel || String(lead.title || '');
+  const species = /蛋|苗|活禽|毛(鸡|鸭|鹅)/.test(head) ? '' : speciesOf(head) || speciesOf(lead.title) || speciesOf(lead.category);
+  if (species) {
+    const name = SPECIES_NAME[species];
+    const same = list.find(p => p.category === species && p.name === name && p.state === state)
+      || list.find(p => p.id === SPECIES_ID[species] && p.state === state);
+    return same || { id: SPECIES_ID[species], category: species, name, state, spec: SPEC };
+  }
+
+  const label = String(catLabel || lead.category || '待分类').slice(0, 20);
+  const slug = label.replace(/[^\u4e00-\u9fa5A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'na';
+  return { id: `frozen-other-${slug}`, category: lead.category || label, name: label, state, spec: SPEC };
+}
 
 export function buildQuickQuote(lead, products, today = dayString()) {
   const details = String(lead.details || '');
@@ -24,11 +56,9 @@ export function buildQuickQuote(lead, products, today = dayString()) {
   const city = province ? region.slice(province.length) : region;
 
   const catLabel = pick(details, '品类').replace(/（[^）]*）$/, '');
-  const preset = FROZEN[catLabel] || { id: 'frozen-other', category: lead.category || '其他', name: '其他冻品' };
   const hint = pick(details, '鲜冻线索');
   const state = /鲜/.test(hint) && !/冻/.test(hint) ? '鲜品' : '冻品';
-  const draft = { category: preset.category, name: preset.name, state, spec: SPEC };
-  const product = products.find(p => p.id === preset.id) || { id: preset.id, ...draft };
+  const product = resolveProduct(lead, products, catLabel, state);
 
   const contact = pick(details, '联系人');
   const phone = pick(details, '电话').replace(/（.*$/, '');
@@ -48,7 +78,7 @@ export function buildQuickQuote(lead, products, today = dayString()) {
   const notes = [
     `产品：${lead.title || ''}；标价：${lead.price_text || '待核实'}；信息日期：${originalDate || '未注明'}（价格需向供货商复核）`,
     `地区：${region || '未注明'}；规格 / 单个重量：${specClue || '待核实'}；货量：${volume || '未注明'}（发布量，不是起订量）`,
-    `★ 系统补全（可修改）：产品规格按「${preset.category} / ${preset.name} / ${state} / 规格待核实」归类；计价口径暂按「${bases.factory}」记录，税运条件未注明；报价日按核实当天 ${quoted_on}，有效期由录入人现场选择 1 / 2 / 3 个月；起订量与运费待询。`,
+    `★ 系统补全（可修改）：产品规格按「${product.category} / ${product.name} / ${state} / 规格待核实」归类；计价口径暂按「${bases.factory}」记录，税运条件未注明；报价日按核实当天 ${quoted_on}，有效期由录入人现场选择 1 / 2 / 3 个月；起订量与运费待询。`,
   ].join('\n');
 
   const quote = {
@@ -77,7 +107,7 @@ export function buildQuickQuote(lead, products, today = dayString()) {
   if (!lead.url) reasons.push('缺少原文链接');
 
   const rows = [
-    { label: '产品 / 规格', value: `${preset.category} · ${preset.name} · ${state} · 规格待核实`, note: '按品类自动归类' },
+    { label: '产品 / 规格', value: `${product.category} · ${product.name} · ${state} · 规格待核实`, note: '按品类自动归类' },
     { label: '供货价', value: price ? `¥ ${price} / kg` : '待填写', note: `标价 ${lead.price_text || '待核实'}` },
     { label: '供应商', value: supplier, note: contact ? '供货方联系人' : '按产品名暂记' },
     { label: '地区', value: `${province}${city ? ' · ' + city : ''}`, note: '仓库所在地' },

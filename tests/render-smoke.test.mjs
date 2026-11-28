@@ -12,7 +12,7 @@ const DATA_KEY = config.localTrial ? 'hqt-trial-data-v2' : 'hqt-data-v2';
 const snapshot = JSON.parse(readFileSync(new URL('./fixtures/leads.json', import.meta.url), 'utf8'));
 
 // 最小 DOM 桩：只验证模块能完整启动、4 个 hash 页面都能渲染出正确结构。
-function stubDom(hash, { unlocked = true, data = snapshot, storage = {} } = {}) {
+function stubDom(hash, { unlocked = true, data = snapshot, storage = {}, discovery = null } = {}) {
   // 全站访问门：默认按「已解锁」启动，另有一条用例验证未解锁时只显示密码页。
   const memory = new Map([[`hqt-access:/:${accessLock.verifier.slice(0, 16)}`, 'unlocked'], ...Object.entries(storage)]);
   if (!unlocked) memory.clear();
@@ -29,7 +29,12 @@ function stubDom(hash, { unlocked = true, data = snapshot, storage = {} } = {}) 
   globalThis.location = { hash, pathname: '/', reload() {} };
   globalThis.localStorage = { getItem: k => memory.get(k) ?? null, setItem: (k, v) => memory.set(k, v), removeItem: k => memory.delete(k) };
   globalThis.sessionStorage = { getItem: k => session.get(k) ?? null, setItem: (k, v) => session.set(k, v), removeItem: k => session.delete(k) };
-  globalThis.fetch = async () => ({ ok: true, json: async () => data });
+  // 采集快照走 data/discovery.json，其余请求（云端表）走 data；两者结构不同，需要分开供给。
+  globalThis.fetch = async input => {
+    const url = typeof input === 'string' ? input : String(input?.href || input?.url || input);
+    if (discovery && url.includes('discovery.json')) return { ok: true, json: async () => discovery };
+    return { ok: true, json: async () => data };
+  };
   app.__click = dataset => {
     const target = { dataset, closest: sel => (sel === 'button,a' ? target : null) };
     for (const fn of clicks) fn({ target });
@@ -42,7 +47,8 @@ function stubDom(hash, { unlocked = true, data = snapshot, storage = {} } = {}) 
 }
 
 const cases = [
-  ['overview', ['参考范围', '产品参考均价', '导出数据', '录入报价']],
+  // 2026-11-28 采购比价并入总览：一页里既有筛选行、品类卡片、走势，也有原来的报价表。
+  ['overview', ['全部品类', '全部产品规格', '均价走势', '供货报价', '导出数据', '录入报价']],
   ['compare', ['供货报价', '全部产品规格']],
   ['review', ['待确认', '刷新记录']],
   ['settings/review', ['待确认', '刷新记录', '数据中心', '基础设置']],
@@ -110,6 +116,8 @@ test('已入库的线索不消失，改为沉到列表末尾并标注', async ()
   const storage = { [DATA_KEY]: JSON.stringify({ products: [], quotes: [], leads: [{ id: 'fixture-0003', status: 'converted' }] }) };
   const app = stubDom('#settings', { storage });
   await import('../src/app.js?route=lead-done-last');
+  // 默认只看「可核实入库」（2026-11-28），这里要连同行情 / 资讯一起看沉底位置，先切回全部处理方式。
+  app.__change({ filter: 'leadUse' }, '');
   const html = app.innerHTML;
   const body = html.slice(html.indexOf('<tbody>') + 7, html.indexOf('</tbody>'));
   const rows = body.split('<tr').filter(Boolean);
@@ -158,6 +166,7 @@ test('线索表可按标题、标价、地区与发布日期排序', async () =>
 test('线索表「标价原文」按折算后的元/kg 排序，按只计价的沉底', async () => {
   const app = stubDom('#settings');
   await import('../src/app.js?route=lead-sort-price');
+  app.__change({ filter: 'leadUse' }, ''); // 最低价的毛鸡来自行情线索，需先放开处理方式
   const rows = () => {
     const start = app.innerHTML.indexOf('<tbody>') + 7;
     return app.innerHTML.slice(start, app.innerHTML.indexOf('</tbody>')).split('<tr').filter(Boolean);
@@ -298,7 +307,7 @@ test('点击品类卡片打开可比均价：多规格逐行比较，不跨规�
   }) };
   const app = stubDom('#overview', { storage });
   await import('../src/app.js?route=comparable');
-  app.__click({ chart: 'goose-a' });
+  app.__click({ comparable: 'goose-a' });
   const html = globalThis.document.querySelector('#dialog').innerHTML;
   assert.match(html, /可比均价/, '应打开可比均价弹窗');
   assert.match(html, /3-4 斤\/只/, '第一个规格应单独成行');
@@ -311,7 +320,9 @@ test('点击品类卡片打开可比均价：多规格逐行比较，不跨规�
   assert.doesNotMatch(html, /23\.00/, '不得把不同重量合并成一个均价');
 });
 
-test('总览默认只显示鹅、鸡、鸭，其余品类收进标签；均价走势排在产品参考均价之前', async () => {
+test('总览：卡片只出鹅鸡鸭三类，顺序为筛选 → 卡片 → 走势 → 报价表，产品参考均价已移除', async () => {
+  const today = dayString();
+  const base = { basis: 'factory', source: 'manual', source_name: '', source_url: '', min_order: '', freight: null, status: 'approved', city: '', created_at: '2020-03-01T00:00:00Z' };
   const storage = { [DATA_KEY]: JSON.stringify({
     products: [
       { id: 'goose', category: '鹅', name: '白条鹅', state: '冻品', spec: '3-4 斤/只' },
@@ -320,45 +331,43 @@ test('总览默认只显示鹅、鸡、鸭，其余品类收进标签；均价�
       { id: 'lamb', category: '羊', name: '羊肉', state: '鲜品', spec: '胴体' },
       { id: 'egg', category: '蛋品', name: '鲜鸡蛋', state: '鲜品', spec: '30 斤/箱' },
     ],
-    quotes: [],
+    quotes: [
+      { ...base, id: 'l1', product_id: 'lamb', supplier: '甲', province: '内蒙古', price: 52, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+      { ...base, id: 'e1', product_id: 'egg', supplier: '乙', province: '河北', price: 9, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+    ],
   }) };
   const app = stubDom('#overview', { storage });
-  await import('../src/app.js?route=overview-core');
+  await import('../src/app.js?route=overview-merged');
   const html = app.innerHTML;
 
-  // 走势在参考均价之前
-  const chartAt = html.indexOf('均价走势');
-  const panelAt = html.indexOf('产品参考均价');
-  assert.ok(chartAt > 0 && panelAt > 0, '两个板块都应存在');
-  assert.ok(chartAt < panelAt, '均价走势应排在产品参考均价之前');
+  assert.doesNotMatch(html, /产品参考均价/, '产品参考均价汇总表已按用户要求移除');
+
+  const toolbarAt = html.indexOf('class="filter-panel market-toolbar"');
   const cardsAt = html.indexOf('<div class="cards">');
-  assert.ok(chartAt < cardsAt && cardsAt < panelAt, '顺序应为：筛选 → 均价走势 → 品类卡片 → 产品参考均价');
+  const chartAt = html.indexOf('class="panel chart-panel"');
+  const tableAt = html.indexOf('class="panel market-results"');
+  assert.ok(toolbarAt >= 0 && cardsAt > toolbarAt, '筛选行在最上，品类卡片紧随其后');
+  assert.ok(chartAt > cardsAt, '走势排在卡片之后');
+  assert.ok(tableAt > chartAt, '报价表排在走势之后');
 
   // 卡片区只放主力三类
-  const cards = html.slice(html.indexOf('<div class="cards">'), panelAt);
+  const cards = html.slice(cardsAt, chartAt);
   assert.match(cards, /白条鹅/);
   assert.match(cards, /清远鸡/);
   assert.match(cards, /白条鸭/);
   assert.doesNotMatch(cards, /羊肉/, '羊默认不进卡片');
   assert.doesNotMatch(cards, /鲜鸡蛋/, '蛋品默认不进卡片');
 
-  // 表格默认也只列主力三类
-  const table = html.slice(panelAt);
-  assert.doesNotMatch(table, /羊肉/, '羊默认不进明细表');
-  assert.doesNotMatch(table, /鲜鸡蛋/, '蛋品默认不进明细表');
+  // 报价表默认跟随筛选行的「全部品类」，与控件一致
+  const table = html.slice(tableAt);
+  assert.match(table, /羊肉/, '筛选为全部品类时，羊的报价应出现在明细里');
+  assert.match(table, /鲜鸡蛋/, '筛选为全部品类时，蛋品的报价也应出现');
 
-  // 标签：常用 / 全部 / 其余品类各一个，主力三类不再重复占位
-  assert.match(html, /data-category=""[^>]*>常用</);
-  assert.match(html, /data-category="\*"[^>]*>全部</);
-  assert.match(html, /data-category="羊"[^>]*>羊</);
-  assert.doesNotMatch(html, /data-category="鸡"/, '鸡属于常用三品类，不再单独成标签');
-
-  // 点「羊」能看到羊；点「全部」能看到所有品类
-  app.__click({ category: '羊' });
-  assert.match(app.innerHTML, /羊肉/, '选中羊后应显示羊的规格');
-  app.__click({ category: '*' });
-  assert.match(app.innerHTML, /羊肉/, '全部视图应包含羊');
-  assert.match(app.innerHTML, /鲜鸡蛋/, '全部视图应包含蛋品');
+  // 点卡片 = 品类与规格一起切过去，走势和报价表同步
+  app.__click({ pick: 'lamb' });
+  assert.match(app.innerHTML, /value="lamb" selected/, '点卡片应把筛选行的产品规格切过去');
+  assert.match(app.innerHTML, /value="羊" selected/, '品类下拉也应跟着切换');
+  assert.doesNotMatch(app.innerHTML, /鲜鸡蛋/, '切到羊之后报价表只剩羊');
 });
 
 test('选中不展示卡片的品类时不输出空卡片容器，避免留出空白块', async () => {
@@ -372,9 +381,8 @@ test('选中不展示卡片的品类时不输出空卡片容器，避免留出�
   const app = stubDom('#overview', { storage });
   await import('../src/app.js?route=empty-cards');
   assert.match(app.innerHTML, /<div class="cards">/, '默认视图应有卡片容器');
-  app.__click({ category: '猪' });
+  app.__change({ filter: 'category' }, '猪');
   assert.doesNotMatch(app.innerHTML, /<div class="cards">/, '猪不出卡片，不应留空容器');
-  assert.match(app.innerHTML, /白条猪/, '猪的规格仍应出现在明细表');
 });
 
 test('数据中心：筛选组排在最左，标题与类型切换在其后', async () => {
@@ -393,34 +401,44 @@ test('数据中心：筛选组排在最左，标题与类型切换在其后', as
   assert.ok(filtersAt < titleAt, '筛选组应在标题之前（放最左边）');
   assert.ok(titleAt < kindAt, '标题应在类型切换之前');
 
-  // 四个筛选项都要在筛选组里，顺序保持原样
+  // 五个筛选项都要在筛选组里，顺序保持原样（2026-11-28 起「来源」排在最左）
   const filters = head.slice(filtersAt, titleAt);
-  const order = ['全部品类', '全部处理方式', '近 30 天'].map((t) => filters.indexOf(t));
-  assert.ok(order.every((i) => i >= 0), '三个下拉都应保留');
+  const order = ['全部来源', '全部品类', '全部处理方式', '近 30 天'].map((t) => filters.indexOf(t));
+  assert.ok(order.every((i) => i >= 0), '四个下拉都应保留');
   assert.deepEqual(order, [...order].sort((a, b) => a - b), '筛选顺序应保持不变');
 });
 
-test('总览 CSV 与常用、全部和单品类表格范围一致，零报价规格仍可导出', async () => {
- const app=stubDom('#overview');
- await import('../src/app.js?route=export-category-regression');
- const createObjectURL=URL.createObjectURL;
- const revokeObjectURL=URL.revokeObjectURL;
- let captured;
- URL.createObjectURL=blob=>{captured=blob;return 'blob:qa-export';};
- URL.revokeObjectURL=()=>{};
- document.createElement=()=>({click(){}});
- try{
-  for(const [category,allowed] of [['',['鹅','鸡','鸭']],['*',['猪','鸡','鸭','鹅','羊']],['猪',['猪']]]){
-   app.__click({category});
-   const tableHtml=app.innerHTML.slice(app.innerHTML.indexOf('<h2>产品参考均价'));
-   const expected=(tableHtml.match(/data-compare="/g)||[]).length;
-   app.__click({action:'export'});
-   const lines=(await captured.text()).trim().split('\r\n');
-   assert.equal(lines.length-1,expected,category||'常用');
-   for(const line of lines.slice(1))assert.ok(allowed.includes(line.match(/^"([^"]+)"/)[1]),line);
-   assert.ok(expected>0,'零报价产品也应显示及导出');
-  }
- }finally{URL.createObjectURL=createObjectURL;URL.revokeObjectURL=revokeObjectURL;}
+test('总览导出就是当前筛选的供货明细，不受分页限制', async () => {
+  const today = dayString();
+  const base = { basis: 'factory', source: 'manual', source_name: '', source_url: '', min_order: '', freight: null, status: 'approved', city: '', created_at: '2020-03-01T00:00:00Z' };
+  const saved = {
+    products: [
+      { id: 'lamb', category: '羊', name: '羊肉', state: '鲜品', spec: '胴体' },
+      { id: 'egg', category: '蛋品', name: '鲜鸡蛋', state: '鲜品', spec: '30 斤/箱' },
+    ],
+    quotes: [
+      { ...base, id: 'l1', product_id: 'lamb', supplier: '甲', province: '内蒙古', price: 52, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+      { ...base, id: 'e1', product_id: 'egg', supplier: '乙', province: '河北', price: 9, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+    ],
+  };
+  const app = stubDom('#overview', { storage: { [DATA_KEY]: JSON.stringify(saved) } });
+  await import('../src/app.js?route=export-scope');
+  const createObjectURL = URL.createObjectURL;
+  const revokeObjectURL = URL.revokeObjectURL;
+  const createElement = document.createElement;
+  let captured;
+  URL.createObjectURL = blob => { captured = blob; return 'blob:qa-export'; };
+  URL.revokeObjectURL = () => {};
+  document.createElement = () => ({ click() {} });
+  const read = async () => { app.__click({ action: 'export' }); return (await captured.text()).trim().split('\r\n'); };
+  try {
+    let lines = await read();
+    assert.equal(lines.length, 3, '默认应导出两条明细 + 表头');
+    app.__change({ filter: 'category' }, '羊');
+    lines = await read();
+    assert.equal(lines.length, 2, '选羊后只导出羊的报价');
+    assert.match(lines[1], /^"羊"/);
+  } finally { URL.createObjectURL = createObjectURL; URL.revokeObjectURL = revokeObjectURL; document.createElement = createElement; }
 });
 
 test('线索品类包含产品档案与采集到的扩展物种', async () => {
@@ -446,7 +464,7 @@ test('总览对待核实规格显示原因，不能把两条未知规格报价�
  const app=stubDom('#overview',{storage:{[DATA_KEY]:JSON.stringify(saved)}});
  await import('../src/app.js?route=unknown-spec-averages');
  assert.doesNotMatch(app.innerHTML,/>9\.55</,'未知规格不能显示混合均价');
- assert.match(app.innerHTML,/规格待核实，暂不统计/);
+ assert.match(app.innerHTML,/不计入均价/,'规格已写待核实时，第二行只说结果，不重复一遍原因');
  saved.quotes[0].notes='联系手机：13800000000';
  const compare=stubDom('#compare',{storage:{[DATA_KEY]:JSON.stringify(saved)}});
  await import('../src/app.js?route=unknown-spec-comparison');
@@ -454,7 +472,7 @@ test('总览对待核实规格显示原因，不能把两条未知规格报价�
  assert.match(compare.innerHTML,/<th>联系方式<\/th>/);
  assert.match(compare.innerHTML,/href="tel:13800000000"/);
  assert.match(compare.innerHTML,/验收供应商1/);
- assert.match(compare.innerHTML,/规格待核实，暂不统计/);
+ assert.match(compare.innerHTML,/不计入均价/);
  compare.__change({filter:'product'},'unknown-goose');
  assert.doesNotMatch(compare.innerHTML,/>9\.55</,'单选待核实规格也不能计算均价');
 });
@@ -474,7 +492,7 @@ test('均价走势默认落在最近 7 天真有样本的产品上，不落在�
  };
  const app = stubDom('#overview', { storage: { [DATA_KEY]: JSON.stringify(saved) } });
  await import('../src/app.js?route=chart-default-with-sample');
- assert.match(app.innerHTML, /value="goose-has" selected/, '默认应选中真有样本的产品，而不是列表第一个');
+ assert.match(app.innerHTML, /均价走势 <small>白条鹅 · 冻品/, '默认应落在真有样本的产品上，而不是列表第一个');
  assert.match(app.innerHTML, /<svg class="chart"/, '有样本时应画出走势图');
  assert.doesNotMatch(app.innerHTML, /最近 7 天没有可用样本/);
 });
@@ -515,9 +533,67 @@ test('手动选到没有样本的产品时，空图给出可一键切换到有�
  };
  const app = stubDom('#overview', { storage: { [DATA_KEY]: JSON.stringify(saved) } });
  await import('../src/app.js?route=chart-empty-switch');
- assert.match(app.innerHTML, /value="goose-live" selected/, '首次进入应自动落在有样本的产品上');
- app.__change({ filter: 'chartProduct' }, 'goose-old');
+ assert.match(app.innerHTML, /均价走势 <small>白条鹅 · 鲜品/, '首次进入应自动落在有样本的产品上');
+ app.__change({ filter: 'product' }, 'goose-old');
  assert.match(app.innerHTML, /最近 7 天没有可用样本/, '手动选到空产品应给出解释');
  assert.match(app.innerHTML, /最近一次入库是/);
- assert.match(app.innerHTML, /data-chart-pick="goose-live"/, '应给出有样本产品的一键切换入口');
+ assert.match(app.innerHTML, /data-pick="goose-live"/, '应给出有样本产品的一键切换入口');
+});
+
+// 2026-11-28 用户反馈「只是找到了肉交所的数据」：惠农网 108 条、顺企网 6 条其实早已在库里，
+// 但肉交所一家占了九成且都有发布日期，其余来源被挤到几十页之后。来源筛选就是解决这个。
+test('线索可按来源筛选，肉交所的多个子源合并成一条', async () => {
+  const base = { kind: 'supply', status: 'pending', fetched_at: '2026-11-27T00:00:00Z', published_on: null, url: 'https://example.com/x', region_text: '郑州', details: '' };
+  const discovery = {
+    fetched_at: '2026-11-27T21:09:54Z',
+    runs: [],
+    items: [
+      { ...base, id: 'a1', source_id: 'roujiaosuo', source_name: '肉交所', title: '肉交所白条鹅甲', price_text: '11.00元/公斤' },
+      { ...base, id: 'a2', source_id: 'roujiaosuo_cats', source_name: '肉交所·四品类', title: '肉交所白条鹅乙', price_text: '11.20元/公斤' },
+      { ...base, id: 'b1', source_id: 'cnhnb', source_name: '惠农网', title: '惠农白条鹅', price_text: '8.21元/斤' },
+      { ...base, id: 'c1', source_id: 'qiye11467', source_name: '顺企网', title: '顺企白条鹅', price_text: '9800.00元/吨' },
+    ],
+  };
+  const app = stubDom('#settings', { discovery });
+  await import('../src/app.js?route=lead-source-filter');
+
+  assert.match(app.innerHTML, /data-filter="leadSource"/, '线索筛选组里应有来源下拉');
+  assert.match(app.innerHTML, /肉交所（2）/, '肉交所的两个子源应合并计数');
+  assert.match(app.innerHTML, /惠农网（1）/);
+  assert.match(app.innerHTML, /顺企网（1）/);
+
+  const rows = () => app.innerHTML.slice(app.innerHTML.indexOf('<tbody>') + 7, app.innerHTML.indexOf('</tbody>'));
+  app.__change({ filter: 'leadSource' }, 'cnhnb');
+  assert.match(rows(), /惠农白条鹅/, '切到惠农网后应只剩惠农网的线索');
+  assert.doesNotMatch(rows(), /肉交所白条鹅/, '其他来源的线索不应再出现');
+  assert.doesNotMatch(rows(), /顺企白条鹅/);
+});
+
+// 2026-11-28 用户要求：打开「自动采集线索」默认就看能核价的那批，不用每次先切一次筛选。
+test('数据中心默认只列「可核实入库」的线索，行情与资讯需手动切回', async () => {
+  const app = stubDom('#settings');
+  await import('../src/app.js?route=lead-use-default');
+  const rows = () => app.innerHTML.slice(app.innerHTML.indexOf('<tbody>') + 7, app.innerHTML.indexOf('</tbody>'));
+
+  assert.match(app.innerHTML, /<option value="convertible" selected>可核实入库/, '处理方式下拉应默认选中「可核实入库」');
+  assert.match(rows(), /白条鹅（净膛）/, '供货线索应照常列出');
+  assert.doesNotMatch(rows(), /全国肉鸡/, '默认不列行情均价');
+  assert.doesNotMatch(rows(), /畜产品价格监测周报/, '默认不列行业资讯');
+  assert.equal(rows().split('<tr').length - 1, 8, '快照里的 8 条供货线索应全部可见');
+
+  // 主动切到不能核价的类型时，默认的处理方式不能把结果清空
+  app.__click({ leadKind: 'market' });
+  assert.match(rows(), /全国肉鸡/, '点「行情均价」应真能看到行情线索，而不是被处理方式筛成空表');
+
+  app.__click({ leadKind: '' });
+  app.__change({ filter: 'leadUse' }, '');
+  assert.match(rows(), /畜产品价格监测周报/, '把处理方式改成全部后，资讯也应出现');
+});
+
+test('默认筛选下空表时给出改回「全部处理方式」的提示，而不是只说没有线索', async () => {
+  const base = { kind: 'market', status: 'pending', fetched_at: '2026-11-27T00:00:00Z', published_on: null, url: 'https://example.com/m', region_text: '全国', details: '', price_text: '见原文' };
+  const discovery = { fetched_at: '2026-11-27T00:00:00Z', runs: [], items: [{ ...base, id: 'm1', source_id: 'roujiaosuo', source_name: '肉交所', title: '全国毛鸡参考价' }] };
+  const app = stubDom('#settings', { discovery });
+  await import('../src/app.js?route=lead-use-empty');
+  assert.match(app.innerHTML, /当前只看「可核实入库」/, '空表时应告诉用户可以改回全部处理方式');
 });

@@ -20,7 +20,7 @@ const icon = (name,size=16) => `<svg width="${size}" height="${size}" viewBox="0
 const esc = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const app = document.querySelector('#app');
 const dialog = document.querySelector('#dialog');
-const state={page:location.hash.slice(1)||'overview',days:7,basis:'factory',category:'',province:'',product:'',source:'',search:'',sort:'price',sortDir:'asc',reviewStatus:'pending',chartProduct:'',pageNumber:1,sourceKind:'',leadKind:'',leadCategory:'',leadUse:'',leadSort:'date_desc',leadRange:30};
+const state={page:location.hash.slice(1)||'overview',days:7,basis:'factory',category:'',province:'',product:'',source:'',search:'',sort:'price',sortDir:'asc',reviewStatus:'pending',pageNumber:1,sourceKind:'',leadKind:'',leadCategory:'',leadUse:'convertible',leadSource:'',leadSort:'date_desc',leadRange:30};
 let data={products:[],quotes:[],leads:[]};
 let busy=false;
 let sessionStore;
@@ -29,8 +29,9 @@ const settingsAccess = createSettingsAccess(sessionStore, location.pathname);
 state.settingsView = 'sources';
 function readRoute() {
  const route = location.hash.slice(1) || 'overview';
- // 报价审核已并入数据设置（2026-11-18）；旧的 #review 链接自动落到「数据设置 → 报价审核」。
- state.page = ['sources','settings','settings/sources','settings/general','settings/review','review'].includes(route) ? 'settings' : route;
+ // 报价审核已并入数据设置（2026-11-18）；采购比价已并入行情总览（2026-11-28）。
+ // 旧的 #review / #compare 链接自动落到新位置，不留在导航里。
+ state.page = ['sources','settings','settings/sources','settings/general','settings/review','review'].includes(route) ? 'settings' : route === 'compare' ? 'overview' : route;
  if(state.page === 'settings') state.settingsView = route === 'settings/general' ? 'general' : (route === 'settings/review' || route === 'review') ? 'review' : 'sources';
 }
 readRoute();
@@ -43,16 +44,21 @@ const visibleProducts=()=>data.products.filter(p=>!excludedCats().has(p.category
 const categories=()=>[...new Set([...['猪','鸡','鸭','鹅','羊'].filter(c=>!excludedCats().has(c)),...visibleProducts().map(p=>p.category)])];
 // 总览默认只看主力三类。2026-11-18 用户要求：产品参考均价默认只显示鹅、鸡、鸭，其余品类收起。
 const CORE_CATS=['鹅','鸡','鸭'];
-const overviewProducts=()=>visibleProducts().filter(p=>state.category==='*'||(state.category?p.category===state.category:CORE_CATS.includes(p.category)));
 const leadCategories=()=>[...new Set([...categories(),'牛',...(data.leads||[]).map(l=>l.category).filter(Boolean)])].filter(c=>!excludedCats().has(c));
 const productOptions=current=>{const list=visibleProducts();const cur=product(current);if(cur&&!list.includes(cur))list.unshift(cur);return list;};
 const quoteVisible=q=>!excludedCats().has(product(q.product_id)?.category);
 const HANDLED_LEADS=new Set(['converted','dismissed','deleted']);
 // 处理方式筛选：只有供货线索能「核实入库」，行情 / 周报只能作参考。与来源类型是两个维度，可叠加。
-const matchesLeadUse=l=>!state.leadUse||(state.leadUse==='convertible'?l.kind==='supply':l.kind!=='supply');
+// 2026-11-28 起默认只看「可核实入库」——打开数据中心就是为了核价，不该先被行情资讯冲满屏。
+// 但用户主动切到某个不能核价的类型（行情均价 / 行业资讯）时，再套这条默认只会得到空表，
+// 此时按「全部处理方式」处理，避免两个筛选互相抵消。传入 kind 是为了让类型按钮上的数字
+// 按「点下去真能看到几条」来算，否则会出现按钮显示 0、点开却有一堆的情况。
+const leadUseOk=(l,kind=state.leadKind)=>!state.leadUse||(kind&&kind!=='supply')||(state.leadUse==='convertible'?l.kind==='supply':l.kind!=='supply');
+const matchesLeadUse=l=>leadUseOk(l);
 const options=(values,current,first)=>`${first!==undefined?`<option value="">${esc(first)}</option>`:''}${values.map(v=>{const [value,label]=Array.isArray(v)?v:[v,v];return `<option value="${esc(value)}" ${current===value?'selected':''}>${esc(label)}</option>`;}).join('')}`;
 const productLabel=p=>p?`${p.name} / ${p.state} / ${p.spec}`:'产品已移除';
-const productCell=p=>p?`<div class="product-name">${esc(p.name)}<span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="product-spec">${esc(p.spec)}</div>${hasComparableSpec(p)?'':'<div class="product-spec">规格待核实，暂不统计</div>'}`:'未知产品';
+// 规格本身就写着「待核实」时不再补一行同样的说明，避免同一个意思出现两次。
+const productCell=p=>p?`<div class="product-name">${esc(p.name)}<span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="product-spec">${esc(p.spec)}</div>${hasComparableSpec(p)?'':`<div class="product-spec">${/待核实/.test(p.spec||'')?'不计入均价':'规格待核实，暂不统计'}</div>`}`:'未知产品';
 const queryOptions=(id,extra={})=>({days:state.days,basis:state.basis,province:state.province,productId:id,products:data.products,...extra});
 const stats=id=>summarize(latestQuotes(data.quotes,queryOptions(id)));
 // 来源 / 网址 / 采集痕迹一律只在「数据设置」输入密码解锁后出现。
@@ -68,21 +74,16 @@ const basisSelect=()=>`<select aria-label="计价口径" data-filter="basis">${o
 const provinceSelect=()=>`<select aria-label="地区" data-filter="province">${options(provinces,state.province,'全国地区')}</select>`;
 // 品类筛选：常用（鹅 / 鸡 / 鸭）为默认，全部放在其次，其余每个品类各一个标签，
 // 避免把蛋品、豆制品等低频品类平铺在默认视图里。
-const categoryTabs=()=>{
- const rest=categories().filter(c=>!CORE_CATS.includes(c));
- const tabs=[['','常用'],['*','全部'],...rest.map(c=>[c,c])];
- return `<div class="segmented" aria-label="品类筛选">${tabs.map(([value,label])=>`<button data-category="${esc(value)}" class="${state.category===value?'active':''}" aria-pressed="${state.category===value}">${esc(label)}</button>`).join('')}</div>`;
-};
 function changeValue(values) { Object.assign(state,values,{pageNumber:1}); render(); }
 
-// 主导航只留三页：报价审核收进「数据设置」，待审数量以角标提示，避免顶部拥挤。
+// 主导航只留两页（2026-11-28）：采购比价并入行情总览，报价审核收进「数据设置」。
 function header() {
  const pending=data.quotes.filter(q=>q.status==='pending').length;
- return `<header class="topbar"><a href="#overview" class="brand" aria-label="行情跳动首页"><img src="./favicon.svg" alt=""><div><strong>行情跳动</strong></div></a><nav class="nav" aria-label="主导航">${[['overview','行情总览'],['compare','采购比价'],['settings','数据设置']].map(([id,label])=>`<button data-page="${id}" class="${state.page===id?'active':''}">${label}${id==='settings'&&pending?`<span class="count">${pending}</span>`:''}</button>`).join('')}</nav><div class="top-actions"><span class="mode">${store.cloud?'团队工作台':'正式版'}</span><button class="avatar" data-action="account" aria-label="账户信息">${admin()?'管':store.role==='editor'?'编':'览'}</button></div></header>`;
+ return `<header class="topbar"><a href="#overview" class="brand" aria-label="行情跳动首页"><img src="./favicon.svg" alt=""><div><strong>行情跳动</strong></div></a><nav class="nav" aria-label="主导航">${[['overview','行情总览'],['settings','数据设置']].map(([id,label])=>`<button data-page="${id}" class="${state.page===id?'active':''}">${label}${id==='settings'&&pending?`<span class="count">${pending}</span>`:''}</button>`).join('')}</nav><div class="top-actions"><span class="mode">${store.cloud?'团队工作台':'正式版'}</span><button class="avatar" data-action="account" aria-label="账户信息">${admin()?'管':store.role==='editor'?'编':'览'}</button></div></header>`;
 }
 function render() {
- if(!['overview','compare','settings'].includes(state.page)) state.page='overview';
- app.innerHTML=header()+`<main class="shell">${({overview:overview,compare:compare,settings:settings}[state.page])()}<footer class="footer"><span><i class="dot"></i>行情跳动 · 让每一笔采购有据可依</span><span>样本参考均价，以实际询价及成交条件为准 ${icon('shield',12)}</span></footer></main>`;
+ if(!['overview','settings'].includes(state.page)) state.page='overview';
+ app.innerHTML=header()+`<main class="shell">${({overview:overview,settings:settings}[state.page])()}<footer class="footer"><span><i class="dot"></i>行情跳动 · 让每一笔采购有据可依</span><span>样本参考均价，以实际询价及成交条件为准 ${icon('shield',12)}</span></footer></main>`;
 }
 // 导航已标明页面名称，正文不再重复大标题；操作按钮与左侧筛选同排，右端对齐。
 function pageActionButtons() {
@@ -104,35 +105,44 @@ function validNote(id) {
   return `<div class="card-valid expired">当前范围无报价 · 有效至 ${until.slice(5)}</div>`;
  return `<div class="card-valid${remain<=7?' soon':''}">有效至 ${until.slice(5)} · 剩 ${remain} 天</div>`;
 }
-function overview() {
- const cat=state.category;
- // 默认（cat 为空）只列主力三类鹅 / 鸡 / 鸭；cat 为 '*' 表示「全部」；否则为某个具体品类。
- const visible=overviewProducts();
- // 品类卡片：总览不展示猪（2026-11-12 用户要求）；其余品类取「已入库样本最多」的规格，
- // 保证卡片显示的是你实际在询价、入库最多的那个规格，而不是产品库里的排序第一个。
- const CARD_HIDDEN=new Set(['猪']);
- const cardCats=cat==='*'?categories():cat?[cat]:CORE_CATS;
- const representatives=cardCats.filter(c=>!CARD_HIDDEN.has(c)).map(c=>{
-  const list=visibleProducts().filter(p=>p.category===c);
-  if(!list.length)return null;
-  return list.map(p=>({p,count:stats(p.id).count})).sort((a,b)=>b.count-a.count)[0].p;
- }).filter(Boolean);
- const rows=visible.map(p=> {
-   const s=stats(p.id); const points=trend(data.quotes,queryOptions(p.id));
-   const latest=latestQuotes(data.quotes,queryOptions(p.id)).map(q=>q.quoted_on).sort().at(-1);
-   return `<tr><td>${productCell(p)}</td><td class="number">${money(s.average)}</td><td class="number green">${money(s.min)}</td><td class="range">${s.count?`${money(s.min)} – ${money(s.max)}`:'—'}</td><td>${s.count}<span class="subtle"> 条 / ${s.provinceCount} 省</span>${s.count&&s.sparse?'<div class="subtle">样本较少</div>':''}</td><td>${spark(points.map(v=>v.average))}</td><td class="subtle">${latest?.slice(5)||'暂无'}</td><td><button class="row-action" data-compare="${esc(p.id)}">去比价 ${icon('arrow',13)}</button></td></tr>`;
- }).join('');
- return `<div class="filters"><span class="label">参考范围</span>${periodSelect()}${provinceSelect()}${basisSelect()}<span class="date-note">${icon('clock',13)} 北京时间 ${dayString().replaceAll('-','.')} · 元 / kg</span><div class="page-bar-actions">${pageActionButtons()}</div></div><div class="bottom-grid single chart-top">${chartPanel()}</div>${representatives.length?`<div class="cards">${representatives.map(p=>{
- const s=stats(p.id);return `<button class="price-card ${state.chartProduct===p.id?'selected':''}" data-chart="${esc(p.id)}" title="只统计你已入库且未过期的报价，同供应商取最新一条后等权平均"><div class="card-head"><span><span class="category-dot">${esc(p.category)}</span>${esc(p.name)}</span><span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="card-sub">${esc(p.spec)}</div><div class="card-price"><strong>${money(s.average)}</strong>${s.average==null?'':'<span>元 / kg</span>'}</div><div class="card-bottom">${deltaFor(p.id)}<span>${s.count} 条已入库</span></div>${validNote(p.id)}</button>`;
- }).join('')}</div>`:''}<section class="panel"><div class="panel-head"><h2>产品参考均价 <small>独立规格，独立统计</small></h2>${categoryTabs()}</div>${data.quotes.some(q=>q.status==='approved')?'':`<div class="review-intro">${icon('info',14)} 还没有已入库的供货报价，产品均价暂为空。录入一条报价后，这里才会出现供货均价。</div>`}<div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>样本均价</th><th>最低供货价</th><th>价格区间</th><th>有效样本 / 覆盖</th><th>7 日均价走势</th><th>最新报价</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="empty">暂无产品，请在数据与设置中添加</td></tr>'}</tbody></table></div><div class="table-foot"><span>${icon('info',12)} ${esc(bases[state.basis])} · 同供应商、同省、同规格保留最新有效报价；均价按供应商等权计算。</span><span>${state.province?'区域样本':'全国采样'} · 非官方全国统计均价</span></div></section>`;
+// 2026-11-28 用户要求：删掉「产品参考均价」汇总表，把「采购比价」并入行情总览。
+// 一页完成「看品类价 → 挑规格 → 比供货价」；筛选只留一份，不再两页各一套控件。
+function marketToolbar() {
+ const list = visibleProducts().filter(p => !state.category || p.category === state.category);
+ return `<div class="filter-panel market-toolbar"><div class="filters market-filters"><select aria-label="品类" data-filter="category">${options(categories(),state.category,'全部品类')}</select><select aria-label="产品规格" data-filter="product">${options(list.map(p=>[p.id,productLabel(p)]),state.product,'全部产品规格')}</select>${provinceSelect()}${periodSelect()}${basisSelect()}<label class="search">${icon('search',15)}<input aria-label="搜索供应商或地区" placeholder="搜索供应商、地区…" value="${esc(state.search)}" id="search"></label><div class="page-bar-actions"><button class="text-btn" data-action="reset-filters">重置</button>${pageActionButtons()}</div></div></div>`;
 }
-function spark(values) {
- const valid=values.filter(v=>v!=null); if(valid.length<2) return '<span class="subtle">暂无走势</span>';
- const min=Math.min(...valid)-.05, range=Math.max(...valid)-min+.05;
- let segments=[],current=[];
- values.forEach((v,i)=>{ if(v==null){if(current.length) segments.push(current); current=[];}else current.push(`${4+i*86/(values.length-1)},${23-(v-min)/range*19}`); });
- if(current.length) segments.push(current);
- return `<svg class="spark" viewBox="0 0 94 27" role="img" aria-label="最近七日样本均价走势"><title>${values.map(v=>money(v)).join('，')}</title>${segments.map(s=>`<polyline points="${s.join(' ')}" fill="none" stroke="#74a78b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`;
+// 品类卡片既是概览也是入口：点一下就把品类 / 规格、走势和下面的报价表一起切过去，
+// 原来表格里的「去比价」按钮和两页之间的跳转都不再需要。
+function categoryCards() {
+ const CARD_HIDDEN = new Set(['猪']);
+ const cardCats = state.category === '*' ? categories() : state.category ? [state.category] : CORE_CATS;
+ const representatives = cardCats.filter(c => !CARD_HIDDEN.has(c)).map(c => {
+  const list = visibleProducts().filter(p => p.category === c);
+  if (!list.length) return null;
+  return list.map(p => ({ p, count: stats(p.id).count })).sort((a, b) => b.count - a.count || (a.p.id < b.p.id ? -1 : 1))[0].p;
+ }).filter(Boolean);
+ if (!representatives.length) return '';
+ return `<div class="cards">${representatives.map(p => {
+  const s = stats(p.id);
+  return `<button class="price-card ${state.product === p.id ? 'selected' : ''}" data-pick="${esc(p.id)}" aria-pressed="${state.product === p.id}" title="只看这个规格：走势和下方报价表一起切换"><div class="card-head"><span><span class="category-dot">${esc(p.category)}</span>${esc(p.name)}</span><span class="tag ${p.state==='鲜品'?'fresh':'frozen'}">${esc(p.state)}</span></div><div class="card-sub">${esc(p.spec)}</div><div class="card-price"><strong>${money(s.average)}</strong>${s.average==null?'':'<span>元 / kg</span>'}</div><div class="card-bottom">${deltaFor(p.id)}<span>${s.count} 条已入库</span></div>${validNote(p.id)}</button>`;
+ }).join('')}</div>`;
+}
+// 统计条只在选中了具体规格时出现：不同规格不能合成一个均价，没选规格就不给汇总数字。
+function summaryStrip(s) {
+ return `<div class="summary-strip">${[['样本均价',money(s.average),'元/kg'],['最低供货价',money(s.min),'元/kg'],['中位价格',money(s.median),'元/kg'],['有效供应商样本',s.count,'个'],['覆盖省份',s.provinceCount,'省']].map(([label,val,unit])=>`<div class="summary-item"><p>${label}</p><strong>${val}</strong><small>${unit}</small></div>`).join('')}</div>`;
+}
+function quotePanel(rows, p, s) {
+ const pageSize = 20; const total = Math.max(1, Math.ceil(rows.length / pageSize));
+ state.pageNumber = Math.min(state.pageNumber, total);
+ const pageRows = rows.slice((state.pageNumber - 1) * pageSize, state.pageNumber * pageSize);
+ return `<section class="panel market-results"><div class="panel-head"><h2>供货报价 <span class="compare-count">${rows.length} 条${s?.sparse?' · 样本较少':''}</span></h2><select aria-label="排序方式" data-filter="sort">${options([['price','供货价：'+(state.sortDir==='desc'?'从高到低':'从低到高')],['date','报价日：从新到旧']],state.sort)}</select></div><div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>供应商 / 地区</th><th aria-sort="${state.sort!=='price'?'none':state.sortDir==='asc'?'ascending':'descending'}"><button class="th-sort" type="button" data-sort-price title="按供货价${state.sort==='price'&&state.sortDir==='asc'?'从低到高排序，点击改为从高到低':'从高到低排序，点击改为从低到高'}">供货价 · 元/kg${icon(state.sort==='price'&&state.sortDir==='desc'?'sortNew':'sortOld',12)}</button></th><th>联系方式</th><th>采购条件</th><th>报价日 / 有效期</th><th></th></tr></thead><tbody>${pageRows.map(q=>`<tr><td>${productCell(product(q.product_id))}</td><td><div>${esc(q.supplier)}</div><div class="product-spec">${esc(q.province)} · ${esc(q.city||'未填城市')}</div></td><td class="number ${p&&q.price===s?.min?'green':''}">${money(q.price)}<small class="compare-mobile-unit"> 元/kg</small>${p&&q.price===s?.min?'<span class="tag fresh">最低</span>':''}</td><td><small class="compare-mobile-unit">联系方式 </small>${quoteContact(q)}</td><td>${esc(q.min_order||'起订量待询')}<div class="product-spec">${esc(bases[q.basis])}</div></td><td>${esc(q.quoted_on)}<div class="product-spec">有效至 ${esc(q.valid_until)}</div></td><td><button class="row-action" data-detail="${esc(q.id)}">详情 ${icon('chevron',12)}</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">没有符合条件的有效报价，试试调整筛选或录入报价。</td></tr>'}</tbody></table></div><div class="pagination"><span>北京时间 ${dayString().replaceAll('-','.')} · ${esc(bases[state.basis])} · 已去重，过期与未确认报价不参与</span><div><button class="btn small" data-pagination="-1" ${state.pageNumber<=1?'disabled':''}>上一页</button><span>${state.pageNumber} / ${total}</span><button class="btn small" data-pagination="1" ${state.pageNumber>=total?'disabled':''}>下一页</button></div></div></section>`;
+}
+function overview() {
+ const rows = comparisonRows();
+ const p = product(state.product);
+ const s = p && hasComparableSpec(p) ? summarize(rows) : null;
+ // 卡片与走势并排：报价表是采购最常看的，不能被上面两块挤到第二屏。
+ return `${marketToolbar()}<div class="market-top">${categoryCards()}${chartPanel()}</div>${s ? summaryStrip(s) : ''}${quotePanel(rows, p, s)}`;
 }
 // 每个产品在「最近 7 日」窗口内真正可用的样本数。口径必须和图形一致，
 // 不能复用 stats()——stats 跟随顶部「参考周期」筛选，可能是 1 天或 30 天。
@@ -157,24 +167,23 @@ function chartEmpty(p, visible) {
  } else {
   why = '还没有任何已入库报价';
  }
- return `<div class="chart-empty"><p><strong>${esc(p ? productLabel(p) : '当前产品')}</strong> 最近 7 天没有可用样本</p><p class="subtle">走势只统计「已核实入库、在有效期内、且规格可比」的报价；${esc(why)}。</p>${others.length ? `<div class="chart-pick"><span class="subtle">这 7 天有样本：</span>${others.map(x => `<button data-chart-pick="${esc(x.id)}">${esc(x.name)} · ${x.count} 条</button>`).join('')}</div>` : ''}</div>`;
+ return `<div class="chart-empty"><p><strong>${esc(p ? productLabel(p) : '当前产品')}</strong> 最近 7 天没有可用样本</p><p class="subtle">走势只统计「已核实入库、在有效期内、且规格可比」的报价；${esc(why)}。</p>${others.length ? `<div class="chart-pick"><span class="subtle">这 7 天有样本：</span>${others.map(x => `<button data-pick="${esc(x.id)}">${esc(x.name)} · ${x.count} 条</button>`).join('')}</div>` : ''}</div>`;
 }
 function chartPanel() {
  const visible = weekSamples();
- const current = product(state.chartProduct);
- // 首次进入、或选中的产品/品类已下线时，优先落在真有样本的产品上——否则打开总览就是一张空图。
- // 用户手动选过的产品不抢，只在空图上提示可切换的样本。
- if (!current || excludedCats().has(current.category)) {
-  state.chartProduct = (visible.find(x => x.count > 0) || visible[0])?.id;
- }
- const p=product(state.chartProduct); const values=trend(data.quotes,queryOptions(p?.id),7);
+ // 走势跟着筛选行的「产品规格」走。不再单独放一个产品下拉——同一页两个选择器会互相打架，
+ // 而且合并后报价表也用同一个 state.product。没选规格时自动落在最近 7 天真有样本的产品上。
+ const auto = visible.find(x => x.count > 0) || visible[0];
+ let p = product(state.product);
+ if (!p || excludedCats().has(p.category)) p = product(auto?.id);
+ const values=trend(data.quotes,queryOptions(p?.id),7);
  const valid=values.filter(x=>x.average!=null); const s=stats(p?.id);
  const low=valid.length?Math.min(...valid.map(x=>x.average))-.3:0, high=valid.length?Math.max(...valid.map(x=>x.average))+.3:1;
  const y=v=>130-(v-low)/(high-low)*105;
  let lines=[],segment=[];
  values.forEach((v,i)=>{if(v.average==null){if(segment.length)lines.push(segment);segment=[];} else segment.push(`${43+i*440/6},${y(v.average)}`);}); if(segment.length)lines.push(segment);
  const svg=valid.length?`<svg class="chart" viewBox="0 0 510 165" role="img" aria-label="${esc(productLabel(p))}近七日均价"><title>${values.map(v=>`${v.day}：${money(v.average)}元/kg`).join('；')}</title>${[0,1,2].map(i=>{const n=low+(high-low)*i/2;return `<line x1="43" y1="${y(n)}" x2="486" y2="${y(n)}" stroke="#edf1ee" stroke-dasharray="3 4"/><text x="0" y="${y(n)+4}">${money(n)}</text>`;}).join('')}${lines.map(l=>`<polyline points="${l.join(' ')}" fill="none" stroke="#368b65" stroke-width="2.2" stroke-linejoin="round"/>`).join('')}${values.map((v,i)=>`<text x="${43+i*440/6}" y="157" text-anchor="middle">${v.day.slice(5).replace('-','/')}</text>${v.average!=null?`<circle cx="${43+i*440/6}" cy="${y(v.average)}" r="3" fill="white" stroke="#368b65" stroke-width="1.8"><title>${v.day} ${money(v.average)}元/kg</title></circle>`:''}`).join('')}</svg>`:chartEmpty(p,visible);
- return `<section class="panel"><div class="panel-head"><h2>均价走势 <small>最近 7 日</small></h2><div class="heading-actions"><button class="text-btn" data-chart="${esc(state.chartProduct)}">可比均价 ${icon('arrow',12)}</button><select aria-label="走势产品" data-filter="chartProduct">${options(visibleProducts().map(p=>[p.id,`${p.name} · ${p.state} · ${p.spec}`]),state.chartProduct)}</select></div></div><div class="chart-wrap"><div class="chart-summary"><strong>${money(s.average)}</strong><span class="subtle">元 / kg</span>${deltaFor(p?.id)}</div>${svg}</div><div class="chart-legend"><i class="dot"></i>${esc(productLabel(p))} · ${esc(bases[state.basis])}</div></section>`;
+ return `<section class="panel chart-panel"><div class="panel-head"><h2>均价走势 <small>${p?`${esc(p.name)} · ${esc(p.state)} · `:''}最近 7 日</small></h2><div class="heading-actions">${p?`<button class="text-btn" data-comparable="${esc(p.id)}">可比均价 ${icon('arrow',12)}</button>`:''}</div></div><div class="chart-wrap"><div class="chart-summary"><strong>${money(s.average)}</strong><span class="subtle">元 / kg</span>${deltaFor(p?.id)}</div>${svg}</div><div class="chart-legend"><i class="dot"></i>${esc(bases[state.basis])}${state.province?` · ${esc(state.province)}`:' · 全国采样'} · ${state.days===1?'当日':'近 '+state.days+' 天'}样本</div></section>`;
 }
 // 可比均价：解决「不同重量没法比」的问题 —— 只在同一规格内部比较，绝不跨规格混算。
 // 口径固定为「截至某日、最近 7 天」的样本均价，只把截止日往前推，做到同口径同比。
@@ -215,12 +224,6 @@ function quoteContact(q) {
  const phone=quoteMobile(q.notes);
  return phone?'<a class="quote-phone" href="tel:'+phone+'">'+phone+'</a>':'<span class="subtle">未填写</span>';
 }
-function compare() {
- const rows=comparisonRows(); const p=product(state.product); const s=hasComparableSpec(p)?summarize(rows):null;
- const pageSize=20; const total=Math.max(1,Math.ceil(rows.length/pageSize)); state.pageNumber=Math.min(state.pageNumber,total);
- const pageRows=rows.slice((state.pageNumber-1)*pageSize,state.pageNumber*pageSize);
- return `<div class="compare-page"><div class="filter-panel compare-toolbar"><div class="filters compare-filters"><select aria-label="品类" data-filter="category">${options(categories(),state.category,'全部品类')}</select><select aria-label="产品规格" data-filter="product">${options(visibleProducts().filter(p=>!state.category||p.category===state.category).map(p=>[p.id,productLabel(p)]),state.product,'全部产品规格')}</select>${provinceSelect()}${periodSelect()}${basisSelect()}<label class="search">${icon('search',15)}<input aria-label="搜索供应商或地区" placeholder="搜索供应商、地区…" value="${esc(state.search)}" id="search"></label><button class="text-btn" data-action="reset-filters">重置筛选</button><div class="page-bar-actions">${pageActionButtons()}</div></div></div>${s?`<div class="summary-strip">${[['样本均价',money(s.average),'元/kg'],['最低供货价',money(s.min),'元/kg'],['中位价格',money(s.median),'元/kg'],['有效供应商样本',s.count,'个'],['覆盖省份',s.provinceCount,'省']].map(([label,val,unit])=>`<div class="summary-item"><p>${label}</p><strong>${val}</strong><small>${unit}</small></div>`).join('')}</div>`:''}<section class="panel compare-results"><div class="panel-head"><h2>${p?esc(p.name)+' · '+esc(p.state):'供货报价'} <span class="compare-count">${rows.length} 条报价${s?.sparse?' · 样本较少':''}</span></h2><select aria-label="排序方式" data-filter="sort">${options([['price','供货价：'+(state.sortDir==='desc'?'从高到低':'从低到高')],['date','报价日：从新到旧']],state.sort)}</select></div><div class="table-wrap"><table><thead><tr><th>产品 / 规格</th><th>供应商 / 地区</th><th aria-sort="${state.sort!=='price'?'none':state.sortDir==='asc'?'ascending':'descending'}"><button class="th-sort" type="button" data-sort-price title="按供货价${state.sort==='price'&&state.sortDir==='asc'?'从低到高排序，点击改为从高到低':'从高到低排序，点击改为从低到高'}">供货价 · 元/kg${icon(state.sort==='price'&&state.sortDir==='desc'?'sortNew':'sortOld',12)}</button></th><th>联系方式</th><th>采购条件</th><th>报价日 / 有效期</th><th></th></tr></thead><tbody>${pageRows.map(q=>`<tr><td>${productCell(product(q.product_id))}</td><td><div>${esc(q.supplier)}</div><div class="product-spec">${esc(q.province)} · ${esc(q.city||'未填城市')}</div></td><td class="number ${p&&q.price===s?.min?'green':''}">${money(q.price)}<small class="compare-mobile-unit"> 元/kg</small>${p&&q.price===s?.min?'<span class="tag fresh">最低</span>':''}</td><td><small class="compare-mobile-unit">联系方式 </small>${quoteContact(q)}</td><td>${esc(q.min_order||'起订量待询')}<div class="product-spec">${esc(bases[q.basis])}</div></td><td>${esc(q.quoted_on)}<div class="product-spec">有效至 ${esc(q.valid_until)}</div></td><td><button class="row-action" data-detail="${esc(q.id)}">详情 ${icon('chevron',12)}</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">没有符合条件的有效报价，试试调整筛选或录入报价。</td></tr>'}</tbody></table></div><div class="pagination"><span>${rows.length} 条 · 已去重，过期与未确认报价不参与</span><div><button class="btn small" data-pagination="-1" ${state.pageNumber<=1?'disabled':''}>上一页</button><span>${state.pageNumber} / ${total}</span><button class="btn small" data-pagination="1" ${state.pageNumber>=total?'disabled':''}>下一页</button></div></div></section></div>`;
-}
 function review() {
  const rows=data.quotes.filter(q=>q.status===state.reviewStatus).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
  const limited=rows.slice(0,100);
@@ -235,7 +238,14 @@ function sourcesPage() {
  const inRange=l=>!cutoff||!l.published_on||l.published_on>=cutoff;
  const olderCount=cutoff?allLeads.filter(l=>l.published_on&&l.published_on<cutoff&&matchesLeadCategory(l,state.leadCategory)&&matchesLeadUse(l)).length:0;
  const activeLeads=allLeads.filter(l=>!HANDLED_LEADS.has(l.status));
- const match=l=>(!state.leadKind||l.kind===state.leadKind)&&matchesLeadCategory(l,state.leadCategory)&&matchesLeadUse(l)&&inRange(l);
+ // 2026-11-28：供货来源增到三个后，单一来源就占了九成待审线索，其余来源被挤到几十页之外，
+ // 看上去像「只能从一家核价」。按站点给一个下拉，直接切到某个来源，不再靠翻页找。
+ const srcKey=l=>(l.source_id||l.source_name||'?').split('_')[0];
+ const srcName=k=>sourceCatalog.find(s=>s.id===k)?.name||allLeads.find(l=>srcKey(l)===k)?.source_name||k;
+ const srcTally=new Map();
+ allLeads.filter(l=>!HANDLED_LEADS.has(l.status)).forEach(l=>{const k=srcKey(l);srcTally.set(k,(srcTally.get(k)||0)+1);});
+ const srcOptions=[...srcTally].sort((a,b)=>b[1]-a[1]).map(([k,n])=>[k,`${srcName(k)}（${n}）`]);
+ const match=l=>(!state.leadKind||l.kind===state.leadKind)&&(!state.leadSource||srcKey(l)===state.leadSource)&&matchesLeadCategory(l,state.leadCategory)&&matchesLeadUse(l)&&inRange(l);
  // 表头可点排序：标题（拼音）、标价（折算元/kg）、地区、发布日期。
  // 取值缺失的行（日期待核实、区间无单价、按只计价）始终沉在末尾，不随升降序翻转。
  const leadField=(state.leadSort||'date_desc').split('_')[0];
@@ -266,7 +276,7 @@ function sourcesPage() {
  const latest=(data.leads||[]).map(l=>l.fetched_at).sort().at(-1);
  const failedSources=(store.discovery?.runs||[]).filter(r=>!r.ok).map(r=>sourceCatalog.find(s=>s.id===r.source_id)?.name||r.source_id);
  const collectionNotice=failedSources.length?`<div class="notice">${esc(failedSources.join('、'))}本次采集未成功，保留上次线索；其余来源正常更新。</div>`:'';
- return `${store.discovery?.error?`<div class="notice">采集快照加载失败：${esc(store.discovery.error)}</div>`:''}${collectionNotice}<section class="panel"><div class="panel-head lead-head"><div class="lead-filters"><select aria-label="线索品类" data-filter="leadCategory">${options(leadCategories(),state.leadCategory,'全部品类')}</select><select aria-label="处理方式" data-filter="leadUse" title="按能否核实入库筛选">${options([['convertible','可核实入库'],['reference','仅作参考']],state.leadUse,'全部处理方式')}</select><select aria-label="发布时间" data-filter="leadRange" title="按原文发布日期筛选">${options([[7,'近 7 天'],[30,'近 30 天'],[90,'近 90 天'],[365,'近一年'],[0,'全部时间']],leadRange)}</select>${admin()?`<button class="btn small" data-action="managed-leads">已处理 ${handledCount}</button>`:''}</div><h2>自动采集线索 <small>${latest?'最近采集 '+esc(new Date(latest).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})):'尚未采集'}</small></h2><div class="segmented">${Object.entries({'':'全部类型',...sourceKinds}).map(([kind,name])=>`<button data-lead-kind="${kind}" class="${state.leadKind===kind?'active':''}">${name} ${activeLeads.filter(l=>inRange(l)&&(!kind||l.kind===kind)&&matchesLeadUse(l)&&matchesLeadCategory(l,state.leadCategory)).length}</button>`).join('')}</div></div><div class="table-wrap"><table><thead><tr><th${leadField==='title'?` aria-sort="${leadAsc?'ascending':'descending'}"`:''}><button class="th-sort" type="button" data-lead-sort="title" title="按标题拼音排序${leadField==='title'?(leadAsc?'，当前从 A 到 Z，点击改为倒序':'，当前倒序，点击改为从 A 到 Z'):''}">原文产品 / 标题${icon(leadField==='title'&&!leadAsc?'sortNew':'sortOld',12)}</button></th><th${leadField==='price'?` aria-sort="${leadAsc?'ascending':'descending'}"`:''}><button class="th-sort" type="button" data-lead-sort="price" title="按标价排序，按斤 / 吨已折算为元/kg，按只计价的排在最后${leadField==='price'?(leadAsc?'，当前从低到高，点击改为从高到低':'，当前从高到低，点击改为从低到高'):''}">标价原文${icon(leadField==='price'&&!leadAsc?'sortNew':'sortOld',12)}</button></th><th${leadField==='date'||leadField==='region'?` aria-sort="${leadAsc?'ascending':'descending'}"`:''}><button class="th-sort" type="button" data-lead-sort="date" title="按发布日期从新到旧；再点改为从旧到新；第三次按地区拼音排序">地区 / 发布日期${icon((leadField==='date'||leadField==='region')&&!leadAsc?'sortNew':'sortOld',12)}</button></th><th>来源</th><th>核对与处理</th></tr></thead><tbody>${rows.map(l=>`<tr class="${l.status==='converted'?'lead-done':''}"><td class="lead-title"><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title)}</a>${l.details?`<details class="lead-more"><summary>详情</summary><div class="lead-note">${esc(l.details)}</div></details>`:''}</td><td>${esc(l.price_text||'见原文')}</td><td>${esc(l.region_text||'原文范围')}<div class="product-spec">${esc(l.published_on||'日期待核实')}</div></td><td>${esc(l.source_name)}<div class="product-spec">${esc(sourceKinds[l.kind])}</div></td><td><div class="review-actions lead-actions"><a class="btn small" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" aria-label="查看原文：${esc(l.title)}">查看原文 ↗</a>${l.status==='converted'?'<span class="pill">已入库</span>':l.kind==='supply'&&canWrite()?`<div class="review-actions"><button class="btn small primary" data-lead="${esc(l.id)}">核实入库</button>${admin()?`<button class="text-btn" data-dismiss-lead="${esc(l.id)}">忽略</button>`:''}</div>`:'<span class="subtle">仅作外部参考</span>'}</div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">当前筛选下暂无线索'+(cutoff?'，这段时间没有新线索，可以把发布时间改成「全部时间」':'')+'。</td></tr>'}</tbody></table></div><div class="pagination"><span>${pendingLeads.length} 条待核实${doneLeads.length?` · 已入库 ${doneLeads.length} 条排在最后`:''}${olderCount?` · 折叠 ${olderCount} 条旧线索`:''}</span><div><button class="btn small" data-pagination="-1" ${state.pageNumber<=1?'disabled':''}>上一页</button><span>${state.pageNumber} / ${total}</span><button class="btn small" data-pagination="1" ${state.pageNumber>=total?'disabled':''}>下一页</button></div></div></section><section class="panel" style="margin-top:20px"><div class="panel-head"><h2>来源目录 <small>${sourceCatalog.length} 个候选来源</small></h2><select aria-label="来源分类" data-filter="sourceKind">${options(Object.entries(sourceKinds),state.sourceKind,'全部来源类型')}</select></div><div class="table-wrap"><table><thead><tr><th>来源</th><th>用途 / 覆盖</th><th>接入进度</th><th>口径与说明</th></tr></thead><tbody>${catalog.map(s=>`<tr><td><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.name)} ↗</a></td><td>${esc(sourceKinds[s.kind])}<div class="product-spec">${esc(s.scope)}</div></td><td class="subtle">${esc(s.status)}</td><td class="source-notes">${esc(s.note)}</td></tr>`).join('')}</tbody></table></div><div class="table-foot"><span>公开列表每天定时核对三次；付费、登录、验证码及不可访问来源需要单独接入。已核验表示页面可见，不表示报价已认证。</span></div></section>`;
+ return `${store.discovery?.error?`<div class="notice">采集快照加载失败：${esc(store.discovery.error)}</div>`:''}${collectionNotice}<section class="panel"><div class="panel-head lead-head"><div class="lead-filters"><select aria-label="线索来源" data-filter="leadSource" title="按采集网站筛选">${options(srcOptions,state.leadSource,`全部来源${activeLeads.length?'（'+activeLeads.length+'）':''}`)}</select><select aria-label="线索品类" data-filter="leadCategory">${options(leadCategories(),state.leadCategory,'全部品类')}</select><select aria-label="处理方式" data-filter="leadUse" title="按能否核实入库筛选">${options([['convertible','可核实入库'],['reference','仅作参考']],state.leadUse,'全部处理方式')}</select><select aria-label="发布时间" data-filter="leadRange" title="按原文发布日期筛选">${options([[7,'近 7 天'],[30,'近 30 天'],[90,'近 90 天'],[365,'近一年'],[0,'全部时间']],leadRange)}</select>${admin()?`<button class="btn small" data-action="managed-leads">已处理 ${handledCount}</button>`:''}</div><h2>自动采集线索 <small>${latest?'最近采集 '+esc(new Date(latest).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})):'尚未采集'}</small></h2><div class="segmented">${Object.entries({'':'全部类型',...sourceKinds}).map(([kind,name])=>`<button data-lead-kind="${kind}" class="${state.leadKind===kind?'active':''}">${name} ${activeLeads.filter(l=>inRange(l)&&(!kind||l.kind===kind)&&leadUseOk(l,kind)&&matchesLeadCategory(l,state.leadCategory)).length}</button>`).join('')}</div></div><div class="table-wrap"><table><thead><tr><th${leadField==='title'?` aria-sort="${leadAsc?'ascending':'descending'}"`:''}><button class="th-sort" type="button" data-lead-sort="title" title="按标题拼音排序${leadField==='title'?(leadAsc?'，当前从 A 到 Z，点击改为倒序':'，当前倒序，点击改为从 A 到 Z'):''}">原文产品 / 标题${icon(leadField==='title'&&!leadAsc?'sortNew':'sortOld',12)}</button></th><th${leadField==='price'?` aria-sort="${leadAsc?'ascending':'descending'}"`:''}><button class="th-sort" type="button" data-lead-sort="price" title="按标价排序，按斤 / 吨已折算为元/kg，按只计价的排在最后${leadField==='price'?(leadAsc?'，当前从低到高，点击改为从高到低':'，当前从高到低，点击改为从低到高'):''}">标价原文${icon(leadField==='price'&&!leadAsc?'sortNew':'sortOld',12)}</button></th><th${leadField==='date'||leadField==='region'?` aria-sort="${leadAsc?'ascending':'descending'}"`:''}><button class="th-sort" type="button" data-lead-sort="date" title="按发布日期从新到旧；再点改为从旧到新；第三次按地区拼音排序">地区 / 发布日期${icon((leadField==='date'||leadField==='region')&&!leadAsc?'sortNew':'sortOld',12)}</button></th><th>来源</th><th>核对与处理</th></tr></thead><tbody>${rows.map(l=>`<tr class="${l.status==='converted'?'lead-done':''}"><td class="lead-title"><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title)}</a>${l.details?`<details class="lead-more"><summary>详情</summary><div class="lead-note">${esc(l.details)}</div></details>`:''}</td><td>${esc(l.price_text||'见原文')}</td><td>${esc(l.region_text||'原文范围')}<div class="product-spec">${esc(l.published_on||'日期待核实')}</div></td><td>${esc(l.source_name)}<div class="product-spec">${esc(sourceKinds[l.kind])}</div></td><td><div class="review-actions lead-actions"><a class="btn small" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" aria-label="查看原文：${esc(l.title)}">查看原文 ↗</a>${l.status==='converted'?'<span class="pill">已入库</span>':l.kind==='supply'&&canWrite()?`<div class="review-actions"><button class="btn small primary" data-lead="${esc(l.id)}">核实入库</button>${admin()?`<button class="text-btn" data-dismiss-lead="${esc(l.id)}">忽略</button>`:''}</div>`:'<span class="subtle">仅作外部参考</span>'}</div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">当前筛选下暂无线索'+[cutoff?'这段时间没有新线索，可以把发布时间改成「全部时间」':'',state.leadUse==='convertible'&&!state.leadKind?'当前只看「可核实入库」，想看行情与资讯请把处理方式改成「全部处理方式」':''].filter(Boolean).join('；')+'。</td></tr>'}</tbody></table></div><div class="pagination"><span>${pendingLeads.length} 条待核实${doneLeads.length?` · 已入库 ${doneLeads.length} 条排在最后`:''}${olderCount?` · 折叠 ${olderCount} 条旧线索`:''}</span><div><button class="btn small" data-pagination="-1" ${state.pageNumber<=1?'disabled':''}>上一页</button><span>${state.pageNumber} / ${total}</span><button class="btn small" data-pagination="1" ${state.pageNumber>=total?'disabled':''}>下一页</button></div></div></section><section class="panel" style="margin-top:20px"><div class="panel-head"><h2>来源目录 <small>${sourceCatalog.length} 个候选来源</small></h2><select aria-label="来源分类" data-filter="sourceKind">${options(Object.entries(sourceKinds),state.sourceKind,'全部来源类型')}</select></div><div class="table-wrap"><table><thead><tr><th>来源</th><th>用途 / 覆盖</th><th>接入进度</th><th>口径与说明</th></tr></thead><tbody>${catalog.map(s=>`<tr><td><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.name)} ↗</a></td><td>${esc(sourceKinds[s.kind])}<div class="product-spec">${esc(s.scope)}</div></td><td class="subtle">${esc(s.status)}</td><td class="source-notes">${esc(s.note)}</td></tr>`).join('')}</tbody></table></div><div class="table-foot"><span>公开列表每天定时核对三次；付费、登录、验证码及不可访问来源需要单独接入。已核验表示页面可见，不表示报价已认证。</span></div></section>`;
 }
 // 已处理线索管理：修改报价 / 撤销入库 / 删除 / 恢复，操作后整页重新渲染。
 function managedLeadsDialog() {
@@ -290,7 +300,7 @@ function settings() {
 }
 function settingsBody() {
  const recentCount=data.quotes.filter(q=>q.status==='approved'&&quoteVisible(q)&&isValidQuote(q)).length;
- return `<div class="filter-panel"><div class="filters"><label for="settings-category">核价品类</label><select id="settings-category" aria-label="核价品类" data-filter="leadCategory">${options(categories(),state.leadCategory,'全部品类')}</select>${admin()?'<button class="btn small" data-action="manage-categories">管理品类</button>':''}</div></div><div class="settings-grid"><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('layers',15)}</span><span class="fold-title"><h2>产品库</h2><small>${visibleProducts().length} 个规格</small></span></summary><div class="settings-body">${admin()?`<div class="fold-actions"><button class="text-btn" data-action="add-product">+ 添加产品</button></div>`:''}${visibleProducts().map(p=>`<div class="settings-row"><span><span class="category-dot">${esc(p.category)}</span>${esc(p.name)} <small>${esc(p.state)}</small></span><span class="row-right"><small>${esc(p.spec)}</small>${admin()?`<button class="text-btn danger" data-delete-product="${esc(p.id)}" aria-label="删除 ${esc(p.name)}">删除</button>`:''}</span></div>`).join('')}</div></details><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('search',15)}</span><span class="fold-title"><h2>数据来源</h2><small>人工确认后入库</small></span></summary><div class="settings-body"><h3>人工询价</h3><p>电话、微信或线下询价，记录供应商、报价日、有效期及采购条件。编辑人员提交后由管理员确认。</p><h3>引擎采集</h3><p>当前接入四类冻品供货线索（清远鸡、白条鹅、清远麻鸡、鸽子），另有毛鸡毛鸭毛鹅行情表、白条鸡批发市场价、各省生猪出栏日均价与畜牧周报，在来源中心逐条核对后转成报价。行情价与供货价分开处理，不混算。</p><div class="settings-row"><span>公开网页适配器</span><strong>${(store.discovery?.runs||[]).length||7} 个</strong></div><p style="margin-top:12px">另支持 JSON / CSV 授权接口。市场行情、官方监测与供货价分别处理；付费或登录内容仍待单独接入。</p><a href="#settings">前往数据中心 →</a><h3>采集配置</h3><p>在仓库 <code>collector/sources.json</code> 配置接口及字段映射，通过 GitHub Actions 运行。</p></div></details><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('info',15)}</span><span class="fold-title"><h2>统计口径</h2><small>样本 · 周期 · 去重规则</small></span></summary><div class="settings-body"><ul><li>按产品规格、鲜冻状态、含税及运输口径独立统计，统一换算为元 / kg。</li><li>周期内，同供应商、同省、同规格、同口径取最新有效报价，按供应商等权算术平均，同时显示中位价与最低价。</li><li>只纳入已确认、未过期的报价。低于 5 个样本或覆盖少于 3 省，标记“样本较少”。</li><li>全国地区表示采样范围，不代表全国全部市场。品类卡片显示一个明确的代表规格，不把不同产品混成一个均价。</li><li>走势按历史当日有效样本回算；后续补录或更改审核状态可能改变历史曲线。</li><li>参考含运价为报价加填写的每公斤运费；未税报价仍需另核税费。最低供货价仍需核实品质、起订量和到货条件。</li></ul></div></details><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('shield',15)}</span><span class="fold-title"><h2>团队与访问</h2><small>成员角色与访问权限</small></span></summary><div class="settings-body"><div class="settings-row"><span>当前模式</span><strong>${store.cloud?'共享数据库':'正式版'}</strong></div><div class="settings-row"><span>当前角色</span><strong>${({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role]}</strong></div><div class="settings-row"><span>数据保存位置</span><strong>${store.cloud?'共享数据库':'此设备（未上传）'}</strong></div>${!store.cloud?'<p style="margin-top:12px">换设备或手机查看时，先在这台设备「导出完整备份」，再到另一台「导入备份」；自动同步需连接共享数据库。</p>':''}<div class="heading-actions"><button class="btn" data-action="backup">${icon('down',14)}导出完整备份</button><button class="btn" data-action="import-backup">导入备份</button><input type="file" id="import-backup-file" accept="application/json,.json" hidden>${store.cloud?`${admin()?'<button class="btn" data-action="members">管理成员</button>':''}<button class="btn" data-action="logout">退出登录</button>`:''}</div></div></details><details class="panel fold full"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('check',15)}</span><span class="fold-title"><h2>最近入库</h2><small>点开查看，共 ${recentCount} 条有效报价</small></span></summary><div class="settings-body recent-fold">${recentRows(8)}<p style="margin:14px 0 0"><a href="#compare">去采购比价看全部 →</a></p></div></details></div>`;
+ return `<div class="filter-panel"><div class="filters"><label for="settings-category">核价品类</label><select id="settings-category" aria-label="核价品类" data-filter="leadCategory">${options(categories(),state.leadCategory,'全部品类')}</select>${admin()?'<button class="btn small" data-action="manage-categories">管理品类</button>':''}</div></div><div class="settings-grid"><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('layers',15)}</span><span class="fold-title"><h2>产品库</h2><small>${visibleProducts().length} 个规格</small></span></summary><div class="settings-body">${admin()?`<div class="fold-actions"><button class="text-btn" data-action="add-product">+ 添加产品</button></div>`:''}${visibleProducts().map(p=>`<div class="settings-row"><span><span class="category-dot">${esc(p.category)}</span>${esc(p.name)} <small>${esc(p.state)}</small></span><span class="row-right"><small>${esc(p.spec)}</small>${admin()?`<button class="text-btn danger" data-delete-product="${esc(p.id)}" aria-label="删除 ${esc(p.name)}">删除</button>`:''}</span></div>`).join('')}</div></details><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('search',15)}</span><span class="fold-title"><h2>数据来源</h2><small>人工确认后入库</small></span></summary><div class="settings-body"><h3>人工询价</h3><p>电话、微信或线下询价，记录供应商、报价日、有效期及采购条件。编辑人员提交后由管理员确认。</p><h3>引擎采集</h3><p>当前接入四类冻品供货线索（清远鸡、白条鹅、清远麻鸡、鸽子），另有毛鸡毛鸭毛鹅行情表、白条鸡批发市场价、各省生猪出栏日均价与畜牧周报，在来源中心逐条核对后转成报价。行情价与供货价分开处理，不混算。</p><div class="settings-row"><span>公开网页适配器</span><strong>${(store.discovery?.runs||[]).length||7} 个</strong></div><p style="margin-top:12px">另支持 JSON / CSV 授权接口。市场行情、官方监测与供货价分别处理；付费或登录内容仍待单独接入。</p><a href="#settings">前往数据中心 →</a><h3>采集配置</h3><p>在仓库 <code>collector/sources.json</code> 配置接口及字段映射，通过 GitHub Actions 运行。</p></div></details><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('info',15)}</span><span class="fold-title"><h2>统计口径</h2><small>样本 · 周期 · 去重规则</small></span></summary><div class="settings-body"><ul><li>按产品规格、鲜冻状态、含税及运输口径独立统计，统一换算为元 / kg。</li><li>周期内，同供应商、同省、同规格、同口径取最新有效报价，按供应商等权算术平均，同时显示中位价与最低价。</li><li>只纳入已确认、未过期的报价。低于 5 个样本或覆盖少于 3 省，标记“样本较少”。</li><li>全国地区表示采样范围，不代表全国全部市场。品类卡片显示一个明确的代表规格，不把不同产品混成一个均价。</li><li>走势按历史当日有效样本回算；后续补录或更改审核状态可能改变历史曲线。</li><li>参考含运价为报价加填写的每公斤运费；未税报价仍需另核税费。最低供货价仍需核实品质、起订量和到货条件。</li></ul></div></details><details class="panel fold"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('shield',15)}</span><span class="fold-title"><h2>团队与访问</h2><small>成员角色与访问权限</small></span></summary><div class="settings-body"><div class="settings-row"><span>当前模式</span><strong>${store.cloud?'共享数据库':'正式版'}</strong></div><div class="settings-row"><span>当前角色</span><strong>${({admin:'管理员',editor:'编辑人员',viewer:'只读成员'})[store.role]}</strong></div><div class="settings-row"><span>数据保存位置</span><strong>${store.cloud?'共享数据库':'此设备（未上传）'}</strong></div>${!store.cloud?'<p style="margin-top:12px">换设备或手机查看时，先在这台设备「导出完整备份」，再到另一台「导入备份」；自动同步需连接共享数据库。</p>':''}<div class="heading-actions"><button class="btn" data-action="backup">${icon('down',14)}导出完整备份</button><button class="btn" data-action="import-backup">导入备份</button><input type="file" id="import-backup-file" accept="application/json,.json" hidden>${store.cloud?`${admin()?'<button class="btn" data-action="members">管理成员</button>':''}<button class="btn" data-action="logout">退出登录</button>`:''}</div></div></details><details class="panel fold full"><summary class="panel-head fold-sum"><span class="fold-icon">${icon('check',15)}</span><span class="fold-title"><h2>最近入库</h2><small>点开查看，共 ${recentCount} 条有效报价</small></span></summary><div class="settings-body recent-fold">${recentRows(8)}<p style="margin:14px 0 0"><a href="#overview">去行情总览看全部 →</a></p></div></details></div>`;
 }
 function showDialog(html) { dialog.innerHTML=html; if(!dialog.open) dialog.showModal(); }
 const dialogHead=(title,sub='')=>`<div class="dialog-head"><div><h2 id="dialog-title">${title}</h2>${sub?`<p>${sub}</p>`:''}</div><button class="close" data-action="close" aria-label="关闭">${icon('close',20)}</button></div>`;
@@ -416,17 +426,16 @@ function exportData() {
  if(state.page==='settings' && state.settingsView==='sources') {
   header=['来源','类型','标题','原始标价','地区','原文日期','链接','处理状态'];
   rows=(data.leads||[]).filter(l=>!HANDLED_LEADS.has(l.status)&&(!state.leadKind||l.kind===state.leadKind)&&matchesLeadUse(l)&&matchesLeadCategory(l,state.leadCategory)).map(l=>[l.source_name,sourceKinds[l.kind],l.title,l.price_text,l.region_text,l.published_on,l.url,l.status]);
- } else if(state.page==='overview') {
-  header=['品类','产品','状态','规格','地区范围','报价口径','参考周期（天）','均价（元/kg）','最低价','最高价','中位价','样本数','省份数','统计日'];
-  rows=overviewProducts().map(p=>{const s=stats(p.id);return [p.category,p.name,p.state,p.spec,state.province||'全国采样',bases[state.basis],state.days,s.average?.toFixed(4),s.min,s.max,s.median,s.count,s.provinceCount,dayString()];});
  } else {
+  // 2026-11-28：采购比价并入总览后，导出就是页面上看到的供货明细（当前筛选、全量、不受分页限制），
+  // 不再导出已被删掉的「产品参考均价」汇总。
   const showOrigin=admin();
   const base=['品类','产品','状态','规格','供应商','省份','城市','供货价（元/kg）','报价口径','运费（元/kg）','起订量','报价日期','有效至'];
   header=showOrigin?[...base,'来源','原始链接','审核状态','备注']:[...base,'审核状态','备注'];
-  const quotes=state.page==='review'?data.quotes.filter(q=>q.status===state.reviewStatus):state.page==='settings'?data.quotes:comparisonRows();
+  const quotes=state.page==='settings'?(state.settingsView==='review'?data.quotes.filter(q=>q.status===state.reviewStatus):data.quotes):comparisonRows();
   rows=quotes.map(q=>{const p=product(q.product_id);const core=[p?.category,p?.name,p?.state,p?.spec,q.supplier,q.province,q.city,q.price,bases[q.basis],q.freight,q.min_order,q.quoted_on,q.valid_until];return showOrigin?[...core,q.source_name,q.source_url,statuses[q.status],q.notes]:[...core,statuses[q.status],safeNotes(q.notes)];});
  }
- download('\uFEFF'+[header,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n'),`行情跳动-${state.page}-${dayString()}.csv`);
+ download('\uFEFF'+[header,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n'),`行情跳动-${state.page==='overview'?'供货报价':state.page}-${dayString()}.csv`);
  toast('已导出当前筛选范围的数据');
 }
 let toastTimer;
@@ -440,9 +449,8 @@ document.addEventListener('click',event=>{
  if(el.dataset.page) {location.hash=el.dataset.page;return;}
  if(el.dataset.settingsView) {state.pageNumber=1;location.hash=`settings/${el.dataset.settingsView}`;return;}
  if(el.dataset.category!==undefined){changeValue({category:el.dataset.category,product:''});return;}
- if(el.dataset.chartPick){state.chartProduct=el.dataset.chartPick;state.pageNumber=1;render();return;}
- if(el.dataset.chart){state.chartProduct=el.dataset.chart;state.pageNumber=1;render();comparableDialog(el.dataset.chart);return;}
- if(el.dataset.compare){state.product=el.dataset.compare;state.category=product(state.product)?.category||'';state.search='';state.source='';state.pageNumber=1;state.page='compare';location.hash='compare';render();return;}
+ if(el.dataset.pick){const id=el.dataset.pick;state.product=id;state.category=product(id)?.category||'';state.pageNumber=1;render();return;}
+ if(el.dataset.comparable){state.pageNumber=1;render();comparableDialog(el.dataset.comparable);return;}
  if(el.dataset.lead){quickConvertDialog(data.leads.find(l=>l.id===el.dataset.lead));return;}
  if(el.dataset.quickEdit){quoteForm(null,data.leads.find(l=>l.id===el.dataset.quickEdit));return;}
  if(el.dataset.quickConfirm){execute(async()=>{

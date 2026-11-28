@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { settingsLock } from '../src/settings-lock.js';
 import { accessLock } from '../src/access-lock.js';
 import { config } from '../config.js';
-import { dayString, addMonths } from '../src/core.js';
+import { dayString, shiftDay, addMonths } from '../src/core.js';
 
 // 本机模式的数据键名，由 config.localTrial 决定；用于预置「已入库」等历史状态。
 const DATA_KEY = config.localTrial ? 'hqt-trial-data-v2' : 'hqt-data-v2';
@@ -457,4 +457,67 @@ test('总览对待核实规格显示原因，不能把两条未知规格报价�
  assert.match(compare.innerHTML,/规格待核实，暂不统计/);
  compare.__change({filter:'product'},'unknown-goose');
  assert.doesNotMatch(compare.innerHTML,/>9\.55</,'单选待核实规格也不能计算均价');
+});
+
+// 2026-11-28 用户反馈「均价走势没有显示」：图形没坏，是默认把这个 id 写死成白羽鸡，
+// 而它在 7 天窗口内一条合格样本都没有。以下三条锁住修复后的行为。
+test('均价走势默认落在最近 7 天真有样本的产品上，不落在空产品上', async () => {
+ const today = dayString();
+ const base = { basis: 'factory', source: 'engine', source_name: '测试来源', source_url: '', min_order: '', freight: null, status: 'approved', city: '', created_at: '2020-03-01T00:00:00Z' };
+ const saved = {
+  products: [
+   { id: 'chicken-empty', category: '鸡', name: '白羽鸡', state: '鲜品', spec: '白条整鸡 · 1–1.5 kg/只' },
+   { id: 'goose-has', category: '鹅', name: '白条鹅', state: '冻品', spec: '整鹅 · 3–4 kg/只' },
+  ],
+  quotes: [{ ...base, id: 'g1', product_id: 'goose-has', supplier: '甲', province: '广东', price: 18.5, quoted_on: today, valid_until: addMonths(today, 2), notes: '' }],
+  leads: [], audit: [], deletionRequests: [],
+ };
+ const app = stubDom('#overview', { storage: { [DATA_KEY]: JSON.stringify(saved) } });
+ await import('../src/app.js?route=chart-default-with-sample');
+ assert.match(app.innerHTML, /value="goose-has" selected/, '默认应选中真有样本的产品，而不是列表第一个');
+ assert.match(app.innerHTML, /<svg class="chart"/, '有样本时应画出走势图');
+ assert.doesNotMatch(app.innerHTML, /最近 7 天没有可用样本/);
+});
+
+test('窗口内报价全是待核实规格时，均价走势要说明是规格原因，而不是笼统的「暂无」', async () => {
+ const today = dayString();
+ const base = { basis: 'factory', source: 'engine', source_name: '测试来源', source_url: '', min_order: '', freight: null, status: 'approved', city: '', created_at: '2020-03-01T00:00:00Z' };
+ const saved = {
+  products: [
+   { id: 'unverified-goose', category: '鹅', name: '其他冻品', state: '冻品', spec: '冻品 · 规格待核实' },
+  ],
+  quotes: [
+   { ...base, id: 'u1', product_id: 'unverified-goose', supplier: '甲', province: '河南', price: 11.6, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+   { ...base, id: 'u2', product_id: 'unverified-goose', supplier: '乙', province: '河南', price: 16.8, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+  ],
+  leads: [], audit: [], deletionRequests: [],
+ };
+ const app = stubDom('#overview', { storage: { [DATA_KEY]: JSON.stringify(saved) } });
+ await import('../src/app.js?route=chart-empty-unverified-spec');
+ assert.match(app.innerHTML, /最近 7 天没有可用样本/);
+ assert.match(app.innerHTML, /2 条报价规格为「待核实」/, '应指出是规格待核实挡住了统计');
+ assert.doesNotMatch(app.innerHTML, /暂无有效报价，录入后即可查看走势/, '旧的含糊提示应被替换');
+});
+
+test('手动选到没有样本的产品时，空图给出可一键切换到有样本产品的入口', async () => {
+ const today = dayString();
+ const base = { basis: 'factory', source: 'engine', source_name: '测试来源', source_url: '', min_order: '', freight: null, status: 'approved', city: '', created_at: '2020-03-01T00:00:00Z' };
+ const saved = {
+  products: [
+   { id: 'goose-old', category: '鹅', name: '白条鹅', state: '冻品', spec: '整鹅 · 3–4 kg/只' },
+   { id: 'goose-live', category: '鹅', name: '白条鹅', state: '鲜品', spec: '整鹅 · 2–3 kg/只' },
+  ],
+  quotes: [
+   { ...base, id: 'o1', product_id: 'goose-old', supplier: '甲', province: '广东', price: 18.5, quoted_on: shiftDay(today, -13), valid_until: shiftDay(today, -1), notes: '' },
+   { ...base, id: 'o2', product_id: 'goose-live', supplier: '乙', province: '广东', price: 20.2, quoted_on: today, valid_until: addMonths(today, 2), notes: '' },
+  ],
+  leads: [], audit: [], deletionRequests: [],
+ };
+ const app = stubDom('#overview', { storage: { [DATA_KEY]: JSON.stringify(saved) } });
+ await import('../src/app.js?route=chart-empty-switch');
+ assert.match(app.innerHTML, /value="goose-live" selected/, '首次进入应自动落在有样本的产品上');
+ app.__change({ filter: 'chartProduct' }, 'goose-old');
+ assert.match(app.innerHTML, /最近 7 天没有可用样本/, '手动选到空产品应给出解释');
+ assert.match(app.innerHTML, /最近一次入库是/);
+ assert.match(app.innerHTML, /data-chart-pick="goose-live"/, '应给出有样本产品的一键切换入口');
 });

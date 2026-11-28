@@ -163,3 +163,12 @@ th[aria-sort="ascending"] .th-sort,th[aria-sort="descending"] .th-sort{color:#6d
  .compare-mobile-unit{display:inline;font-size:11px;font-weight:400;color:#506158}
 }
 .compare-results .quote-phone{color:#17674b;font-weight:600;white-space:nowrap;text-decoration:underline;text-underline-offset:3px}
+
+/* 均价走势空状态：讲清为什么空，并给出可一键切换的有样本产品（2026-11-28） */
+.chart-empty{height:auto;min-height:170px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:7px;padding:6px 2px;text-align:left;color:inherit}
+.chart-empty p{margin:0;font-size:12px;color:#4f6157;line-height:1.75}
+.chart-empty p.subtle{font-size:11px;color:var(--muted)}
+.chart-empty strong{font-weight:650}
+.chart-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:4px}
+.chart-pick button{border:1px solid #d7e3db;background:#f6faf7;color:#2f6b4f;border-radius:4px;padding:6px 10px;font-size:11px;line-height:1}
+.chart-pick button:hover{background:#ecf5ef;border-color:#bcd4c5}

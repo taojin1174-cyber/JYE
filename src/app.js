@@ -20,7 +20,7 @@ const icon = (name,size=16) => `<svg width="${size}" height="${size}" viewBox="0
 const esc = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const app = document.querySelector('#app');
 const dialog = document.querySelector('#dialog');
-const state={page:location.hash.slice(1)||'overview',days:7,basis:'factory',category:'',province:'',product:'',source:'',search:'',sort:'price',sortDir:'asc',reviewStatus:'pending',chartProduct:'chicken-fresh',pageNumber:1,sourceKind:'',leadKind:'',leadCategory:'',leadUse:'',leadSort:'date_desc',leadRange:30};
+const state={page:location.hash.slice(1)||'overview',days:7,basis:'factory',category:'',province:'',product:'',source:'',search:'',sort:'price',sortDir:'asc',reviewStatus:'pending',chartProduct:'',pageNumber:1,sourceKind:'',leadKind:'',leadCategory:'',leadUse:'',leadSort:'date_desc',leadRange:30};
 let data={products:[],quotes:[],leads:[]};
 let busy=false;
 let sessionStore;
@@ -134,15 +134,46 @@ function spark(values) {
  if(current.length) segments.push(current);
  return `<svg class="spark" viewBox="0 0 94 27" role="img" aria-label="最近七日样本均价走势"><title>${values.map(v=>money(v)).join('，')}</title>${segments.map(s=>`<polyline points="${s.join(' ')}" fill="none" stroke="#74a78b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`;
 }
+// 每个产品在「最近 7 日」窗口内真正可用的样本数。口径必须和图形一致，
+// 不能复用 stats()——stats 跟随顶部「参考周期」筛选，可能是 1 天或 30 天。
+function weekSamples() {
+ return visibleProducts().map(p => ({ id: p.id, name: p.name, count: latestQuotes(data.quotes, {...queryOptions(p.id), days: 7}).length }));
+}
+// 空图不再只说一句「暂无有效报价」：讲清为什么空（没入库 / 超出 7 天 / 规格待核实），
+// 并列出真有样本的产品供一键切换。
+function chartEmpty(p, visible) {
+ const others = visible.filter(x => x.id !== p?.id && x.count > 0).slice(0, 3);
+ const today = dayString(), start = shiftDay(today, -6);
+ const inWindow = data.quotes.filter(q => q.status === 'approved' && !q.deleted_at && Number(q.price) > 0 && q.quoted_on >= start && q.valid_until >= today);
+ const blocked = inWindow.filter(q => !hasComparableSpec(product(q.product_id)));
+ const approved = data.quotes.filter(q => q.status === 'approved' && !q.deleted_at);
+ const lastDay = approved.map(q => q.quoted_on).sort().at(-1);
+ const gap = lastDay ? Math.round((Date.parse(today) - Date.parse(lastDay)) / 86400000) : null;
+ let why;
+ if (inWindow.length && blocked.length === inWindow.length) {
+  why = `最近 7 天入库的 ${blocked.length} 条报价规格为「待核实」，补齐规格后才会计入走势`;
+ } else if (lastDay) {
+  why = `最近一次入库是 ${lastDay.slice(5).replace('-', '/')}${gap === 0 ? '（今天）' : `（${gap} 天前）`}${gap >= 7 ? '，已超出 7 天窗口' : ''}`;
+ } else {
+  why = '还没有任何已入库报价';
+ }
+ return `<div class="chart-empty"><p><strong>${esc(p ? productLabel(p) : '当前产品')}</strong> 最近 7 天没有可用样本</p><p class="subtle">走势只统计「已核实入库、在有效期内、且规格可比」的报价；${esc(why)}。</p>${others.length ? `<div class="chart-pick"><span class="subtle">这 7 天有样本：</span>${others.map(x => `<button data-chart-pick="${esc(x.id)}">${esc(x.name)} · ${x.count} 条</button>`).join('')}</div>` : ''}</div>`;
+}
 function chartPanel() {
- if(!product(state.chartProduct)||excludedCats().has(product(state.chartProduct)?.category)) state.chartProduct=visibleProducts()[0]?.id;
+ const visible = weekSamples();
+ const current = product(state.chartProduct);
+ // 首次进入、或选中的产品/品类已下线时，优先落在真有样本的产品上——否则打开总览就是一张空图。
+ // 用户手动选过的产品不抢，只在空图上提示可切换的样本。
+ if (!current || excludedCats().has(current.category)) {
+  state.chartProduct = (visible.find(x => x.count > 0) || visible[0])?.id;
+ }
  const p=product(state.chartProduct); const values=trend(data.quotes,queryOptions(p?.id),7);
  const valid=values.filter(x=>x.average!=null); const s=stats(p?.id);
  const low=valid.length?Math.min(...valid.map(x=>x.average))-.3:0, high=valid.length?Math.max(...valid.map(x=>x.average))+.3:1;
  const y=v=>130-(v-low)/(high-low)*105;
  let lines=[],segment=[];
  values.forEach((v,i)=>{if(v.average==null){if(segment.length)lines.push(segment);segment=[];} else segment.push(`${43+i*440/6},${y(v.average)}`);}); if(segment.length)lines.push(segment);
- const svg=valid.length?`<svg class="chart" viewBox="0 0 510 165" role="img" aria-label="${esc(productLabel(p))}近七日均价"><title>${values.map(v=>`${v.day}：${money(v.average)}元/kg`).join('；')}</title>${[0,1,2].map(i=>{const n=low+(high-low)*i/2;return `<line x1="43" y1="${y(n)}" x2="486" y2="${y(n)}" stroke="#edf1ee" stroke-dasharray="3 4"/><text x="0" y="${y(n)+4}">${money(n)}</text>`;}).join('')}${lines.map(l=>`<polyline points="${l.join(' ')}" fill="none" stroke="#368b65" stroke-width="2.2" stroke-linejoin="round"/>`).join('')}${values.map((v,i)=>`<text x="${43+i*440/6}" y="157" text-anchor="middle">${v.day.slice(5).replace('-','/')}</text>${v.average!=null?`<circle cx="${43+i*440/6}" cy="${y(v.average)}" r="3" fill="white" stroke="#368b65" stroke-width="1.8"><title>${v.day} ${money(v.average)}元/kg</title></circle>`:''}`).join('')}</svg>`:'<div class="chart-empty">暂无有效报价，录入后即可查看走势</div>';
+ const svg=valid.length?`<svg class="chart" viewBox="0 0 510 165" role="img" aria-label="${esc(productLabel(p))}近七日均价"><title>${values.map(v=>`${v.day}：${money(v.average)}元/kg`).join('；')}</title>${[0,1,2].map(i=>{const n=low+(high-low)*i/2;return `<line x1="43" y1="${y(n)}" x2="486" y2="${y(n)}" stroke="#edf1ee" stroke-dasharray="3 4"/><text x="0" y="${y(n)+4}">${money(n)}</text>`;}).join('')}${lines.map(l=>`<polyline points="${l.join(' ')}" fill="none" stroke="#368b65" stroke-width="2.2" stroke-linejoin="round"/>`).join('')}${values.map((v,i)=>`<text x="${43+i*440/6}" y="157" text-anchor="middle">${v.day.slice(5).replace('-','/')}</text>${v.average!=null?`<circle cx="${43+i*440/6}" cy="${y(v.average)}" r="3" fill="white" stroke="#368b65" stroke-width="1.8"><title>${v.day} ${money(v.average)}元/kg</title></circle>`:''}`).join('')}</svg>`:chartEmpty(p,visible);
  return `<section class="panel"><div class="panel-head"><h2>均价走势 <small>最近 7 日</small></h2><div class="heading-actions"><button class="text-btn" data-chart="${esc(state.chartProduct)}">可比均价 ${icon('arrow',12)}</button><select aria-label="走势产品" data-filter="chartProduct">${options(visibleProducts().map(p=>[p.id,`${p.name} · ${p.state} · ${p.spec}`]),state.chartProduct)}</select></div></div><div class="chart-wrap"><div class="chart-summary"><strong>${money(s.average)}</strong><span class="subtle">元 / kg</span>${deltaFor(p?.id)}</div>${svg}</div><div class="chart-legend"><i class="dot"></i>${esc(productLabel(p))} · ${esc(bases[state.basis])}</div></section>`;
 }
 // 可比均价：解决「不同重量没法比」的问题 —— 只在同一规格内部比较，绝不跨规格混算。
@@ -409,6 +440,7 @@ document.addEventListener('click',event=>{
  if(el.dataset.page) {location.hash=el.dataset.page;return;}
  if(el.dataset.settingsView) {state.pageNumber=1;location.hash=`settings/${el.dataset.settingsView}`;return;}
  if(el.dataset.category!==undefined){changeValue({category:el.dataset.category,product:''});return;}
+ if(el.dataset.chartPick){state.chartProduct=el.dataset.chartPick;state.pageNumber=1;render();return;}
  if(el.dataset.chart){state.chartProduct=el.dataset.chart;state.pageNumber=1;render();comparableDialog(el.dataset.chart);return;}
  if(el.dataset.compare){state.product=el.dataset.compare;state.category=product(state.product)?.category||'';state.search='';state.source='';state.pageNumber=1;state.page='compare';location.hash='compare';render();return;}
  if(el.dataset.lead){quickConvertDialog(data.leads.find(l=>l.id===el.dataset.lead));return;}

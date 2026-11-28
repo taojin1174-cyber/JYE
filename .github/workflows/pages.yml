@@ -29,6 +29,9 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
+      # 实测两次出现「产物已上传成功，但 Publish 立刻查不到 github-pages」，
+      # 补一个短暂等待，避开产物列表的最终一致性延迟。
+      - run: sleep 5
       - name: Publish
         id: deploy
         uses: actions/deploy-pages@v5
